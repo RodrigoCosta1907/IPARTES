@@ -1343,7 +1343,7 @@ td.hi { color: var(--text); font-weight: 500; }
       </select></div>
     <div class="filter-group"><span class="filter-label">Status</span>
       <select id="fStatus" onchange="applyFilters()"><option value="">Todos</option>
-        <option>Em Análise</option><option>Proposta Enviada</option><option>Ganho</option><option>Perdido</option><option>Cancelado</option>
+        <option>Não Interessa</option><option>Cotando</option><option>Orçamento Enviado</option><option>Pedido Recebido</option><option>Perdido</option><option>Cancelado</option><option>Sem Cotação</option>
       </select></div>
     <div class="filter-group"><span class="filter-label">Venda</span>
       <select id="fVenda" onchange="applyFilters()"><option value="">Todos</option>
@@ -1577,7 +1577,7 @@ function saveClients(list) {
 // Alias for backward compat — always fresh
 let CLIENTS = getClients();
 const PORTALS = ['COUPA', 'MERCADO ELETRONICO', 'FAIRMARKIT', 'PETRONECT', 'CAPTURAME', 'E-MAIL', 'ENGIE'];
-const STATUS_OPTS = ['Em Análise','Proposta Enviada','Ganho','Perdido','Cancelado'];
+const STATUS_OPTS = ['Não Interessa','Cotando','Orçamento Enviado','Pedido Recebido','Perdido','Cancelado','Sem Cotação'];
 const MONTHS = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 const CHART_COLORS = ['#1d4ed8','#ea580c','#15803d','#b45309','#475569','#7c3aed','#0891b2','#be123c'];
 const IMPORT_COLS = {
@@ -1724,6 +1724,8 @@ async function loadFromSupabase() {
     if (currentTab === 'overview') renderOverview();
     else if (currentTab === 'vendas') renderVendasModule();
     else renderClientTab(currentTab);
+    // Aplica regra automática de Perdido após carregar dados
+    setTimeout(() => aplicarRegraPerdido(), 1000);
   } catch (err) {
     showToast('Erro ao carregar: ' + err.message, '#dc2626');
     markSyncError(err.message);
@@ -2155,8 +2157,8 @@ async function addRecord(client) {
     numero: document.getElementById(id+'-numero')?.value||'',
     portal: document.getElementById(id+'-portal')?.value||'',
     valor: document.getElementById(id+'-valor')?.value||'',
-    status: document.getElementById(id+'-status')?.value||'',
-    participamos: document.getElementById(id+'-participamos')?.value||'',
+    status: document.getElementById(id+'-status')?.value||'Cotando',
+    participamos: document.getElementById(id+'-participamos')?.value||'NÃO',
     venda: document.getElementById(id+'-venda')?.value||'',
     dataPedido: document.getElementById(id+'-dataPedido')?.value||'',
     responsavel: document.getElementById(id+'-responsavel')?.value||'',
@@ -2401,8 +2403,8 @@ function downloadTemplate(client) {
   const headers = Object.values(IMPORT_COLS);
   const ws = XLSX.utils.aoa_to_sheet([
     headers,
-    ['04','2025','OPP-001','COUPA','15000.00','Proposta Enviada','SIM','NÃO','','Exemplo de registro'],
-    ['04','2025','OPP-002','FAIRMARKIT','32000.00','Ganho','SIM','SIM','2025-05-10','Pedido entregue']
+    ['04','2025','OPP-001','COUPA','15000.00','Cotando','NÃO','NÃO','','Exemplo de registro'],
+    ['04','2025','OPP-002','FAIRMARKIT','32000.00','Pedido Recebido','SIM','SIM','2025-05-10','Pedido entregue']
   ]);
   ws['!cols'] = headers.map(h => ({wch: Math.max(h.length, 14)}));
   XLSX.utils.book_append_sheet(wb, ws, 'Oportunidades');
@@ -2432,7 +2434,7 @@ function exportToExcel(records, filename, customHeaders, customRows) {
 // ══════════════════════════════════════════════════
 // RENDER CLIENT TAB
 // ══════════════════════════════════════════════════
-const SB_MAP = {'Ganho':'b-green','Perdido':'b-slate','Em Análise':'b-blue','Proposta Enviada':'b-amber','Cancelado':'b-slate'};
+const SB_MAP = {'Pedido Recebido':'b-green','Perdido':'b-slate','Cotando':'b-blue','Orçamento Enviado':'b-amber','Cancelado':'b-slate','Não Interessa':'b-slate','Sem Cotação':'b-slate'};
 
 function renderClientTab(client) {
   const slug = slugify(client);
@@ -2481,10 +2483,10 @@ function rowHtml(r, client) {
   const ai = r.alertaMes ? '<span class="alert-icon" title="Meses diferentes">⚠</span>' : '';
   const sb = SB_MAP[r.status] || 'b-slate';
   const rowCls = r.alertaMes ? 'alert-row' :
-    r.status==='Ganho'           ? 'row-ganho'    :
-    r.status==='Perdido'         ? 'row-perdido'  :
-    r.status==='Em Análise'      ? 'row-analise'  :
-    r.status==='Proposta Enviada'? 'row-proposta'  : '';
+    r.status==='Pedido Recebido'  ? 'row-ganho'    :
+    r.status==='Perdido'          ? 'row-perdido'  :
+    r.status==='Cotando'          ? 'row-analise'  :
+    r.status==='Orçamento Enviado'? 'row-proposta'  : '';
   return `<tr class="${rowCls}">
     ${client === 'Outros' ? `<td class="hi">${r.subcliente||'—'}</td>` : ''}
     <td class="hi">${r.mes||'—'}/${r.ano||'—'}${ai}</td>
@@ -2668,7 +2670,7 @@ function renderInsights(filtered) {
     insights.push({icon:'⏱',title:'Ciclo de Vendas',text:`Média de ${avg} dias. Máximo: ${Math.max(...ciclos)} dias.`});
   }
 
-  const pending = filtered.filter(r=>r.status==='Em Análise'||r.status==='Proposta Enviada').length;
+  const pending = filtered.filter(r=>r.status==='Cotando'||r.status==='Orçamento Enviado').length;
   if (pending>0) insights.push({icon:'⏳',title:'Pipeline Ativo',text:`${pending} oportunidade(s) em andamento.`});
 
   if (!insights.length) insights.push({icon:'💡',title:'Sem dados',text:'Registre oportunidades para ver insights automáticos.'});
@@ -2953,7 +2955,7 @@ function renderCharts(filtered) {
   dc('fn');
   const fT=filtered.length;
   const fP=filtered.filter(r=>r.participamos==='SIM').length;
-  const fPr=filtered.filter(r=>r.status==='Proposta Enviada'||r.status==='Ganho').length;
+  const fPr=filtered.filter(r=>r.status==='Orçamento Enviado'||r.status==='Pedido Recebido').length;
   const fV=filtered.filter(r=>r.venda==='SIM').length;
   const fnData = [fT,fP,fPr,fV];
   const fnLabels = ['Oportunidades','Participações','Propostas / Ganhos','Vendas'];
@@ -3562,17 +3564,24 @@ setInterval(async () => {
 // INLINE GRID — Lançamento rápido estilo planilha
 // ════════════════════════════════════════════════
 const GRID_PORTALS  = ['COUPA', 'MERCADO ELETRONICO', 'FAIRMARKIT', 'PETRONECT', 'CAPTURAME', 'E-MAIL', 'ENGIE'];
-const GRID_STATUS   = ['Em Análise','Proposta Enviada','Ganho','Perdido','Cancelado'];
+const GRID_STATUS   = ['Não Interessa','Cotando','Orçamento Enviado','Pedido Recebido','Perdido','Cancelado','Sem Cotação'];
 const STATUS_COLORS = {
-  'Em Análise':     '#1d4ed8',
-  'Proposta Enviada':'#b45309',
-  'Ganho':          '#15803d',
-  'Perdido':        '#64748b',
-  'Cancelado':      '#94a3b8',
+  'Não Interessa':    '#94a3b8',
+  'Cotando':          '#1d4ed8',
+  'Orçamento Enviado':'#b45309',
+  'Pedido Recebido':  '#15803d',
+  'Perdido':          '#64748b',
+  'Cancelado':        '#475569',
+  'Sem Cotação':      '#cbd5e1',
 };
 
 function todayStr() {
   return new Date().toISOString().slice(0,10);
+}
+function prazo7dias() {
+  const d = new Date();
+  d.setDate(d.getDate() + 7);
+  return d.toISOString().slice(0,10);
 }
 function currentMes() {
   return String(new Date().getMonth()+1).padStart(2,'0');
@@ -3678,14 +3687,13 @@ function addGridRow(client) {
     dataLancamento: todayStr(),
     portal:         'COUPA',
     numero:         '',
-    finaliza:       '',
+    finaliza:       prazo7dias(),
     valor:          '',
-    status:         'Em Análise',
-    participamos:   'SIM',
+    status:         'Cotando',
+    participamos:   'NÃO',
     venda:          'NÃO',
     dataPedido:     '',
     obs:            '',
-    finaliza:       '',
   };
   computeRecord(newRec);
 
@@ -3891,7 +3899,7 @@ function vendaToRow(v){
 }
 
 async function checkCreateVenda(client, rec) {
-  if (rec.status !== 'Ganho') return;
+  if (rec.status !== 'Pedido Recebido') return;
   const existing = getAllVendas().find(v => v.numOportunidade===rec.numero && v.cliente===client);
   if (existing) return;
   const venda = { id:genId(), cliente:client, numOportunidade:rec.numero, portal:rec.portal||'',
@@ -4577,6 +4585,47 @@ function buildReportHTML(dados, analise, today) {
 }
 
 
+
+// ════════════════════════════════════════════════
+// REGRA AUTOMÁTICA — Perdido após 15 dias do prazo
+// ════════════════════════════════════════════════
+async function aplicarRegraPerdido() {
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  CLIENTS = getClients();
+  let totalAtualizado = 0;
+
+  for (const client of CLIENTS) {
+    const recs = data[client] || [];
+    for (const rec of recs) {
+      // Só aplica se: tem prazo finalizar, status não é final e não é venda
+      if (!rec.finaliza) continue;
+      if (rec.status === 'Perdido' || rec.status === 'Pedido Recebido' ||
+          rec.status === 'Cancelado' || rec.venda === 'SIM') continue;
+
+      const prazo = new Date(rec.finaliza); prazo.setHours(0,0,0,0);
+      const diasVencido = Math.ceil((hoje - prazo) / 86400000);
+
+      if (diasVencido > 15) {
+        rec.status = 'Perdido';
+        computeRecord(rec);
+        totalAtualizado++;
+
+        // Atualiza no Supabase silenciosamente
+        if (useSupabase) {
+          try { await updateInSupabase(client, rec); } catch(e) {}
+        }
+      }
+    }
+  }
+
+  if (totalAtualizado > 0) {
+    saveLocal();
+    showToast(`⚠ ${totalAtualizado} oportunidade(s) marcada(s) como Perdida (prazo +15 dias)`, '#b45309');
+    if (currentTab === 'overview') renderOverview();
+    else renderClientTab(currentTab);
+  }
+}
+
 // ════════════════════════════════════════════════
 // SYNC INDICATOR
 // ════════════════════════════════════════════════
@@ -4651,6 +4700,8 @@ async function init() {
   buildClientTabs();
   renderNav();
   renderOverview();
+  // Verifica regra de perdido no carregamento local
+  setTimeout(() => aplicarRegraPerdido(), 2000);
   // Restore last sync time
   const lastSync = localStorage.getItem('ipartes_last_sync');
   if (lastSync) {
