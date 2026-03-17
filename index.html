@@ -1194,6 +1194,57 @@ td.hi { color: var(--text); font-weight: 500; }
     .no-print { display: none !important; }
   }
 
+
+  /* ── REGISTRO EM MASSA ── */
+  .grid-bulk-footer {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border-top: 2px solid var(--border);
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .grid-bulk-info {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12px; color: var(--text3);
+  }
+  .grid-pending-count {
+    background: var(--orange);
+    color: #fff;
+    font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 10px;
+    min-width: 20px; text-align: center;
+  }
+  .btn-bulk-register {
+    background: linear-gradient(135deg, #15803d, #16a34a);
+    border: none; color: #fff;
+    font-family: var(--font); font-size: 13px; font-weight: 700;
+    padding: 9px 22px; border-radius: var(--radius);
+    cursor: pointer; transition: all .2s;
+    display: flex; align-items: center; gap: 7px;
+    box-shadow: 0 2px 8px rgba(21,128,61,.25);
+  }
+  .btn-bulk-register:hover {
+    opacity: .9; transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(21,128,61,.3);
+  }
+  .btn-bulk-register:disabled {
+    opacity: .4; cursor: not-allowed; transform: none;
+  }
+  .btn-bulk-clear {
+    background: transparent; border: 1px solid var(--border2);
+    color: var(--text3); font-family: var(--font);
+    font-size: 12px; padding: 7px 14px;
+    border-radius: var(--radius); cursor: pointer;
+    transition: all .15s;
+  }
+  .btn-bulk-clear:hover { border-color: #ef4444; color: #ef4444; }
+
+  .grid-row-pending { background: #fffbeb !important; }
+  .grid-row-saved   { background: #f0fdf4 !important; opacity: .7; }
+  .grid-row-error   { background: #fef2f2 !important; }
+
 </style>
 </head>
 <body>
@@ -1576,6 +1627,32 @@ function saveClients(list) {
 }
 // Alias for backward compat — always fresh
 let CLIENTS = getClients();
+
+// Responsável padrão por cliente
+const RESPONSAVEL_MAP = {
+  'Vale Ferrosos': 'Rodrigo',
+  'Vale Metals':   'Rodrigo',
+  'Alcoa':         'Rodrigo',
+  'Suzano':        'Rodrigo',
+  'Axia Energia':  'Rodrigo',
+  'BW Energy':     'Rodrigo',
+  'Petrobras':     'Lenon',
+  'Transpetro':    'Lenon',
+  'Eneva':         'Lenon',
+  'Engie':         'Lenon',
+};
+
+function getResponsavelPadrao(client) {
+  // Busca pelo nome exato ou por correspondência parcial (case insensitive)
+  if (!client) return '';
+  const exact = RESPONSAVEL_MAP[client];
+  if (exact) return exact;
+  const key = Object.keys(RESPONSAVEL_MAP).find(k =>
+    client.toLowerCase().includes(k.toLowerCase()) ||
+    k.toLowerCase().includes(client.toLowerCase())
+  );
+  return key ? RESPONSAVEL_MAP[key] : '';
+}
 const PORTALS = ['COUPA', 'MERCADO ELETRONICO', 'FAIRMARKIT', 'PETRONECT', 'CAPTURAME', 'E-MAIL', 'ENGIE'];
 const STATUS_OPTS = ['Não Interessa','Cotando','Orçamento Enviado','Pedido Recebido','Perdido','Cancelado','Sem Cotação'];
 const MONTHS = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
@@ -1971,15 +2048,36 @@ function buildClientTabs() {
                 <th style="width:150px">Status</th>
                 <th style="width:100px">Particip.</th>
                 <th style="width:85px">Venda</th>
+                <th style="width:90px">Resp.</th>
                 <th style="width:80px">Ações</th>
               </tr>
             </thead>
             <tbody id="grid-body-${slug}"></tbody>
           </table>
         </div>
-        <div class="grid-add-row" onclick="addGridRow('${client}')">
-          <span class="plus">＋</span>
-          <span>Nova oportunidade</span>
+        <!-- Bulk footer -->
+        <div class="grid-bulk-footer" id="grid-bulk-footer-${slug}">
+          <div class="grid-bulk-info">
+            <button class="grid-add-row" onclick="addGridRow('${client}')"
+              style="border:none;cursor:pointer;display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:var(--radius);background:var(--blue-light);color:var(--blue);font-family:var(--font);font-size:12px;font-weight:600;transition:background .15s">
+              <span style="font-size:16px">＋</span>
+              <span>Nova linha</span>
+            </button>
+            <span id="grid-pending-info-${slug}" style="display:none">
+              <span class="grid-pending-count" id="grid-pending-count-${slug}">0</span>
+              linha(s) aguardando registro
+            </span>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn-bulk-clear" id="grid-btn-clear-${slug}"
+              onclick="clearGridRows('${client}')" style="display:none">
+              ✕ Limpar rascunhos
+            </button>
+            <button class="btn-bulk-register" id="grid-btn-register-${slug}"
+              onclick="registerAllGridRows('${client}')" disabled>
+              ✅ Registrar Tudo
+            </button>
+          </div>
         </div>
       </div>
 
@@ -2127,7 +2225,7 @@ function buildFormFields(client, rec, forEdit) {
       <label>Responsável</label>
       <select id="${id}-responsavel">
         <option value="">—</option>
-        ${['Luiz','Lenon','Rodrigo'].map(r=>`<option value="${r}" ${(v.responsavel||'')===r?'selected':''}>${r}</option>`).join('')}
+        ${['Luiz','Lenon','Rodrigo'].map(r=>`<option value="${r}" ${(v.responsavel||getResponsavelPadrao(client)||'')===r?'selected':''}>${r}</option>`).join('')}
       </select>
     </div>
     <div class="form-group" style="grid-column:1/-1">
@@ -2161,7 +2259,8 @@ async function addRecord(client) {
     participamos: document.getElementById(id+'-participamos')?.value||'NÃO',
     venda: document.getElementById(id+'-venda')?.value||'',
     dataPedido: document.getElementById(id+'-dataPedido')?.value||'',
-    responsavel: document.getElementById(id+'-responsavel')?.value||'',
+    responsavel: document.getElementById(id+'-responsavel')?.value ||
+                 getResponsavelPadrao(client) || '',
     obs: document.getElementById(id+'-obs')?.value||''
   };
   if (!rec.mes || !rec.ano || !rec.numero) { showToast('⚠ Preencha Mês, Ano e Nº','#b45309'); return; }
@@ -3619,6 +3718,7 @@ function renderGrid(client) {
 
   // Attach events
   attachGridEvents(slug, client);
+  updateBulkFooter(slug);
 }
 
 function gridRowHtml(r, client, rowNum, isNew) {
@@ -3665,6 +3765,12 @@ function gridRowHtml(r, client, rowNum, isNew) {
         <option value="NÃO" ${r.venda==='NÃO'?'selected':''}>NÃO</option>
       </select>
     </td>
+    <td class="grid-cell" style="min-width:90px">
+      <select data-field="responsavel" style="font-size:11px;font-weight:600;color:${r.responsavel==='Rodrigo'?'var(--orange)':r.responsavel==='Lenon'?'var(--green)':r.responsavel==='Luiz'?'var(--blue)':'var(--text3)'}">
+        <option value="" ${!r.responsavel?'selected':''}>—</option>
+        ${['Luiz','Lenon','Rodrigo'].map(n=>`<option value="${n}" ${r.responsavel===n?'selected':''}>${n}</option>`).join('')}
+      </select>
+    </td>
     <td class="grid-cell" style="min-width:80px">
       <div class="grid-row-actions">
         <button class="btn-grid-save" onclick="saveGridRow('${id}','${client}')">✓</button>
@@ -3674,43 +3780,7 @@ function gridRowHtml(r, client, rowNum, isNew) {
   </tr>`;
 }
 
-// Add new empty row at top of grid
-function addGridRow(client) {
-  const slug  = slugify(client);
-  const tbody = document.getElementById('grid-body-'+slug);
-  if (!tbody) return;
-
-  const newRec = {
-    id:             genId(),
-    mes:            currentMes(),
-    ano:            currentAno(),
-    dataLancamento: todayStr(),
-    portal:         'COUPA',
-    numero:         '',
-    finaliza:       prazo7dias(),
-    valor:          '',
-    status:         'Cotando',
-    participamos:   'NÃO',
-    venda:          'NÃO',
-    dataPedido:     '',
-    obs:            '',
-  };
-  computeRecord(newRec);
-
-  // Insert at top of DOM
-  const tr = document.createElement('tr');
-  tr.className = 'row-new';
-  tr.dataset.id = newRec.id;
-  tr.dataset.client = client;
-  tr.innerHTML = gridRowHtml(newRec, client, '★', true).replace(/^<tr[^>]*>/,'');
-  tbody.insertBefore(tr, tbody.firstChild);
-
-  // Focus first editable cell (numero)
-  const numInput = tr.querySelector('input[data-field="numero"]');
-  if (numInput) { numInput.focus(); numInput.select(); }
-
-  attachGridEvents(slug, client);
-}
+// addGridRow — defined in bulk register module above
 
 // Save a grid row to data + Supabase
 async function saveGridRow(id, client) {
@@ -3758,6 +3828,7 @@ async function saveGridRow(id, client) {
   renderClientTab(client);
   renderGrid(client);
   if (currentTab === 'overview') renderOverview();
+  updateBulkFooter(slugify(client));
   showToast('✓ Oportunidade salva!');
 }
 
@@ -3793,6 +3864,7 @@ function getRecFromRow(tr, id, client) {
     participamos:   get('participamos'),
     venda:          get('venda'),
     dataPedido:     get('venda')==='SIM' ? get('dataPedido')||'' : '',
+    responsavel:    get('responsavel') || getResponsavelPadrao(client),
     obs:            '',
   };
 }
@@ -4624,6 +4696,227 @@ async function aplicarRegraPerdido() {
     if (currentTab === 'overview') renderOverview();
     else renderClientTab(currentTab);
   }
+}
+
+
+// ════════════════════════════════════════════════
+// REGISTRO EM MASSA
+// ════════════════════════════════════════════════
+
+// Track pending (unsaved) rows per client
+const pendingGridRows = {}; // { slug: Set of row IDs }
+
+function getPendingCount(slug) {
+  const tbody = document.getElementById('grid-body-'+slug);
+  if (!tbody) return 0;
+  return tbody.querySelectorAll('tr.grid-row-pending, tr.row-new').length;
+}
+
+function updateBulkFooter(slug) {
+  const count    = getPendingCount(slug);
+  const countEl  = document.getElementById('grid-pending-count-'+slug);
+  const infoEl   = document.getElementById('grid-pending-info-'+slug);
+  const btnReg   = document.getElementById('grid-btn-register-'+slug);
+  const btnClear = document.getElementById('grid-btn-clear-'+slug);
+
+  if (countEl) countEl.textContent = count;
+  if (infoEl)  infoEl.style.display   = count > 0 ? '' : 'none';
+  if (btnReg)  btnReg.disabled        = count === 0;
+  if (btnClear)btnClear.style.display = count > 0 ? '' : 'none';
+
+  // Update button text
+  if (btnReg) {
+    btnReg.innerHTML = count > 0
+      ? `✅ Registrar Tudo <span style="background:rgba(255,255,255,.25);border-radius:10px;padding:1px 8px;font-size:11px">${count}</span>`
+      : '✅ Registrar Tudo';
+  }
+}
+
+// Override addGridRow to mark rows as pending and update counter
+const _origAddGridRow = addGridRow;
+function addGridRow(client) {
+  const slug  = slugify(client);
+  const tbody = document.getElementById('grid-body-'+slug);
+  if (!tbody) return;
+
+  const newRec = {
+    id:             genId(),
+    mes:            currentMes(),
+    ano:            currentAno(),
+    dataLancamento: todayStr(),
+    portal:         'COUPA',
+    numero:         '',
+    finaliza:       prazo7dias(),
+    valor:          '',
+    status:         'Cotando',
+    participamos:   'NÃO',
+    venda:          'NÃO',
+    dataPedido:     '',
+    responsavel:    getResponsavelPadrao(client),
+    obs:            '',
+  };
+  computeRecord(newRec);
+
+  const tr = document.createElement('tr');
+  tr.className = 'row-new grid-row-pending';
+  tr.dataset.id = newRec.id;
+  tr.dataset.client = client;
+  tr.innerHTML = gridRowHtml(newRec, client, '★', true).replace(/^<tr[^>]*>/, '');
+  tbody.insertBefore(tr, tbody.firstChild);
+
+  // Focus numero field
+  const numInput = tr.querySelector('input[data-field="numero"]');
+  if (numInput) { numInput.focus(); numInput.select(); }
+
+  attachGridEvents(slug, client);
+  updateBulkFooter(slug);
+}
+
+// REGISTER ALL — save all pending rows at once
+async function registerAllGridRows(client) {
+  const slug   = slugify(client);
+  const tbody  = document.getElementById('grid-body-'+slug);
+  const btnReg = document.getElementById('grid-btn-register-'+slug);
+  if (!tbody || !btnReg) return;
+
+  const pendingRows = Array.from(tbody.querySelectorAll('tr.grid-row-pending, tr.row-new'));
+  if (pendingRows.length === 0) return;
+
+  // Validate all rows first
+  const toSave = [];
+  let hasErrors = false;
+
+  pendingRows.forEach(tr => {
+    const rec = getRecFromRow(tr, tr.dataset.id, client);
+    if (!rec.numero) {
+      tr.classList.add('grid-row-error');
+      tr.classList.remove('grid-row-pending','row-new');
+      // Highlight the empty numero field
+      const numEl = tr.querySelector('input[data-field="numero"]');
+      if (numEl) {
+        numEl.style.boxShadow = 'inset 0 0 0 2px #ef4444';
+        numEl.focus();
+      }
+      hasErrors = true;
+    } else {
+      tr.classList.remove('grid-row-error');
+      if (numEl) numEl.style.boxShadow = '';
+      toSave.push({ tr, rec });
+    }
+  });
+
+  if (hasErrors) {
+    showToast('⚠ Preencha o Nº da oportunidade nas linhas destacadas em vermelho', '#b45309');
+    updateBulkFooter(slug);
+    return;
+  }
+
+  // Disable button while saving
+  btnReg.disabled = true;
+  btnReg.innerHTML = '⏳ Salvando…';
+
+  let saved = 0;
+  let errors = 0;
+
+  // Save all to local data first
+  toSave.forEach(({ rec }) => {
+    computeRecord(rec);
+    if (!data[client]) data[client] = [];
+    data[client].push(rec);
+  });
+  saveLocal();
+
+  // Then batch insert to Supabase
+  if (useSupabase) {
+    try {
+      markSyncing();
+      // Insert in batches of 100
+      const BATCH = 100;
+      for (let i = 0; i < toSave.length; i += BATCH) {
+        const batch = toSave.slice(i, i + BATCH);
+        await insertBatchToSupabase(client, batch.map(x => x.rec));
+      }
+      markSynced();
+    } catch(e) {
+      markSyncError(e.message);
+      showToast('✗ Erro ao salvar no Supabase: ' + e.message, '#dc2626');
+      btnReg.disabled = false;
+      btnReg.innerHTML = '✅ Registrar Tudo';
+      return;
+    }
+  }
+
+  // Mark rows as saved visually
+  toSave.forEach(({ tr, rec }) => {
+    tr.classList.remove('grid-row-pending','row-new');
+    tr.classList.add('grid-row-saved');
+    // Check auto-create venda
+    checkCreateVenda(client, rec);
+    saved++;
+  });
+
+  // Remove saved rows after brief delay and re-render
+  setTimeout(() => {
+    renderClientTab(client);
+    renderGrid(client);
+    if (currentTab === 'overview') renderOverview();
+    updateBulkFooter(slug);
+  }, 800);
+
+  showToast(`✅ ${saved} oportunidade(s) registrada(s) com sucesso!`, 'var(--green)');
+}
+
+// CLEAR all pending rows
+function clearGridRows(client) {
+  if (!confirm(`Remover todos os rascunhos não salvos?`)) return;
+  const slug  = slugify(client);
+  const tbody = document.getElementById('grid-body-'+slug);
+  if (!tbody) return;
+  tbody.querySelectorAll('tr.grid-row-pending, tr.row-new').forEach(tr => tr.remove());
+  updateBulkFooter(slug);
+}
+
+// Hook: update counter whenever a row input changes
+function attachGridEvents(slug, client) {
+  const tbody = document.getElementById('grid-body-'+slug);
+  if (!tbody) return;
+
+  tbody.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const tr = el.closest('tr');
+        // On Enter in last column, add new row; otherwise move to next cell
+        const inputs = Array.from(tr.querySelectorAll('input, select'));
+        const idx = inputs.indexOf(el);
+        if (idx < inputs.length - 1) {
+          inputs[idx + 1].focus();
+        } else {
+          // Last field — add new row automatically
+          addGridRow(client);
+        }
+      }
+      if (e.key === 'Escape') {
+        const tr = el.closest('tr');
+        if (tr?.classList.contains('row-new') || tr?.classList.contains('grid-row-pending')) {
+          tr.remove();
+          updateBulkFooter(slug);
+        }
+      }
+      if (e.key === 'Tab') {
+        // After tabbing, update counter
+        setTimeout(() => updateBulkFooter(slug), 50);
+      }
+    });
+
+    el.addEventListener('input', () => updateBulkFooter(slug));
+    el.addEventListener('change', () => {
+      updateBulkFooter(slug);
+      if (el.dataset.field === 'status') {
+        el.style.color = STATUS_COLORS[el.value] || '#64748b';
+      }
+    });
+  });
 }
 
 // ════════════════════════════════════════════════
