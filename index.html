@@ -1576,7 +1576,7 @@ function saveClients(list) {
 }
 // Alias for backward compat — always fresh
 let CLIENTS = getClients();
-const PORTALS = ['Ariba','Licitação','Direto','E-mail','Outro'];
+const PORTALS = ['COUPA', 'MERCADO ELETRONICO', 'FAIRMARKIT', 'PETRONECT', 'CAPTURAME', 'E-MAIL', 'ENGIE'];
 const STATUS_OPTS = ['Em Análise','Proposta Enviada','Ganho','Perdido','Cancelado'];
 const MONTHS = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 const CHART_COLORS = ['#1d4ed8','#ea580c','#15803d','#b45309','#475569','#7c3aed','#0891b2','#be123c'];
@@ -2401,8 +2401,8 @@ function downloadTemplate(client) {
   const headers = Object.values(IMPORT_COLS);
   const ws = XLSX.utils.aoa_to_sheet([
     headers,
-    ['04','2025','OPP-001','Ariba','15000.00','Proposta Enviada','SIM','NÃO','','Exemplo de registro'],
-    ['04','2025','OPP-002','Licitação','32000.00','Ganho','SIM','SIM','2025-05-10','Pedido entregue']
+    ['04','2025','OPP-001','COUPA','15000.00','Proposta Enviada','SIM','NÃO','','Exemplo de registro'],
+    ['04','2025','OPP-002','FAIRMARKIT','32000.00','Ganho','SIM','SIM','2025-05-10','Pedido entregue']
   ]);
   ws['!cols'] = headers.map(h => ({wch: Math.max(h.length, 14)}));
   XLSX.utils.book_append_sheet(wb, ws, 'Oportunidades');
@@ -3561,7 +3561,7 @@ setInterval(async () => {
 // ════════════════════════════════════════════════
 // INLINE GRID — Lançamento rápido estilo planilha
 // ════════════════════════════════════════════════
-const GRID_PORTALS  = ['COUPA','Ariba','Licitação','Direto','E-mail','SUPER BUY','Outro'];
+const GRID_PORTALS  = ['COUPA', 'MERCADO ELETRONICO', 'FAIRMARKIT', 'PETRONECT', 'CAPTURAME', 'E-MAIL', 'ENGIE'];
 const GRID_STATUS   = ['Em Análise','Proposta Enviada','Ganho','Perdido','Cancelado'];
 const STATUS_COLORS = {
   'Em Análise':     '#1d4ed8',
@@ -4133,7 +4133,11 @@ function buildVendaForm(v){
   return`
     <div class="form-group"><label>Cliente</label><select id="vf-cliente"><option value="">—</option>${cOpts}</select></div>
     <div class="form-group"><label>Nº Oportunidade</label><input type="text" id="vf-numOportunidade" value="${sanitize(v.numOportunidade||'')}" placeholder="Ex: 137321"></div>
-    <div class="form-group"><label>Portal</label><input type="text" id="vf-portal" value="${sanitize(v.portal||'')}"></div>
+    <div class="form-group"><label>Portal</label>
+      <select id="vf-portal">
+        <option value="">—</option>
+        ${['COUPA','MERCADO ELETRONICO','FAIRMARKIT','PETRONECT','CAPTURAME','E-MAIL','ENGIE'].map(p=>`<option value="${p}" ${(v.portal||'')===p?'selected':''}>${p}</option>`).join('')}
+      </select></div>
     <div class="form-group"><label>Valor (R$)</label><input type="number" id="vf-valor" value="${v.valor||''}" step="0.01"></div>
     <div class="form-group"><label>Nº Pedido (PO)</label><input type="text" id="vf-numPO" value="${sanitize(v.numPO||'')}" placeholder="PO do cliente"></div>
     <div class="form-group"><label>Data do Pedido</label><input type="date" id="vf-dataPedido" value="${v.dataPedido||''}"></div>
