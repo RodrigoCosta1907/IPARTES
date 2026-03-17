@@ -2294,6 +2294,12 @@ async function addRecord(client) {
   }
 
   data[client].push(rec);
+  // Deduplicar antes de salvar
+  const dupRemoved = deduplicarOportunidade(client, rec);
+  if (dupRemoved) {
+    showToast(`ℹ Oportunidade ${rec.numero} atualizada — registro anterior substituído`, '#1d4ed8');
+    if (useSupabase) deduplicarSupabase(client, rec.numero, rec.sb_id || rec.id);
+  }
   saveLocal();
   checkCreateVenda(client, rec);
   renderClientTab(client);
@@ -3827,6 +3833,12 @@ async function saveGridRow(id, client) {
   } else {
     computeRecord(rec);
     data[client] = data[client] || [];
+    // Deduplicar antes de inserir
+    const gridDup = deduplicarOportunidade(client, rec);
+    if (gridDup) {
+      showToast(`ℹ Nº ${rec.numero} já existia — registro atualizado`, '#1d4ed8');
+      if (useSupabase) deduplicarSupabase(client, rec.numero, rec.id);
+    }
     data[client].push(rec);
     if (useSupabase) {
       try { await insertToSupabase(client, rec); }
@@ -4718,6 +4730,49 @@ async function aplicarRegraPerdido() {
 }
 
 
+
+// ════════════════════════════════════════════════
+// DEDUPLICAÇÃO — substitui registro anterior pelo
+// mais novo quando o Nº oportunidade já existe
+// ════════════════════════════════════════════════
+function deduplicarOportunidade(client, rec) {
+  if (!data[client] || !rec.numero) return;
+  const idx = data[client].findIndex(r =>
+    r.numero === rec.numero &&
+    r.id     !== rec.id
+  );
+  if (idx !== -1) {
+    const antigo = data[client][idx];
+    // Remove o antigo
+    data[client].splice(idx, 1);
+    // Agendado para deletar no Supabase (silencioso)
+    if (useSupabase && antigo.sb_id) {
+      deleteFromSupabase(antigo.sb_id || antigo.id).catch(() => {});
+    }
+    return antigo; // retorna o removido para log
+  }
+  return null;
+}
+
+async function deduplicarSupabase(client, numero, keepId) {
+  // Busca e remove duplicatas no Supabase
+  if (!useSupabase || !sbClient) return;
+  try {
+    const url = sbClient.url;
+    const key  = sbClient.key;
+    let authToken = key;
+    try {
+      const session = JSON.parse(localStorage.getItem(AUTH_SESSION_KEY)||'{}');
+      if (session.access_token && Date.now() < session.expires_at-10000) authToken = session.access_token;
+    } catch(e){}
+    // Delete all records with same cliente+numero EXCEPT the new one
+    await fetch(
+      `${url}/rest/v1/${TABLE}?cliente=eq.${encodeURIComponent(client)}&numero=eq.${encodeURIComponent(numero)}&id=neq.${keepId}`,
+      { method:'DELETE', headers:{ 'apikey':key, 'Authorization':'Bearer '+authToken, 'Prefer':'return=minimal' } }
+    );
+  } catch(e) { /* silencioso */ }
+}
+
 // ════════════════════════════════════════════════
 // REGISTRO EM MASSA
 // ════════════════════════════════════════════════
@@ -4838,13 +4893,19 @@ async function registerAllGridRows(client) {
   btnReg.innerHTML = `⏳ Salvando ${toSave.length} registro(s)…`;
 
   try {
-    // ── Save all to localStorage first (fast, no network) ──
+    // ── Save all to localStorage (deduplicates by número) ──
     if (!data[client]) data[client] = [];
+    let dedupCount = 0;
     toSave.forEach(({ rec }) => {
       computeRecord(rec);
+      const removed = deduplicarOportunidade(client, rec);
+      if (removed) dedupCount++;
       data[client].push(rec);
     });
     saveLocal();
+    if (dedupCount > 0) {
+      showToast(`ℹ ${dedupCount} registro(s) duplicado(s) substituído(s) pela versão mais recente`, '#1d4ed8');
+    }
 
     // ── Then send to Supabase if connected ──
     if (useSupabase) {
@@ -4865,6 +4926,10 @@ async function registerAllGridRows(client) {
         await insertBatchToSupabase(client, batch);
       }
       markSynced();
+      // Clean up duplicates in Supabase
+      for (const { rec } of toSave) {
+        if (rec.numero) deduplicarSupabase(client, rec.numero, rec.sb_id || rec.id);
+      }
     }
 
     // ── Visual feedback — mark as saved ──
@@ -4877,13 +4942,23 @@ async function registerAllGridRows(client) {
 
     showToast(`✅ ${toSave.length} oportunidade(s) registrada(s)!`, 'var(--green)');
 
-    // ── Re-render after short delay ──
+    // ── Remove saved rows immediately ──
+    toSave.forEach(({ tr }) => {
+      tr.classList.add('grid-row-saved');
+      // Animate out
+      tr.style.transition = 'opacity .4s, transform .3s';
+      tr.style.opacity = '0';
+      tr.style.transform = 'translateX(20px)';
+      setTimeout(() => tr.remove(), 400);
+    });
+
+    // ── Re-render after rows are gone ──
     setTimeout(() => {
       renderClientTab(client);
       renderGrid(client);
       if (currentTab === 'overview') renderOverview();
       updateBulkFooter(slug);
-    }, 600);
+    }, 500);
 
   } catch(e) {
     // On error — data is safe in localStorage, show error
