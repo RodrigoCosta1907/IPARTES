@@ -1230,7 +1230,18 @@ td.hi { color: var(--text); font-weight: 500; }
     box-shadow: 0 4px 12px rgba(21,128,61,.3);
   }
   .btn-bulk-register:disabled {
-    opacity: .4; cursor: not-allowed; transform: none;
+    opacity: .7; cursor: not-allowed; transform: none;
+  }
+  .grid-progress-bar {
+    height: 3px; background: var(--border);
+    border-radius: 0 0 var(--radius2) var(--radius2);
+    overflow: hidden; display: none;
+  }
+  .grid-progress-fill {
+    height: 100%; background: var(--green);
+    border-radius: 2px;
+    transition: width .3s ease;
+    width: 0%;
   }
   .btn-bulk-clear {
     background: transparent; border: 1px solid var(--border2);
@@ -1863,15 +1874,20 @@ async function deleteFromSupabase(id) {
 }
 
 async function insertBatchToSupabase(client, recs) {
+  if (!recs || recs.length === 0) return;
   const rows = recs.map(r => recToRow(r, client));
   try {
     const res = await sbFetch('POST', '', rows);
     if (!res.ok) {
-      const t = await res.text();
-      throw new Error('Batch insert falhou: ' + t);
+      let errMsg = 'Erro desconhecido';
+      try { const j = await res.json(); errMsg = j.message || j.error || errMsg; } catch(e2) {}
+      throw new Error(`Batch insert falhou (${res.status}): ${errMsg}`);
     }
   } catch(e) {
-    throw new Error('Erro ao importar lote: ' + e.message);
+    if (e.message.includes('Failed to fetch') || e.message.includes('NetworkError')) {
+      throw new Error('Sem conexão com o Supabase. Dados salvos localmente.');
+    }
+    throw new Error('Erro ao salvar lote: ' + e.message);
   }
 }
 
@@ -2078,6 +2094,9 @@ function buildClientTabs() {
               ✅ Registrar Tudo
             </button>
           </div>
+        </div>
+        <div class="grid-progress-bar" id="grid-progress-${slug}">
+          <div class="grid-progress-fill" id="grid-progress-fill-${slug}"></div>
         </div>
       </div>
 
@@ -4780,19 +4799,22 @@ async function registerAllGridRows(client) {
   if (!tbody || !btnReg) return;
 
   const pendingRows = Array.from(tbody.querySelectorAll('tr.grid-row-pending, tr.row-new'));
-  if (pendingRows.length === 0) return;
+  if (pendingRows.length === 0) {
+    showToast('⚠ Nenhuma linha para registrar', '#b45309');
+    return;
+  }
 
-  // Validate all rows first
+  // ── Validate all rows first ──
   const toSave = [];
   let hasErrors = false;
 
   pendingRows.forEach(tr => {
-    const rec = getRecFromRow(tr, tr.dataset.id, client);
+    const rec    = getRecFromRow(tr, tr.dataset.id, client);
+    const numEl  = tr.querySelector('input[data-field="numero"]');
+
     if (!rec.numero) {
       tr.classList.add('grid-row-error');
-      tr.classList.remove('grid-row-pending','row-new');
-      // Highlight the empty numero field
-      const numEl = tr.querySelector('input[data-field="numero"]');
+      tr.classList.remove('grid-row-pending', 'row-new');
       if (numEl) {
         numEl.style.boxShadow = 'inset 0 0 0 2px #ef4444';
         numEl.focus();
@@ -4806,65 +4828,73 @@ async function registerAllGridRows(client) {
   });
 
   if (hasErrors) {
-    showToast('⚠ Preencha o Nº da oportunidade nas linhas destacadas em vermelho', '#b45309');
+    showToast('⚠ Preencha o Nº da oportunidade nas linhas em vermelho', '#b45309');
     updateBulkFooter(slug);
     return;
   }
 
-  // Disable button while saving
+  // ── Disable button while saving ──
   btnReg.disabled = true;
-  btnReg.innerHTML = '⏳ Salvando…';
+  btnReg.innerHTML = `⏳ Salvando ${toSave.length} registro(s)…`;
 
-  let saved = 0;
-  let errors = 0;
-
-  // Save all to local data first
-  toSave.forEach(({ rec }) => {
-    computeRecord(rec);
+  try {
+    // ── Save all to localStorage first (fast, no network) ──
     if (!data[client]) data[client] = [];
-    data[client].push(rec);
-  });
-  saveLocal();
+    toSave.forEach(({ rec }) => {
+      computeRecord(rec);
+      data[client].push(rec);
+    });
+    saveLocal();
 
-  // Then batch insert to Supabase
-  if (useSupabase) {
-    try {
+    // ── Then send to Supabase if connected ──
+    if (useSupabase) {
       markSyncing();
-      // Insert in batches of 100
-      const BATCH = 100;
-      for (let i = 0; i < toSave.length; i += BATCH) {
-        const batch = toSave.slice(i, i + BATCH);
-        await insertBatchToSupabase(client, batch.map(x => x.rec));
+      btnReg.innerHTML = `⏳ Enviando para Supabase…`;
+
+      // Send in batches of 50 to avoid timeout
+      const BATCH = 50;
+      const allRecs = toSave.map(x => x.rec);
+
+      for (let i = 0; i < allRecs.length; i += BATCH) {
+        const batch = allRecs.slice(i, i + BATCH);
+        const batchNum = Math.floor(i/BATCH) + 1;
+        const totalBatches = Math.ceil(allRecs.length/BATCH);
+        if (totalBatches > 1) {
+          btnReg.innerHTML = `⏳ Lote ${batchNum}/${totalBatches}…`;
+        }
+        await insertBatchToSupabase(client, batch);
       }
       markSynced();
-    } catch(e) {
-      markSyncError(e.message);
-      showToast('✗ Erro ao salvar no Supabase: ' + e.message, '#dc2626');
-      btnReg.disabled = false;
-      btnReg.innerHTML = '✅ Registrar Tudo';
-      return;
     }
+
+    // ── Visual feedback — mark as saved ──
+    toSave.forEach(({ tr, rec }) => {
+      tr.classList.remove('grid-row-pending', 'row-new');
+      tr.classList.add('grid-row-saved');
+      // Auto-create venda if Pedido Recebido
+      checkCreateVenda(client, rec);
+    });
+
+    showToast(`✅ ${toSave.length} oportunidade(s) registrada(s)!`, 'var(--green)');
+
+    // ── Re-render after short delay ──
+    setTimeout(() => {
+      renderClientTab(client);
+      renderGrid(client);
+      if (currentTab === 'overview') renderOverview();
+      updateBulkFooter(slug);
+    }, 600);
+
+  } catch(e) {
+    // On error — data is safe in localStorage, show error
+    markSyncError(e.message);
+    showToast('✗ Erro ao enviar: ' + e.message + ' — dados salvos localmente', '#dc2626');
+    btnReg.disabled = false;
+    btnReg.innerHTML = `✅ Tentar novamente (${toSave.length})`;
   }
-
-  // Mark rows as saved visually
-  toSave.forEach(({ tr, rec }) => {
-    tr.classList.remove('grid-row-pending','row-new');
-    tr.classList.add('grid-row-saved');
-    // Check auto-create venda
-    checkCreateVenda(client, rec);
-    saved++;
-  });
-
-  // Remove saved rows after brief delay and re-render
-  setTimeout(() => {
-    renderClientTab(client);
-    renderGrid(client);
-    if (currentTab === 'overview') renderOverview();
-    updateBulkFooter(slug);
-  }, 800);
-
-  showToast(`✅ ${saved} oportunidade(s) registrada(s) com sucesso!`, 'var(--green)');
 }
+
+
 
 // CLEAR all pending rows
 function clearGridRows(client) {
