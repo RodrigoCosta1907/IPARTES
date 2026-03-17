@@ -1598,6 +1598,12 @@ let currentFilters = {mes:'',ano:'',cliente:'',portal:'',status:'',venda:''};
 let pendingImport = [], pendingImportClient = null;
 let sortState = { col: null, dir: 'asc', table: null };
 
+// Vendas module state
+let salesData = {};
+let salesCurrentClient = null;
+let salesFilters = { status:'', cliente:'', atrasado:'', de:'', ate:'' };
+let editingVendaId = null;
+
 // Supabase
 let sbClient = null;
 let useSupabase = false;
@@ -3827,8 +3833,6 @@ const VENDA_STATUS_CSS = {
   'Aguardando PO':'vs-aguardando','Em separação':'vs-separacao',
   'Enviado':'vs-enviado','Entregue':'vs-entregue','Faturado':'vs-faturado',
 };
-let editingVendaId = null;
-
 function loadSalesLocal() {
   const s = localStorage.getItem('ipartes_vendas_v1');
   salesData = s ? JSON.parse(s) : {};
