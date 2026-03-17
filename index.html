@@ -3733,15 +3733,18 @@ function filterGrid(slug) {
 }
 
 // Render grid for a client tab
+// The grid shows ONLY unsaved (pending) rows.
+// Saved records appear in the table below — not here.
 function renderGrid(client) {
   const slug  = slugify(client);
   const tbody = document.getElementById('grid-body-'+slug);
   if (!tbody) return;
 
-  const recs = (data[client]||[]).slice().reverse().slice(0, 50); // show last 50
-  tbody.innerHTML = recs.map((r, i) => gridRowHtml(r, client, i+1, false)).join('');
+  // Remove only saved rows — keep any pending rows the user is typing
+  const savedRows = tbody.querySelectorAll('tr:not(.grid-row-pending):not(.row-new)');
+  savedRows.forEach(tr => tr.remove());
 
-  // Attach events
+  // Recount pending
   attachGridEvents(slug, client);
   updateBulkFooter(slug);
 }
