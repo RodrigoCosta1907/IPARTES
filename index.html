@@ -1256,6 +1256,74 @@ td.hi { color: var(--text); font-weight: 500; }
   .grid-row-saved   { background: #f0fdf4 !important; opacity: .7; }
   .grid-row-error   { background: #fef2f2 !important; }
 
+
+  /* ── PAGINAÇÃO + FILTROS CLIENT TAB ── */
+  .client-filters-bar {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    align-items: center;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+  .client-filters-bar select,
+  .client-filters-bar input[type="text"] {
+    padding: 5px 9px; font-size: 12px;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text);
+    font-family: var(--font);
+  }
+  .client-filters-bar select:focus,
+  .client-filters-bar input:focus {
+    outline: none; border-color: var(--blue);
+    box-shadow: 0 0 0 2px rgba(29,78,216,.1);
+  }
+  .filter-sep {
+    width: 1px; height: 20px;
+    background: var(--border2); flex-shrink: 0;
+  }
+
+  /* Paginação */
+  .pagination-bar {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+  }
+  .pagination-info { color: var(--text3); }
+  .pagination-controls { display: flex; gap: 4px; align-items: center; }
+  .page-btn {
+    min-width: 30px; height: 30px;
+    border: 1px solid var(--border2);
+    background: var(--surface);
+    color: var(--text2);
+    border-radius: var(--radius);
+    cursor: pointer; font-size: 12px;
+    font-family: var(--font);
+    transition: all .15s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .page-btn:hover:not(:disabled) {
+    border-color: var(--blue); color: var(--blue);
+  }
+  .page-btn.active {
+    background: var(--blue); border-color: var(--blue);
+    color: #fff; font-weight: 700;
+  }
+  .page-btn:disabled { opacity: .35; cursor: not-allowed; }
+  .page-size-sel {
+    padding: 4px 8px; font-size: 11px;
+    border: 1px solid var(--border2);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text3);
+    font-family: var(--font);
+    cursor: pointer;
+  }
+
 </style>
 </head>
 <body>
@@ -2157,9 +2225,50 @@ function buildClientTabs() {
         <div class="table-header">
           <div class="table-title">Oportunidades Registradas</div>
           <div style="display:flex;align-items:center;gap:10px">
-            <button class="btn-export" onclick="exportClient('${client}')">⬇ Exportar</button>
             <span class="table-count" id="count-${slug}">—</span>
+            <button class="btn-export" onclick="exportClient('${client}')">⬇ Exportar</button>
           </div>
+        </div>
+        <!-- Filtros da aba cliente -->
+        <div class="client-filters-bar">
+          <span style="font-size:11px;color:var(--text3)">🔍</span>
+          <input type="text" id="cf-search-${slug}" placeholder="Buscar nº, portal…"
+            oninput="renderClientTab('${client}')" style="width:130px">
+          <div class="filter-sep"></div>
+          <select id="cf-status-${slug}" onchange="renderClientTab('${client}')">
+            <option value="">Status</option>
+            <option>Não Interessa</option><option>Cotando</option>
+            <option>Orçamento Enviado</option><option>Pedido Recebido</option>
+            <option>Perdido</option><option>Cancelado</option><option>Sem Cotação</option>
+          </select>
+          <select id="cf-portal-${slug}" onchange="renderClientTab('${client}')">
+            <option value="">Portal</option>
+            <option>COUPA</option><option>MERCADO ELETRONICO</option>
+            <option>FAIRMARKIT</option><option>PETRONECT</option>
+            <option>CAPTURAME</option><option>E-MAIL</option><option>ENGIE</option>
+          </select>
+          <select id="cf-particip-${slug}" onchange="renderClientTab('${client}')">
+            <option value="">Particip.</option>
+            <option value="SIM">SIM</option><option value="NÃO">NÃO</option>
+          </select>
+          <select id="cf-venda-${slug}" onchange="renderClientTab('${client}')">
+            <option value="">Venda</option>
+            <option value="SIM">SIM</option><option value="NÃO">NÃO</option>
+          </select>
+          <div class="filter-sep"></div>
+          <select id="cf-ano-${slug}" onchange="renderClientTab('${client}')">
+            <option value="">Ano</option>
+            <option>2023</option><option>2024</option><option>2025</option><option>2026</option>
+          </select>
+          <select id="cf-mes-${slug}" onchange="renderClientTab('${client}')">
+            <option value="">Mês</option>
+            <option>01</option><option>02</option><option>03</option><option>04</option>
+            <option>05</option><option>06</option><option>07</option><option>08</option>
+            <option>09</option><option>10</option><option>11</option><option>12</option>
+          </select>
+          <div class="filter-sep"></div>
+          <button class="btn-reset" onclick="resetClientFilters('${slug}','${client}')"
+            style="font-size:11px;padding:4px 10px" title="Limpar filtros">↺</button>
         </div>
         <div class="table-wrap">
           <table>
@@ -2172,6 +2281,22 @@ function buildClientTabs() {
             </tr></thead>
             <tbody id="table-${slug}"></tbody>
           </table>
+        </div>
+        <!-- Paginação -->
+        <div class="pagination-bar">
+          <div class="pagination-info" id="cpagination-info-${slug}">—</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="display:flex;align-items:center;gap:5px">
+              <span style="font-size:11px;color:var(--text3)">Por página:</span>
+              <select class="page-size-sel" id="cpagesize-${slug}"
+                onchange="clientPageState['${slug}']=1;renderClientTab('${client}')">
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+            <div class="pagination-controls" id="cpagination-controls-${slug}"></div>
+          </div>
         </div>
       </div>`;
     container.appendChild(div);
@@ -2561,19 +2686,48 @@ function exportToExcel(records, filename, customHeaders, customRows) {
 const SB_MAP = {'Pedido Recebido':'b-green','Perdido':'b-slate','Cotando':'b-blue','Orçamento Enviado':'b-amber','Cancelado':'b-slate','Não Interessa':'b-slate','Sem Cotação':'b-slate'};
 
 function renderClientTab(client) {
-  const slug = slugify(client);
+  const slug    = slugify(client);
   const records = (data[client]||[]).slice().reverse();
-  const filtered = applySearch(applyFilter(records.map(r=>({...r,cliente:client}))));
-  const tbody = document.getElementById('table-'+slug);
+
+  // Apply global search + global filters + client-specific filters
+  let filtered = applySearch(applyFilter(records.map(r=>({...r,cliente:client}))));
+  filtered = applyClientFilters(filtered, slug);
+  filtered = sortClientRecords(filtered, slug);
+
+  const tbody   = document.getElementById('table-'+slug);
   const countEl = document.getElementById('count-'+slug);
   if (!tbody) return;
 
-  countEl.textContent = filtered.length + ' registro(s)';
-  tbody.innerHTML = !filtered.length
-    ? `<tr><td colspan="13"><div class="empty-state"><div class="icon">📋</div><p>Nenhuma oportunidade registrada</p></div></td></tr>`
-    : filtered.map(r => rowHtml(r, client)).join('');
+  // Pagination
+  const pageSize = parseInt(document.getElementById('cpagesize-'+slug)?.value || '20');
+  const page     = clientPageState[slug] || 1;
+  const total    = filtered.length;
+  const start    = (page-1) * pageSize;
+  const paginated= filtered.slice(start, start + pageSize);
 
-  makeSortable('table-'+slug);
+  countEl.textContent = total + ' registro(s)';
+
+  tbody.innerHTML = !filtered.length
+    ? `<tr><td colspan="14"><div class="empty-state"><div class="icon">📋</div><p>Nenhuma oportunidade encontrada</p></div></td></tr>`
+    : paginated.map(r => rowHtml(r, client)).join('');
+
+  // Update sortable headers with client-specific sort
+  const table = document.getElementById('table-'+slug);
+  if (table) {
+    table.querySelectorAll('thead th').forEach((th, i) => {
+      if (CLIENT_COL_FIELDS[i]) {
+        th.style.cursor = 'pointer';
+        th.onclick = () => sortClientCol(slug, client, i);
+        const s = clientSortState[slug];
+        th.classList.remove('sort-asc','sort-desc');
+        if (s && s.col === CLIENT_COL_FIELDS[i]) {
+          th.classList.add(s.dir === 'asc' ? 'sort-asc' : 'sort-desc');
+        }
+      }
+    });
+  }
+
+  renderClientPagination(slug, client, total, page, pageSize);
   renderGrid(client);
   const ckpi = document.getElementById('ckpi-'+slug);
   if (ckpi) {
@@ -5025,6 +5179,120 @@ function attachGridEvents(slug, client) {
       }
     });
   });
+}
+
+
+// ════════════════════════════════════════════════
+// PAGINAÇÃO + FILTROS — ABAS DE CLIENTE
+// ════════════════════════════════════════════════
+const clientPageState = {}; // { slug: currentPage }
+const clientSortState = {}; // { slug: { col, dir } }
+
+function getClientFilters(slug) {
+  const g = id => document.getElementById(id)?.value || '';
+  return {
+    search:  g('cf-search-'+slug).toLowerCase(),
+    status:  g('cf-status-'+slug),
+    portal:  g('cf-portal-'+slug),
+    particip:g('cf-particip-'+slug),
+    venda:   g('cf-venda-'+slug),
+    ano:     g('cf-ano-'+slug),
+    mes:     g('cf-mes-'+slug),
+  };
+}
+
+function resetClientFilters(slug, client) {
+  ['cf-search-','cf-status-','cf-portal-','cf-particip-','cf-venda-','cf-ano-','cf-mes-'].forEach(p => {
+    const el = document.getElementById(p+slug);
+    if (el) el.value = '';
+  });
+  clientPageState[slug] = 1;
+  renderClientTab(client);
+}
+
+function applyClientFilters(records, slug) {
+  const f = getClientFilters(slug);
+  return records.filter(r => {
+    if (f.search && ![r.numero,r.portal,r.status,r.obs,r.responsavel]
+      .join(' ').toLowerCase().includes(f.search)) return false;
+    if (f.status  && r.status       !== f.status)  return false;
+    if (f.portal  && r.portal       !== f.portal)  return false;
+    if (f.particip&& r.participamos !== f.particip) return false;
+    if (f.venda   && r.venda        !== f.venda)   return false;
+    if (f.ano     && r.ano          !== f.ano)     return false;
+    if (f.mes     && r.mes          !== f.mes)     return false;
+    return true;
+  });
+}
+
+function sortClientRecords(records, slug) {
+  const s = clientSortState[slug];
+  if (!s || !s.col) return records;
+  return [...records].sort((a, b) => {
+    let av = a[s.col] || '', bv = b[s.col] || '';
+    const an = parseFloat(String(av).replace(',','.'));
+    const bn = parseFloat(String(bv).replace(',','.'));
+    if (!isNaN(an) && !isNaN(bn)) return s.dir==='asc' ? an-bn : bn-an;
+    return s.dir==='asc' ? String(av).localeCompare(String(bv),'pt') : String(bv).localeCompare(String(av),'pt');
+  });
+}
+
+function renderClientPagination(slug, client, total, page, pageSize) {
+  const totalPages = Math.ceil(total / pageSize) || 1;
+  const infoEl   = document.getElementById('cpagination-info-'+slug);
+  const ctrlEl   = document.getElementById('cpagination-controls-'+slug);
+  if (!infoEl || !ctrlEl) return;
+
+  const from = total === 0 ? 0 : (page-1)*pageSize + 1;
+  const to   = Math.min(page*pageSize, total);
+  infoEl.textContent = total > 0
+    ? `Exibindo ${from}–${to} de ${total} registro(s)`
+    : 'Nenhum registro';
+
+  if (totalPages <= 1) { ctrlEl.innerHTML = ''; return; }
+
+  // Build page buttons — show max 7 pages
+  let pages = [];
+  if (totalPages <= 7) {
+    pages = Array.from({length:totalPages}, (_,i)=>i+1);
+  } else {
+    pages = [1];
+    if (page > 3) pages.push('…');
+    for (let i=Math.max(2,page-1); i<=Math.min(totalPages-1,page+1); i++) pages.push(i);
+    if (page < totalPages-2) pages.push('…');
+    pages.push(totalPages);
+  }
+
+  ctrlEl.innerHTML =
+    `<button class="page-btn" ${page===1?'disabled':''} onclick="goClientPage('${slug}','${client}',${page-1})">‹</button>` +
+    pages.map(p => p === '…'
+      ? `<span style="padding:0 4px;color:var(--text4)">…</span>`
+      : `<button class="page-btn ${p===page?'active':''}" onclick="goClientPage('${slug}','${client}',${p})">${p}</button>`
+    ).join('') +
+    `<button class="page-btn" ${page===totalPages?'disabled':''} onclick="goClientPage('${slug}','${client}',${page+1})">›</button>`;
+}
+
+function goClientPage(slug, client, page) {
+  clientPageState[slug] = page;
+  renderClientTab(client);
+  // Scroll to table top
+  const table = document.getElementById('table-'+slug);
+  if (table) table.closest('.table-card')?.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// Sortable headers with field mapping
+const CLIENT_COL_FIELDS = ['mes','numero','portal','valor','status','participamos','venda','dataPedido','mesPedido','ciclo','obs','responsavel'];
+
+function sortClientCol(slug, client, colIdx) {
+  const field = CLIENT_COL_FIELDS[colIdx];
+  if (!field) return;
+  const cur = clientSortState[slug] || {};
+  clientSortState[slug] = {
+    col: field,
+    dir: cur.col === field && cur.dir === 'asc' ? 'desc' : 'asc'
+  };
+  clientPageState[slug] = 1;
+  renderClientTab(client);
 }
 
 // ════════════════════════════════════════════════
