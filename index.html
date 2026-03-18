@@ -146,7 +146,7 @@ body {
 .tab.active { color: #fff; border-bottom-color: var(--orange); }
 
 /* ── MAIN ── */
-.main { padding: 24px 28px; max-width: 1560px; margin: 0 auto; }
+.main { padding: 0; }  /* legacy — content now in .main-content */
 
 /* ── PAGE HEADER ── */
 .page-header { margin-bottom: 20px; }
@@ -308,7 +308,7 @@ select option { background: #fff; }
 .client-section { display: none; }
 .client-section.active { display: block; }
 .overview-section { display: none; }
-.overview-section.active { display: block; }
+.overview-section.active { display: block; width: 100%; box-sizing: border-box; }
 
 /* ── FORM CARD ── */
 .form-card {
@@ -804,8 +804,10 @@ td.hi { color: var(--text); font-weight: 500; }
   .user-dropdown-item.danger:hover { background: #fee2e2; }
 
   /* Hide app content when not logged in */
-  #appContent { display: none; }
-  #appContent.visible { display: block; }
+  #appContent { display: none;
+  width: 100%;
+  box-sizing: border-box; }
+  #appContent.visible { display: block; width: 100%; }
 
 
   /* ── INLINE GRID ── */
@@ -1383,12 +1385,15 @@ td.hi { color: var(--text); font-weight: 500; }
   /* ── SIDEBAR LAYOUT ── */
   .app-layout {
     display: flex;
+    width: 100%;
     min-height: calc(100vh - 56px);
+    align-items: flex-start;
   }
 
   .sidebar {
     width: 220px;
     flex-shrink: 0;
+    flex-grow: 0;
     background: #1e293b;
     display: flex;
     flex-direction: column;
@@ -1485,8 +1490,9 @@ td.hi { color: var(--text); font-weight: 500; }
 
   /* Main content area */
   .main-content {
-    flex: 1;
+    flex: 1 1 0;
     min-width: 0;
+    width: 0;
     padding: 20px 28px;
     background: var(--bg);
     background-image: radial-gradient(circle at 1px 1px, rgba(29,78,216,.04) 1px, transparent 0);
@@ -1514,7 +1520,7 @@ td.hi { color: var(--text); font-weight: 500; }
 
   /* Sidebar toggle for mobile */
   .sidebar-toggle {
-    display: none;
+    display: none; /* hidden on desktop, shown on mobile */
     position: fixed; bottom: 20px; left: 20px;
     width: 44px; height: 44px;
     background: var(--blue); border: none; border-radius: 50%;
@@ -2007,6 +2013,31 @@ const RESPONSAVEL_MAP = {
   'TBG':           'Lenon',
 };
 
+const VENDOR_CONFIG = {
+  rodrigo: {
+    name: 'Rodrigo',
+    badge: 'RO',
+    color: '#ea580c',
+    clients: ['Vale Ferrosos','Vale Metals','Suzano','Outros'],
+    allowNew: true,
+  },
+  lenon: {
+    name: 'Lenon',
+    badge: 'LE',
+    color: '#15803d',
+    clients: ['Petrobras','Eneva','Transpetro','Engie','TBG'],
+    allowNew: false,
+  },
+  luiz: {
+    name: 'Luiz',
+    badge: 'LU',
+    color: '#1d4ed8',
+    clients: [],
+    allowNew: true,
+  },
+};
+
+
 function getResponsavelPadrao(client) {
   // Busca pelo nome exato ou por correspondência parcial (case insensitive)
   if (!client) return '';
@@ -2166,7 +2197,7 @@ async function loadFromSupabase() {
     CLIENTS = getClients(); // ensure all vendor clients present
     renderNav();
     buildSidebarClients();
-    if (currentTab === 'overview') renderOverview();
+    sidebarNav(currentSidebarNav || 'overview');
     else if (currentTab === 'vendas') renderVendasModule();
     else renderClientTab(currentTab);
     // Aplica regra automática de Perdido após carregar dados
@@ -4139,6 +4170,10 @@ function onLoginSuccess(user) {
   // Hide login, show app
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appContent').classList.add('visible');
+  // Build sidebar AFTER app is visible so DOM elements exist and are accessible
+  CLIENTS = getClients();
+  buildSidebarClients();
+  sidebarNav('overview');
 
   // Update user menu
   const email     = user.email || '';
@@ -5823,29 +5858,7 @@ function dedupByNumero(records) {
 // ════════════════════════════════════════════════
 
 // Vendor config
-const VENDOR_CONFIG = {
-  rodrigo: {
-    name: 'Rodrigo',
-    badge: 'RO',
-    color: '#ea580c',
-    clients: ['Vale Ferrosos','Vale Metals','Suzano','Outros'],
-    allowNew: true,
-  },
-  lenon: {
-    name: 'Lenon',
-    badge: 'LE',
-    color: '#15803d',
-    clients: ['Petrobras','Eneva','Transpetro','Engie','TBG'],
-    allowNew: false,
-  },
-  luiz: {
-    name: 'Luiz',
-    badge: 'LU',
-    color: '#1d4ed8',
-    clients: [],
-    allowNew: true,
-  },
-};
+
 
 let currentSidebarNav = 'overview';
 
@@ -6293,8 +6306,6 @@ async function init() {
   renderNav();
   buildSidebarClients();
   renderOverview();
-  // Start on overview
-  sidebarNav('overview');
   // Verifica regra de perdido no carregamento local
   setTimeout(() => aplicarRegraPerdido(), 2000);
   // Restore last sync time
