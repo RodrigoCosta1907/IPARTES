@@ -2260,11 +2260,21 @@ function buildClientTabs() {
         <div class="table-wrap">
           <table>
             <thead><tr>
-              ${client === 'Outros' ? '<th>Cliente Real</th>' : ''}
-              <th>Mês/Ano</th><th>Nº Oport.</th><th>Portal</th><th>Valor</th>
-              <th>Status</th><th>Particip.</th><th>Venda</th>
-              <th>Data Pedido</th><th>Mês Ped.</th><th>Ano Ped.</th>
-              <th>Ciclo (d)</th><th>Obs.</th><th>Resp.</th><th>Ações</th>
+              ${client === 'Outros' ? `<th onclick="sortClientCol('${slug}','${client}',0)" title="Ordenar" style="cursor:pointer">Cliente Real <span class="sort-icon" data-field="subcliente" data-slug="${slug}">⇅</span></th>` : ''}
+              <th onclick="sortClientCol('${slug}','${client}',0)" title="Clique para ordenar ↓ Maior | ↑ Menor" style="cursor:pointer">Mês/Ano <span class="sort-icon" data-field="mes" data-slug="${slug}">⇅</span></th>
+              <th onclick="sortClientCol('${slug}','${client}',1)" title="Clique para ordenar" style="cursor:pointer">Nº Oport. <span class="sort-icon" data-field="numero" data-slug="${slug}">⇅</span></th>
+              <th onclick="sortClientCol('${slug}','${client}',2)" title="Clique para ordenar" style="cursor:pointer">Portal <span class="sort-icon" data-field="portal" data-slug="${slug}">⇅</span></th>
+              <th onclick="sortClientCol('${slug}','${client}',3)" title="Clique para ordenar" style="cursor:pointer">Valor <span class="sort-icon" data-field="valor" data-slug="${slug}">⇅</span></th>
+              <th onclick="sortClientCol('${slug}','${client}',4)" title="Clique para ordenar" style="cursor:pointer">Status <span class="sort-icon" data-field="status" data-slug="${slug}">⇅</span></th>
+              <th onclick="sortClientCol('${slug}','${client}',5)" title="Clique para ordenar" style="cursor:pointer">Particip. <span class="sort-icon" data-field="participamos" data-slug="${slug}">⇅</span></th>
+              <th onclick="sortClientCol('${slug}','${client}',6)" title="Clique para ordenar" style="cursor:pointer">Venda <span class="sort-icon" data-field="venda" data-slug="${slug}">⇅</span></th>
+              <th onclick="sortClientCol('${slug}','${client}',7)" title="Clique para ordenar" style="cursor:pointer">Data Pedido <span class="sort-icon" data-field="dataPedido" data-slug="${slug}">⇅</span></th>
+              <th class="hide-mobile">Mês Ped.</th>
+              <th class="hide-mobile">Ano Ped.</th>
+              <th onclick="sortClientCol('${slug}','${client}',10)" title="Clique para ordenar" style="cursor:pointer">Ciclo (d) <span class="sort-icon" data-field="ciclo" data-slug="${slug}">⇅</span></th>
+              <th class="hide-mobile">Obs.</th>
+              <th onclick="sortClientCol('${slug}','${client}',11)" title="Clique para ordenar" style="cursor:pointer">Resp. <span class="sort-icon" data-field="responsavel" data-slug="${slug}">⇅</span></th>
+              <th>Ações</th>
             </tr></thead>
             <tbody id="table-${slug}"></tbody>
           </table>
@@ -2698,29 +2708,8 @@ function renderClientTab(client) {
     ? `<tr><td colspan="14"><div class="empty-state"><div class="icon">📋</div><p>Nenhuma oportunidade encontrada</p></div></td></tr>`
     : paginated.map(r => rowHtml(r, client)).join('');
 
-  // Update sortable headers with ↑↓ indicators
-  const table = document.getElementById('table-'+slug);
-  if (table) {
-    const s = clientSortState[slug];
-    table.querySelectorAll('thead th').forEach((th, i) => {
-      if (!CLIENT_COL_FIELDS[i]) return;
-      th.style.cursor = 'pointer';
-      th.title = 'Clique para ordenar';
-      th.onclick = () => sortClientCol(slug, client, i);
-      // Remove old indicators
-      th.classList.remove('sort-asc','sort-desc');
-      // Add new visual indicator
-      const baseText = th.textContent.replace(/ [↑↓⇅].*$/, '').trim();
-      if (s && s.col === CLIENT_COL_FIELDS[i]) {
-        th.classList.add(s.dir === 'desc' ? 'sort-desc' : 'sort-asc');
-        th.innerHTML = baseText + (s.dir === 'desc'
-          ? ' <span style="font-size:9px;opacity:.8" title="Maior → Menor">↓</span>'
-          : ' <span style="font-size:9px;opacity:.8" title="Menor → Maior">↑</span>');
-      } else {
-        th.innerHTML = baseText + ' <span style="font-size:9px;opacity:.3">⇅</span>';
-      }
-    });
-  }
+  // Sort icons are static in HTML — updated by updateSortIcons()
+  setTimeout(() => updateSortIcons(slug), 50);
 
   renderClientPagination(slug, client, total, page, pageSize);
   renderGrid(client);
@@ -5264,9 +5253,9 @@ function sortClientCol(slug, client, colIdx) {
   const cur = clientSortState[slug] || {};
   // Cycle: none → desc (maior primeiro) → asc (menor primeiro) → none
   let newDir;
-  if (cur.col !== field)          newDir = 'desc'; // first click = maior primeiro
-  else if (cur.dir === 'desc')    newDir = 'asc';  // second click = menor primeiro
-  else                            newDir = null;   // third click = remove sort
+  if (cur.col !== field)          newDir = 'desc';
+  else if (cur.dir === 'desc')    newDir = 'asc';
+  else                            newDir = null;
 
   if (newDir) {
     clientSortState[slug] = { col: field, dir: newDir };
@@ -5275,6 +5264,24 @@ function sortClientCol(slug, client, colIdx) {
   }
   clientPageState[slug] = 1;
   renderClientTab(client);
+  updateSortIcons(slug);
+}
+
+function updateSortIcons(slug) {
+  const s = clientSortState[slug];
+  document.querySelectorAll(`.sort-icon[data-slug="${slug}"]`).forEach(el => {
+    const f = el.dataset.field;
+    if (!s || s.col !== f) {
+      el.textContent = '⇅';
+      el.style.opacity = '.3';
+      el.style.color = '';
+    } else {
+      el.textContent = s.dir === 'desc' ? '↓' : '↑';
+      el.style.opacity = '1';
+      el.style.color = 'var(--blue)';
+      el.title = s.dir === 'desc' ? 'Maior → Menor (clique para inverter)' : 'Menor → Maior (clique para remover)';
+    }
+  });
 }
 
 // ════════════════════════════════════════════════
