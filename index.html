@@ -2163,6 +2163,7 @@ async function loadFromSupabase() {
     saveLocal();
     await loadVendasFromSupabase();
     markSynced();
+    CLIENTS = getClients(); // ensure all vendor clients present
     renderNav();
     buildSidebarClients();
     if (currentTab === 'overview') renderOverview();
@@ -6153,6 +6154,13 @@ function sidebarHighlightClient(vendor, client) {
 
 // ── Populate sidebar client items ──
 function buildSidebarClients() {
+  // Always ensure all vendor clients are in CLIENTS
+  CLIENTS = getClients();
+  const allVendorClients = Object.values(VENDOR_CONFIG).flatMap(v => v.clients);
+  allVendorClients.forEach(c => {
+    if (!CLIENTS.includes(c)) CLIENTS.push(c);
+  });
+
   Object.keys(VENDOR_CONFIG).forEach(vendor => {
     const cfg      = VENDOR_CONFIG[vendor];
     const fixed    = cfg.clients; // Fixed clients for this vendor
@@ -6278,7 +6286,10 @@ async function init() {
 
   loadLocal();
   loadSalesLocal();
+  // Ensure ALL vendor clients are in CLIENTS before building tabs
+  CLIENTS = getClients(); // refresh with all required clients
   buildClientTabs();
+  CLIENTS = getClients(); // refresh again after buildClientTabs adds any missing
   renderNav();
   buildSidebarClients();
   renderOverview();
