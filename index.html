@@ -1780,7 +1780,8 @@ const CHART_COLORS = ['#1d4ed8','#ea580c','#15803d','#b45309','#475569','#7c3aed
 const IMPORT_COLS = {
   subcliente:'Cliente Real', mes:'Mês', ano:'Ano', numero:'Nº Oportunidade', portal:'Portal',
   valor:'Valor', status:'Status', participamos:'Participamos',
-  venda:'Venda', dataPedido:'Data do Pedido', obs:'Observação'
+  venda:'Venda', dataPedido:'Data do Pedido',
+  finaliza:'Finaliza', responsavel:'Responsável', obs:'Observação'
 };
 const STORAGE_KEY = 'ipartes_v1';
 
@@ -2583,7 +2584,26 @@ function processImportFile(file, client) {
         }
       } else {
         const wb = XLSX.read(e.target.result, {type:'array', cellDates:true});
-        rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {raw:false, dateNF:'yyyy-mm-dd'});
+        // raw:true preserves exact numeric values — avoids locale formatting issues
+        // defval:'' ensures empty cells return empty string not undefined
+        rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
+          raw: true,
+          dateNF: 'yyyy-mm-dd',
+          defval: ''
+        });
+      }
+
+      // Helper: convert Excel serial date to YYYY-MM-DD string
+      function excelDateToStr(val) {
+        if (!val) return '';
+        if (typeof val === 'string' && /\d{4}-\d{2}-\d{2}/.test(val)) return val.slice(0,10);
+        if (val instanceof Date) return val.toISOString().slice(0,10);
+        if (typeof val === 'number' && val > 40000) {
+          // Excel serial date
+          const d = new Date((val - 25569) * 86400 * 1000);
+          return d.toISOString().slice(0,10);
+        }
+        return String(val).slice(0,10);
       }
 
       const colMap = {};
@@ -2600,27 +2620,33 @@ function processImportFile(file, client) {
         if (rec.ano) rec.ano = String(parseInt(rec.ano));
         if (rec.valor) {
           // Handle both BR string format "R$ 1.234,56" and already-numeric "1234.56"
-          let v = rec.valor.toString().trim();
-          if (v.includes(',')) {
-            // BR format: R$ 1.234,56 → remove R$, spaces, dots (thousands), comma→dot
-            v = v.replace(/R\$\s*/g,'').replace(/\./g,'').replace(',','.').trim();
+          let v = rec.valor;
+          if (typeof v === 'number') {
+            // Raw numeric from Excel — use directly (most accurate)
+            rec.valor = v.toString();
           } else {
-            // Already numeric string or plain number: just strip R$ and spaces
-            v = v.replace(/R\$\s*/g,'').trim();
+            v = v.toString().trim();
+            if (v.includes(',') && v.includes('.')) {
+              // BR format: R$ 1.234,56 → remove R$, dots (thousands), comma→dot
+              v = v.replace(/R\$\s*/g,'').replace(/\./g,'').replace(',','.').trim();
+            } else if (v.includes(',')) {
+              // Only comma: treat as decimal separator
+              v = v.replace(/R\$\s*/g,'').replace(',','.').trim();
+            } else {
+              // Plain number string or US format
+              v = v.replace(/R\$\s*/g,'').trim();
+            }
+            rec.valor = v;
           }
-          rec.valor = v;
         }
         if (rec.venda) rec.venda = rec.venda.toUpperCase().trim();
         if (rec.subcliente) rec.subcliente = rec.subcliente.trim();
         if (rec.participamos) rec.participamos = rec.participamos.toUpperCase().trim();
         if (rec.dataPedido) {
-          if (/^\d{5}$/.test(rec.dataPedido)) {
-            const d = new Date(Date.UTC(1899,11,30)+parseInt(rec.dataPedido)*86400000);
-            rec.dataPedido = d.toISOString().slice(0,10);
-          } else if (/^\d{2}\/\d{2}\/\d{4}$/.test(rec.dataPedido)) {
-            const [dd,mm,yyyy] = rec.dataPedido.split('/');
-            rec.dataPedido = `${yyyy}-${mm}-${dd}`;
-          }
+          rec.dataPedido = excelDateToStr(rec.dataPedido);
+        }
+        if (rec.finaliza) {
+          rec.finaliza = excelDateToStr(rec.finaliza);
         }
         if (!rec.mes || !rec.ano || !rec.numero) { errors.push(`Linha ${idx+2}: dados incompletos`); return; }
         computeRecord(rec);
