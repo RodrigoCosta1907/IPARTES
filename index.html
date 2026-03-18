@@ -1324,6 +1324,60 @@ td.hi { color: var(--text); font-weight: 500; }
     cursor: pointer;
   }
 
+
+  /* ── SELEÇÃO MÚLTIPLA ── */
+  .row-selected { background: #eff6ff !important; }
+  .row-selected td { border-color: #bfdbfe !important; }
+
+  .bulk-delete-bar {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 14px;
+    background: #fef2f2;
+    border-top: 1px solid #fecaca;
+    border-bottom: 1px solid #fecaca;
+    gap: 12px;
+    animation: slideDown .2s ease;
+  }
+  .bulk-delete-bar.visible { display: flex; }
+  @keyframes slideDown { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+
+  .bulk-delete-info {
+    font-size: 12px; font-weight: 600; color: #dc2626;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .bulk-delete-count {
+    background: #dc2626; color: #fff;
+    font-size: 11px; font-weight: 700;
+    padding: 2px 8px; border-radius: 10px;
+  }
+  .btn-bulk-delete {
+    background: #dc2626; border: none; color: #fff;
+    font-family: var(--font); font-size: 12px; font-weight: 700;
+    padding: 7px 16px; border-radius: var(--radius);
+    cursor: pointer; transition: all .15s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .btn-bulk-delete:hover { background: #b91c1c; }
+  .btn-deselect-all {
+    background: transparent; border: 1px solid #fca5a5;
+    color: #dc2626; font-family: var(--font);
+    font-size: 11px; padding: 5px 12px;
+    border-radius: var(--radius); cursor: pointer;
+    transition: all .15s;
+  }
+  .btn-deselect-all:hover { background: #fee2e2; }
+
+  /* Checkbox styling */
+  .row-checkbox {
+    width: 16px; height: 16px;
+    cursor: pointer; accent-color: var(--blue);
+    flex-shrink: 0;
+  }
+  .th-checkbox { width: 32px; padding: 0 8px !important; }
+  .td-checkbox { width: 32px; padding: 0 8px !important; text-align: center; }
+
 </style>
 </head>
 <body>
@@ -2260,6 +2314,10 @@ function buildClientTabs() {
         <div class="table-wrap">
           <table>
             <thead><tr>
+              <th class="th-checkbox">
+                <input type="checkbox" class="row-checkbox" title="Selecionar todos"
+                  onclick="toggleSelectAll('${slug}','${client}',this)">
+              </th>
               ${client === 'Outros' ? `<th onclick="sortClientCol('${slug}','${client}',0)" title="Ordenar" style="cursor:pointer">Cliente Real <span class="sort-icon" data-field="subcliente" data-slug="${slug}">⇅</span></th>` : ''}
               <th onclick="sortClientCol('${slug}','${client}',0)" title="Clique para ordenar ↓ Maior | ↑ Menor" style="cursor:pointer">Mês/Ano <span class="sort-icon" data-field="mes" data-slug="${slug}">⇅</span></th>
               <th onclick="sortClientCol('${slug}','${client}',1)" title="Clique para ordenar" style="cursor:pointer">Nº Oport. <span class="sort-icon" data-field="numero" data-slug="${slug}">⇅</span></th>
@@ -2416,11 +2474,20 @@ async function addRecord(client) {
   }
 
   data[client].push(rec);
-  // Deduplicar antes de salvar
-  const dupRemoved = deduplicarOportunidade(client, rec);
-  if (dupRemoved) {
-    showToast(`ℹ Oportunidade ${rec.numero} atualizada — registro anterior substituído`, '#1d4ed8');
-    if (useSupabase) deduplicarSupabase(client, rec.numero, rec.sb_id || rec.id);
+  // Verifica se já existe registro com mesmo número
+  const existing = (data[client]||[]).find(r => r.numero && r.numero === rec.numero);
+  if (existing) {
+    // Atualiza o registro existente em vez de criar duplicata
+    Object.assign(existing, rec, { id: existing.id, sb_id: existing.sb_id });
+    computeRecord(existing);
+    if (useSupabase && existing.sb_id) {
+      try { await updateInSupabase(client, existing); } catch(e) {}
+    }
+    saveLocal();
+    showToast(`ℹ Oportunidade ${rec.numero} já existia — registro atualizado`, '#1d4ed8');
+    renderClientTab(client);
+    if (currentTab === 'overview') renderOverview();
+    return; // Não continua para inserir novo
   }
   saveLocal();
   checkCreateVenda(client, rec);
@@ -2614,24 +2681,65 @@ function openImportModal(client) {
 async function confirmImport() {
   if (!pendingImportClient || !pendingImport.length) return;
   const client = pendingImportClient;
-  const recs = [...pendingImport];
+  const recs   = [...pendingImport];
 
-  if (useSupabase) {
-    try {
-      markSyncing(); showLoading(`Salvando ${recs.length} registros no Supabase…`);
-      await insertBatchToSupabase(client, recs);
-      hideLoading(); markSynced();
-    } catch(e) { hideLoading(); markSyncError(e.message); showToast('✗ Erro no batch insert: '+e.message,'#dc2626'); return; }
+  // ── Separar novos de existentes (por número de oportunidade) ──
+  const existingNums = new Set((data[client]||[]).map(r => r.numero).filter(Boolean));
+  const novos     = recs.filter(r => !r.numero || !existingNums.has(r.numero));
+  const existentes= recs.filter(r =>  r.numero &&  existingNums.has(r.numero));
+
+  let importados = 0, atualizados = 0;
+
+  // ── Atualiza existentes (substitui pelo mais novo) ──
+  existentes.forEach(rec => {
+    const idx = (data[client]||[]).findIndex(r => r.numero === rec.numero);
+    if (idx !== -1) {
+      data[client][idx] = { ...data[client][idx], ...rec, id: data[client][idx].id };
+      computeRecord(data[client][idx]);
+    }
+    atualizados++;
+  });
+
+  // ── Insere novos ──
+  if (novos.length) {
+    if (useSupabase) {
+      try {
+        markSyncing();
+        showLoading(`Salvando ${novos.length} novos registros…`);
+        await insertBatchToSupabase(client, novos);
+        hideLoading(); markSynced();
+      } catch(e) {
+        hideLoading(); markSyncError(e.message);
+        showToast('✗ Erro ao importar: '+e.message,'#dc2626'); return;
+      }
+    }
+    data[client].push(...novos);
+    importados = novos.length;
   }
 
-  data[client].push(...recs);
+  // ── Atualiza existentes no Supabase ──
+  if (existentes.length && useSupabase) {
+    try {
+      for (const rec of existentes) {
+        const local = (data[client]||[]).find(r => r.numero === rec.numero);
+        if (local?.sb_id) await updateInSupabase(client, local);
+      }
+    } catch(e) { /* silencioso — dados já salvos localmente */ }
+  }
+
   saveLocal();
   pendingImport = []; pendingImportClient = null;
   closeImportModal();
   cancelImport(slugify(client));
   renderClientTab(client);
   if (currentTab === 'overview') renderOverview();
-  showToast(`✓ ${recs.length} oportunidades importadas!`);
+
+  const msg = importados > 0 && atualizados > 0
+    ? `✓ ${importados} importada(s) · ${atualizados} atualizada(s)`
+    : importados > 0
+    ? `✓ ${importados} oportunidade(s) importada(s)`
+    : `✓ ${atualizados} oportunidade(s) atualizada(s)`;
+  showToast(msg);
 }
 
 function cancelImport(slug) {
@@ -2718,7 +2826,7 @@ function renderClientTab(client) {
     const total = filtered.length;
     const particip = filtered.filter(r=>r.participamos==='SIM').length;
     const vendas = filtered.filter(r=>r.venda==='SIM').length;
-    const receita = filtered.filter(r=>r.venda==='SIM').reduce((s,r)=>s+(parseFloat(r.valor)||0),0);
+    const receita = dedupByNumero(filtered.filter(r=>r.venda==='SIM')).reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0);
     const conv = particip > 0 ? (vendas/particip*100).toFixed(1) : '0.0';
     const ciclos = filtered.filter(r=>r.ciclo!=null).map(r=>r.ciclo);
     const cicloMed = ciclos.length ? Math.round(ciclos.reduce((a,b)=>a+b,0)/ciclos.length)+'d' : '—';
@@ -2800,12 +2908,9 @@ function renderOverviewTable(filtered) {
     const qtdVendas  = vendas_recs.length;
 
     // Valor cotado = soma de todos com valor > 0
-    const valorCotado = recs.reduce((s,r) => s + (parseFloat(r.valor)||0), 0);
-    const mediaCotada = particip > 0
-      ? recs.filter(r=>r.participamos==='SIM').reduce((s,r)=>s+(parseFloat(r.valor)||0),0) / particip
-      : 0;
-    const valorVendido = vendas_recs.reduce((s,r) => s + (parseFloat(r.valor)||0), 0);
-    const conversao    = particip > 0 ? (qtdVendas / particip * 100) : 0;
+    const valorCotado  = dedupByNumero(recs).reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0);
+    const qtdVendas    = recs.filter(r=>r.venda==='SIM').length;
+    const valorVendido = dedupByNumero(recs.filter(r=>r.venda==='SIM')).reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0);
     const ticketMedio  = qtdVendas > 0 ? (valorVendido / qtdVendas) : 0;
 
     return { client, total, particip, valorCotado, mediaCotada, qtdVendas, valorVendido, conversao, ticketMedio };
@@ -2883,7 +2988,7 @@ function renderKPIs(filtered) {
   const total = filtered.length;
   const particip = filtered.filter(r=>r.participamos==='SIM').length;
   const vendas = filtered.filter(r=>r.venda==='SIM').length;
-  const receita = filtered.filter(r=>r.venda==='SIM').reduce((s,r)=>s+(parseFloat(r.valor)||0),0);
+  const receita = dedupByNumero(filtered.filter(r=>r.venda==='SIM')).reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0);
   const conv = particip > 0 ? (vendas/particip*100).toFixed(1) : '0.0';
   const ciclos = filtered.filter(r=>r.ciclo!=null).map(r=>r.ciclo);
   const cicloMed = ciclos.length ? Math.round(ciclos.reduce((a,b)=>a+b,0)/ciclos.length) : '—';
@@ -2977,7 +3082,7 @@ function renderCharts(filtered) {
   dc('rc');
   const rcClients = CLIENTS.filter(c => filtered.some(r => r.cliente===c));
   const rcData = rcClients.map(c =>
-    filtered.filter(r=>r.cliente===c && r.venda==='SIM')
+    dedupByNumero(filtered.filter(r=>r.cliente===c && r.venda==='SIM'))
             .reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0)
   );
   const rcMax = Math.max(...rcData, 1);
@@ -3133,12 +3238,18 @@ function renderCharts(filtered) {
   dc('ev');
   dc('mo'); // remove standalone month chart if exists
   const evMonths={};
+  const evSeenNums={}; // track numero per month to avoid double-counting
   filtered.forEach(r=>{
     if(!r.mes||!r.ano)return;
     const k=r.ano+'-'+r.mes;
-    if(!evMonths[k])evMonths[k]={total:0,receita:0,particip:0,vendas:0};
+    if(!evMonths[k]){evMonths[k]={total:0,receita:0,particip:0,vendas:0}; evSeenNums[k]=new Set();}
     evMonths[k].total++;
-    if(r.venda==='SIM')evMonths[k].receita+=(parseFloat(String(r.valor||0).replace(',','.'))||0);
+    if(r.venda==='SIM' && r.numero && !evSeenNums[k].has(r.numero)){
+      evMonths[k].receita+=(parseFloat(String(r.valor||0).replace(',','.'))||0);
+      evSeenNums[k].add(r.numero);
+    } else if(r.venda==='SIM' && !r.numero){
+      evMonths[k].receita+=(parseFloat(String(r.valor||0).replace(',','.'))||0);
+    }
     if(r.participamos==='SIM')evMonths[k].particip++;
     if(r.venda==='SIM')evMonths[k].vendas++;
   });
@@ -5014,18 +5125,28 @@ async function registerAllGridRows(client) {
   btnReg.innerHTML = `⏳ Salvando ${toSave.length} registro(s)…`;
 
   try {
-    // ── Save all to localStorage (deduplicates by número) ──
+    // ── Separar novos de existentes ──
     if (!data[client]) data[client] = [];
-    let dedupCount = 0;
+    const existNums = new Set(data[client].map(r=>r.numero).filter(Boolean));
+    const novosRecs = [], existRecs = [];
     toSave.forEach(({ rec }) => {
       computeRecord(rec);
-      const removed = deduplicarOportunidade(client, rec);
-      if (removed) dedupCount++;
-      data[client].push(rec);
+      if (rec.numero && existNums.has(rec.numero)) {
+        // Atualiza o existente
+        const idx = data[client].findIndex(r=>r.numero===rec.numero);
+        if (idx !== -1) {
+          data[client][idx] = {...data[client][idx], ...rec, id: data[client][idx].id};
+          computeRecord(data[client][idx]);
+        }
+        existRecs.push(data[client].find(r=>r.numero===rec.numero) || rec);
+      } else {
+        data[client].push(rec);
+        novosRecs.push(rec);
+      }
     });
     saveLocal();
-    if (dedupCount > 0) {
-      showToast(`ℹ ${dedupCount} registro(s) duplicado(s) substituído(s) pela versão mais recente`, '#1d4ed8');
+    if (existRecs.length > 0) {
+      showToast(`ℹ ${existRecs.length} registro(s) atualizado(s) · ${novosRecs.length} novo(s)`, '#1d4ed8');
     }
 
     // ── Then send to Supabase if connected ──
@@ -5281,6 +5402,133 @@ function updateSortIcons(slug) {
       el.style.color = 'var(--blue)';
       el.title = s.dir === 'desc' ? 'Maior → Menor (clique para inverter)' : 'Menor → Maior (clique para remover)';
     }
+  });
+}
+
+
+// ════════════════════════════════════════════════
+// SELEÇÃO MÚLTIPLA E EXCLUSÃO EM MASSA
+// ════════════════════════════════════════════════
+
+function onRowSelect(cb, slug) {
+  const tr = cb.closest('tr');
+  if (cb.checked) {
+    tr.classList.add('row-selected');
+  } else {
+    tr.classList.remove('row-selected');
+  }
+  updateBulkDeleteBar(slug);
+}
+
+function updateBulkDeleteBar(slug) {
+  const bar      = document.getElementById('bulk-bar-'+slug);
+  const countEl  = document.getElementById('bulk-count-'+slug);
+  const selected = document.querySelectorAll(`#table-${slug} .row-select-cb:checked`);
+  const n = selected.length;
+
+  if (bar) bar.classList.toggle('visible', n > 0);
+  if (countEl) countEl.textContent = n;
+
+  // Update select-all checkbox state
+  const allCbs = document.querySelectorAll(`#table-${slug} .row-select-cb`);
+  const selectAllCb = document.querySelector(`#table-${slug}`).closest('.table-card')
+    ?.querySelector('.th-checkbox input');
+  if (selectAllCb) {
+    selectAllCb.indeterminate = n > 0 && n < allCbs.length;
+    selectAllCb.checked = n === allCbs.length && n > 0;
+  }
+}
+
+function toggleSelectAll(slug, client, masterCb) {
+  const cbs = document.querySelectorAll(`#table-${slug} .row-select-cb`);
+  cbs.forEach(cb => {
+    cb.checked = masterCb.checked;
+    const tr = cb.closest('tr');
+    if (masterCb.checked) tr.classList.add('row-selected');
+    else tr.classList.remove('row-selected');
+  });
+  updateBulkDeleteBar(slug);
+}
+
+function deselectAll(slug) {
+  const cbs = document.querySelectorAll(`#table-${slug} .row-select-cb`);
+  cbs.forEach(cb => {
+    cb.checked = false;
+    cb.closest('tr')?.classList.remove('row-selected');
+  });
+  const selectAllCb = document.querySelector(`#table-${slug}`)?.closest('.table-card')
+    ?.querySelector('.th-checkbox input');
+  if (selectAllCb) { selectAllCb.checked = false; selectAllCb.indeterminate = false; }
+  updateBulkDeleteBar(slug);
+}
+
+async function bulkDeleteSelected(client, slug) {
+  const selected = Array.from(document.querySelectorAll(`#table-${slug} .row-select-cb:checked`));
+  if (!selected.length) return;
+
+  const n = selected.length;
+
+  // Warn if any selected records have duplicates (same número, different id)
+  const selectedIds = new Set(selected.map(cb => cb.dataset.id));
+  const selectedRecs = (data[client]||[]).filter(r => selectedIds.has(r.id));
+  const selectedNums = selectedRecs.map(r => r.numero).filter(Boolean);
+  const allRecs = data[client] || [];
+  const hasDups = selectedNums.some(num =>
+    allRecs.filter(r => r.numero === num).length > 1 &&
+    allRecs.filter(r => r.numero === num && !selectedIds.has(r.id)).length > 0
+  );
+
+  let msg = `Excluir ${n} registro(s) selecionado(s)?`;
+  if (hasDups) {
+    msg += `
+
+⚠ Atenção: alguns números selecionados possuem outros registros com o mesmo número — apenas os registros selecionados serão excluídos, os demais serão mantidos.`;
+  }
+  msg += `
+
+Esta ação não pode ser desfeita.`;
+
+  if (!confirm(msg)) return;
+
+  const ids = Array.from(selectedIds);
+
+  // Remove ONLY selected IDs from local data (not all with same número)
+  if (data[client]) {
+    data[client] = data[client].filter(r => !ids.includes(r.id));
+  }
+  saveLocal();
+
+  // Delete from Supabase by ID (not by número — very important!)
+  if (useSupabase) {
+    try {
+      markSyncing();
+      for (let i = 0; i < ids.length; i += 50) {
+        const batch = ids.slice(i, i + 50);
+        const inFilter = batch.map(id => `id.eq.${id}`).join(',');
+        await sbFetch('DELETE', `?or=(${inFilter})`);
+      }
+      markSynced();
+    } catch(e) {
+      markSyncError(e.message);
+      showToast('✗ Erro ao excluir no Supabase: '+e.message, '#dc2626');
+    }
+  }
+
+  showToast(`🗑 ${n} registro(s) excluído(s)`, '#dc2626');
+  renderClientTab(client);
+  if (currentTab === 'overview') renderOverview();
+}
+
+
+// Remove duplicatas por número de oportunidade para cálculos
+// (mesmo nº = mesma oportunidade, não deve somar valor duas vezes)
+function dedupByNumero(records) {
+  const seen = new Set();
+  return records.filter(r => {
+    if (!r.numero) return true;
+    if (seen.has(r.numero)) return false;
+    seen.add(r.numero);
+    return true;
   });
 }
 
