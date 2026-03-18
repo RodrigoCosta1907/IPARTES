@@ -1496,43 +1496,35 @@ td.hi { color: var(--text); font-weight: 500; }
   <!-- Comparativo Mês a Mês -->
   <div class="comparativo-grid" id="comparativoGrid"></div>
 
-  <!-- Row 1: Receita + Conversão por Cliente -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+  <!-- Row 1: 3 colunas — Receita | Conversão | Status -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px;">
     <div class="chart-card">
-      <div class="chart-label">Receita por Cliente</div>
-      <div class="chart-wrap" style="height:230px"><canvas id="chartRC"></canvas></div>
+      <div class="chart-label">💰 Receita por Cliente</div>
+      <div class="chart-wrap" style="height:240px"><canvas id="chartRC"></canvas></div>
     </div>
     <div class="chart-card">
-      <div class="chart-label">Conversão por Cliente (%)</div>
-      <div class="chart-wrap" style="height:230px"><canvas id="chartCC"></canvas></div>
-    </div>
-  </div>
-
-  <!-- Row 2: Status + Receita por Mês -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
-    <div class="chart-card">
-      <div class="chart-label">Distribuição de Status</div>
-      <div class="chart-wrap" style="height:230px"><canvas id="chartST"></canvas></div>
+      <div class="chart-label">🎯 Conversão por Cliente (%)</div>
+      <div class="chart-wrap" style="height:240px"><canvas id="chartCC"></canvas></div>
     </div>
     <div class="chart-card">
-      <div class="chart-label">Receita por Mês da Oportunidade</div>
-      <div class="chart-wrap" style="height:230px"><canvas id="chartMO"></canvas></div>
+      <div class="chart-label">📊 Pipeline por Status</div>
+      <div class="chart-wrap" style="height:240px"><canvas id="chartST"></canvas></div>
     </div>
   </div>
 
-  <!-- Row 3: Evolução Mensal full width -->
+  <!-- Row 2: Evolução Mensal — full width, mais alto -->
   <div style="margin-bottom:14px;">
     <div class="chart-card">
-      <div class="chart-label">Evolução Mensal — Receita &amp; Conversão</div>
-      <div class="chart-wrap" style="height:260px"><canvas id="chartEV"></canvas></div>
+      <div class="chart-label">📈 Evolução Mensal — Oportunidades, Receita &amp; Conversão</div>
+      <div class="chart-wrap" style="height:300px"><canvas id="chartEV"></canvas></div>
     </div>
   </div>
 
-  <!-- Row 4: Funil full width -->
+  <!-- Row 3: Funil — full width, mais alto para caber labels -->
   <div style="margin-bottom:20px;">
     <div class="chart-card">
-      <div class="chart-label">Funil de Conversão</div>
-      <div class="chart-wrap" style="height:180px"><canvas id="chartFN"></canvas></div>
+      <div class="chart-label">🔽 Funil do Processo Comercial</div>
+      <div class="chart-wrap" style="height:220px"><canvas id="chartFN"></canvas></div>
     </div>
   </div>
 
@@ -2974,292 +2966,274 @@ const CD = {
 
 function renderCharts(filtered) {
 
-  // ── Shared plugin: data labels via chartjs-plugin-datalabels ──
-  // We use built-in formatter instead of external plugin for reliability
-
   const fmtR = v => {
     const n = parseFloat(v) || 0;
-    if (n >= 1000000) return 'R$ ' + (n/1000000).toFixed(1).replace('.',',') + 'M';
-    if (n >= 1000)    return 'R$ ' + (n/1000).toFixed(1).replace('.',',') + 'k';
-    if (n > 0)        return 'R$ ' + n.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0});
+    if (n >= 1000000) return 'R$ '+(n/1000000).toFixed(1).replace('.',',')+' M';
+    if (n >= 1000)    return 'R$ '+(n/1000).toFixed(1).replace('.',',')+' k';
+    if (n > 0)        return 'R$ '+n.toLocaleString('pt-BR',{maximumFractionDigits:0});
     return '';
   };
-
   const fmtN = v => v > 0 ? v.toLocaleString('pt-BR') : '';
 
-  // ── 1. Receita por Cliente (bar + labels) ──
+  // Shared tooltip style
+  const TT = {
+    backgroundColor:'#fff', titleColor:'#0f172a', bodyColor:'#475569',
+    borderColor:'#e2e8f0', borderWidth:1, padding:10, boxPadding:4
+  };
+
+  // ── 1. Receita por Cliente ──
   dc('rc');
-  const rcData = CLIENTS.map(c =>
-    filtered.filter(r => r.cliente===c && r.venda==='SIM')
-            .reduce((s,r) => s+(parseFloat(String(r.valor).replace(',','.'))||0), 0)
+  const rcClients = CLIENTS.filter(c => filtered.some(r => r.cliente===c));
+  const rcData = rcClients.map(c =>
+    filtered.filter(r=>r.cliente===c && r.venda==='SIM')
+            .reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0)
   );
+  const rcMax = Math.max(...rcData, 1);
   const c1 = document.getElementById('chartRC');
   if (c1) charts['rc'] = new Chart(c1, {
-    type: 'bar',
-    data: {
-      labels: CLIENTS,
-      datasets: [{
+    type:'bar',
+    data:{
+      labels: rcClients.map(c => c.length > 12 ? c.slice(0,12)+'…' : c),
+      datasets:[{
         data: rcData,
-        backgroundColor: ['rgba(29,78,216,.85)','rgba(234,88,12,.85)','rgba(21,128,61,.85)','rgba(180,83,9,.85)','rgba(71,85,105,.85)','rgba(124,58,237,.85)'],
-        borderRadius: 5, borderSkipped: false
+        backgroundColor:['rgba(29,78,216,.8)','rgba(234,88,12,.8)','rgba(21,128,61,.8)','rgba(180,83,9,.8)','rgba(71,85,105,.8)','rgba(124,58,237,.8)'],
+        borderRadius:5, borderSkipped:false
       }]
     },
-    options: {
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: ctx => ' ' + fmtR(ctx.raw) } }
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      layout:{ padding:{ top:28 } },
+      plugins:{
+        legend:{ display:false },
+        tooltip:{ ...TT, callbacks:{ label: ctx=>' '+fmtR(ctx.raw) } }
       },
-      scales: {
-        x: { ticks:{ color:'#475569', font:{family:'Inter',size:11} }, grid:{ display:false } },
-        y: { ticks:{ color:'#94a3b8', font:{family:'Inter',size:10}, callback: v => fmtR(v) }, grid:{ color:'#f1f5f9' } }
+      scales:{
+        x:{ ticks:{ color:'#475569', font:{family:'Inter',size:10}, maxRotation:20 }, grid:{display:false} },
+        y:{ ticks:{ color:'#94a3b8', font:{family:'Inter',size:10}, callback: v=>fmtR(v) },
+            grid:{ color:'#f1f5f9' }, max: rcMax * 1.25 }
       }
     },
-    plugins: [{
-      id: 'rcLabels',
-      afterDatasetsDraw(chart) {
-        const { ctx, data } = chart;
-        chart.getDatasetMeta(0).data.forEach((bar, i) => {
+    plugins:[{
+      id:'rcLabels',
+      afterDatasetsDraw(chart){
+        const {ctx,data} = chart;
+        chart.getDatasetMeta(0).data.forEach((bar,i)=>{
           const val = data.datasets[0].data[i];
           if (!val) return;
-          const label = fmtR(val);
           ctx.save();
-          ctx.font = 'bold 11px Inter';
+          ctx.font = 'bold 10px Inter';
           ctx.fillStyle = '#1e3a8a';
           ctx.textAlign = 'center';
-          ctx.fillText(label, bar.x, bar.y - 6);
+          ctx.fillText(fmtR(val), bar.x, bar.y - 6);
           ctx.restore();
         });
       }
     }]
   });
 
-  // ── 2. Conversão por Cliente (bar + labels %) ──
+  // ── 2. Conversão por Cliente ──
   dc('cc');
-  const ccData = CLIENTS.map(c => {
-    const r = filtered.filter(x => x.cliente===c);
-    const p = r.filter(x => x.participamos==='SIM').length;
-    const v = r.filter(x => x.venda==='SIM').length;
+  const ccData = rcClients.map(c => {
+    const recs = filtered.filter(x=>x.cliente===c);
+    const p = recs.filter(x=>x.participamos==='SIM').length;
+    const v = recs.filter(x=>x.venda==='SIM').length;
     return p > 0 ? +(v/p*100).toFixed(1) : 0;
   });
   const c2 = document.getElementById('chartCC');
   if (c2) charts['cc'] = new Chart(c2, {
-    type: 'bar',
-    data: {
-      labels: CLIENTS,
-      datasets: [{
+    type:'bar',
+    data:{
+      labels: rcClients.map(c => c.length > 12 ? c.slice(0,12)+'…' : c),
+      datasets:[{
         data: ccData,
         backgroundColor: ccData.map(v =>
-          v >= 15 ? 'rgba(21,128,61,.85)' :
-          v >= 8  ? 'rgba(180,83,9,.85)'  :
-                    'rgba(29,78,216,.85)'
+          v >= 15 ? 'rgba(21,128,61,.8)' :
+          v >= 8  ? 'rgba(180,83,9,.8)'  : 'rgba(29,78,216,.8)'
         ),
-        borderRadius: 5, borderSkipped: false
+        borderRadius:5, borderSkipped:false
       }]
     },
-    options: {
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: ctx => ' ' + ctx.raw + '%' } }
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      layout:{ padding:{ top:28 } },
+      plugins:{
+        legend:{ display:false },
+        tooltip:{ ...TT, callbacks:{ label: ctx=>' '+ctx.raw+'%' } }
       },
-      scales: {
-        x: { ticks:{ color:'#475569', font:{family:'Inter',size:11} }, grid:{ display:false } },
-        y: { max: 100, ticks:{ color:'#94a3b8', font:{family:'Inter',size:10}, callback: v => v+'%' }, grid:{ color:'#f1f5f9' } }
+      scales:{
+        x:{ ticks:{ color:'#475569', font:{family:'Inter',size:10}, maxRotation:20 }, grid:{display:false} },
+        y:{ max:100, ticks:{ color:'#94a3b8', font:{family:'Inter',size:10}, callback: v=>v+'%' },
+            grid:{ color:'#f1f5f9' } }
       }
     },
-    plugins: [{
-      id: 'ccLabels',
-      afterDatasetsDraw(chart) {
-        const { ctx, data } = chart;
-        chart.getDatasetMeta(0).data.forEach((bar, i) => {
+    plugins:[{
+      id:'ccLabels',
+      afterDatasetsDraw(chart){
+        const {ctx,data} = chart;
+        chart.getDatasetMeta(0).data.forEach((bar,i)=>{
           const val = data.datasets[0].data[i];
           if (!val) return;
           ctx.save();
-          ctx.font = 'bold 11px Inter';
-          ctx.fillStyle = val >= 15 ? '#15803d' : val >= 8 ? '#b45309' : '#1d4ed8';
+          ctx.font = 'bold 10px Inter';
+          ctx.fillStyle = val>=15?'#15803d':val>=8?'#b45309':'#1d4ed8';
           ctx.textAlign = 'center';
-          ctx.fillText(val + '%', bar.x, bar.y - 6);
+          ctx.fillText(val+'%', bar.x, bar.y - 6);
           ctx.restore();
         });
       }
     }]
   });
 
-  // ── 4. Distribuição de Status (doughnut + center label) ──
+  // ── 3. Pipeline por Status (doughnut) ──
   dc('st');
-  const svData = STATUS_OPTS.map(s => filtered.filter(r => r.status===s).length);
-  const svTotal = svData.reduce((a,b)=>a+b,0);
-  const stColors = ['rgba(29,78,216,.85)','rgba(180,83,9,.85)','rgba(21,128,61,.85)','rgba(71,85,105,.85)','rgba(148,163,184,.85)'];
+  const stLabels = STATUS_OPTS.filter(s => filtered.some(r=>r.status===s));
+  const svData   = stLabels.map(s => filtered.filter(r=>r.status===s).length);
+  const svTotal  = svData.reduce((a,b)=>a+b,0);
+  const stPalette= ['rgba(29,78,216,.85)','rgba(180,83,9,.85)','rgba(21,128,61,.85)',
+                    'rgba(239,68,68,.8)','rgba(71,85,105,.8)','rgba(148,163,184,.8)','rgba(234,88,12,.8)'];
   const c4 = document.getElementById('chartST');
   if (c4) charts['st'] = new Chart(c4, {
-    type: 'doughnut',
-    data: {
-      labels: STATUS_OPTS,
-      datasets: [{
+    type:'doughnut',
+    data:{
+      labels: stLabels,
+      datasets:[{
         data: svData,
-        backgroundColor: stColors,
-        borderWidth: 2, borderColor: '#fff', hoverOffset: 8
+        backgroundColor: stPalette,
+        borderWidth:2, borderColor:'#fff', hoverOffset:8
       }]
     },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      cutout: '62%',
-      plugins: {
-        legend: { position:'right', labels:{ color:'#475569', font:{family:'Inter',size:11}, boxWidth:12, padding:8,
-          generateLabels: chart => chart.data.labels.map((label,i) => ({
-            text: label + '  ' + (svData[i]||0),
-            fillStyle: stColors[i], hidden: false, index: i
-          }))
-        }},
-        tooltip: { callbacks: { label: ctx => ' ' + ctx.label + ': ' + ctx.raw + ' (' + (svTotal?+(ctx.raw/svTotal*100).toFixed(1):0)+'%)' }}
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      cutout:'58%',
+      plugins:{
+        legend:{
+          position:'right',
+          labels:{
+            color:'#475569', font:{family:'Inter',size:10},
+            boxWidth:10, padding:8,
+            generateLabels: chart => chart.data.labels.map((label,i)=>({
+              text: label+'  '+fmtN(svData[i]),
+              fillStyle: stPalette[i], hidden:false, index:i
+            }))
+          }
+        },
+        tooltip:{ ...TT, callbacks:{ label: ctx=>' '+ctx.label+': '+fmtN(ctx.raw)+
+          ' ('+(svTotal?+(ctx.raw/svTotal*100).toFixed(1):0)+'%)' }}
       }
     },
-    plugins: [{
-      id: 'stCenter',
-      beforeDraw(chart) {
-        const { ctx, chartArea: {top,bottom,left,right} } = chart;
-        const cx = (left+right)/2, cy = (top+bottom)/2;
+    plugins:[{
+      id:'stCenter',
+      beforeDraw(chart){
+        const {ctx,chartArea:{top,bottom,left,right}} = chart;
+        const cx=(left+right)/2, cy=(top+bottom)/2;
         ctx.save();
-        ctx.font = 'bold 20px Inter'; ctx.fillStyle = '#0f172a';
-        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText(svTotal, cx, cy-8);
-        ctx.font = '11px Inter'; ctx.fillStyle = '#94a3b8';
-        ctx.fillText('registros', cx, cy+10);
+        ctx.font='bold 18px Inter'; ctx.fillStyle='#0f172a';
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(fmtN(svTotal), cx, cy-8);
+        ctx.font='10px Inter'; ctx.fillStyle='#94a3b8';
+        ctx.fillText('oportunidades', cx, cy+10);
         ctx.restore();
       }
     }]
   });
 
-  // ── 5. Receita por Mês da Oportunidade (line + point labels) ──
-  dc('mo');
-  const rmop = {};
-  filtered.filter(r=>r.venda==='SIM'&&r.mes&&r.ano).forEach(r=>{
-    const k=r.ano+'-'+r.mes; rmop[k]=(rmop[k]||0)+(parseFloat(String(r.valor).replace(',','.'))||0);
-  });
-  const s5 = Object.entries(rmop).sort((a,b)=>a[0].localeCompare(b[0]));
-  const moLabels = s5.map(([k])=>{ const[y,m]=k.split('-'); return MONTHS[parseInt(m)-1]+'/'+y.slice(2); });
-  const moData   = s5.map(([,v])=>v);
-  const c5 = document.getElementById('chartMO');
-  if (c5) charts['mo'] = new Chart(c5, {
-    type: 'line',
-    data: {
-      labels: moLabels,
-      datasets: [{
-        label: 'Receita',
-        data: moData,
-        borderColor: '#1d4ed8',
-        backgroundColor: 'rgba(29,78,216,.07)',
-        tension: .4,
-        pointBackgroundColor: '#1d4ed8',
-        pointRadius: 5,
-        pointHoverRadius: 7,
-        fill: true
-      }]
-    },
-    options: {
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: ctx => ' ' + fmtR(ctx.raw) }}
-      },
-      scales: {
-        x: { ticks:{ color:'#475569', font:{family:'Inter',size:11} }, grid:{ color:'#f1f5f9' } },
-        y: { ticks:{ color:'#94a3b8', font:{family:'Inter',size:10}, callback: v => fmtR(v) }, grid:{ color:'#f1f5f9' } }
-      }
-    },
-    plugins: [{
-      id: 'moLabels',
-      afterDatasetsDraw(chart) {
-        if (moData.length > 12) return; // skip if too many points
-        const { ctx } = chart;
-        chart.getDatasetMeta(0).data.forEach((pt, i) => {
-          const val = moData[i];
-          if (!val) return;
-          ctx.save();
-          ctx.font = 'bold 10px Inter';
-          ctx.fillStyle = '#1d4ed8';
-          ctx.textAlign = 'center';
-          ctx.fillText(fmtR(val), pt.x, pt.y - 10);
-          ctx.restore();
-        });
-      }
-    }]
-  });
-
-  // ── 6. Evolução Mensal (bar + line dual axis) ──
+  // ── 4. Evolução Mensal — Oportunidades (bars) + Receita (line) + Conversão (line) ──
   dc('ev');
+  dc('mo'); // remove standalone month chart if exists
   const evMonths={};
   filtered.forEach(r=>{
     if(!r.mes||!r.ano)return;
     const k=r.ano+'-'+r.mes;
-    if(!evMonths[k])evMonths[k]={receita:0,particip:0,vendas:0};
+    if(!evMonths[k])evMonths[k]={total:0,receita:0,particip:0,vendas:0};
+    evMonths[k].total++;
     if(r.venda==='SIM')evMonths[k].receita+=(parseFloat(String(r.valor||0).replace(',','.'))||0);
     if(r.participamos==='SIM')evMonths[k].particip++;
     if(r.venda==='SIM')evMonths[k].vendas++;
   });
-  const evKeys=Object.keys(evMonths).sort();
-  const evLabels=evKeys.map(k=>{const[y,m]=k.split('-');return MONTHS[parseInt(m)-1]+'/'+y.slice(2);});
-  const evReceita=evKeys.map(k=>evMonths[k].receita);
-  const evConv=evKeys.map(k=>evMonths[k].particip>0?+(evMonths[k].vendas/evMonths[k].particip*100).toFixed(1):0);
+  const evKeys   = Object.keys(evMonths).sort();
+  const evLabels = evKeys.map(k=>{const[y,m]=k.split('-');return MONTHS[parseInt(m)-1]+'/'+y.slice(2);});
+  const evTotal  = evKeys.map(k=>evMonths[k].total);
+  const evReceita= evKeys.map(k=>evMonths[k].receita);
+  const evConv   = evKeys.map(k=>evMonths[k].particip>0?+(evMonths[k].vendas/evMonths[k].particip*100).toFixed(1):0);
   const cEV=document.getElementById('chartEV');
   if(cEV) charts['ev']=new Chart(cEV,{
     data:{
       labels:evLabels,
       datasets:[
-        {type:'bar',  label:'Receita (R$)',  data:evReceita, backgroundColor:'rgba(29,78,216,.18)',borderColor:'#1d4ed8',borderWidth:1.5,borderRadius:4,yAxisID:'y'},
-        {type:'line', label:'Conversão (%)', data:evConv,    borderColor:'#ea580c',backgroundColor:'rgba(234,88,12,.08)',tension:.4,pointBackgroundColor:'#ea580c',pointRadius:5,fill:true,yAxisID:'y2'}
+        {type:'bar',  label:'Oportunidades', data:evTotal,   backgroundColor:'rgba(29,78,216,.12)',
+         borderColor:'rgba(29,78,216,.4)', borderWidth:1, borderRadius:3, yAxisID:'y'},
+        {type:'line', label:'Receita (R$)',   data:evReceita, borderColor:'#ea580c',
+         backgroundColor:'rgba(234,88,12,.06)', tension:.4, pointRadius:3,
+         pointBackgroundColor:'#ea580c', fill:true, yAxisID:'y2'},
+        {type:'line', label:'Conversão (%)',  data:evConv,    borderColor:'#15803d',
+         backgroundColor:'transparent', tension:.4, pointRadius:3,
+         pointBackgroundColor:'#15803d', borderDash:[4,3], yAxisID:'y3'}
       ]
     },
     options:{
-      responsive: true,
-      maintainAspectRatio: false,
+      responsive:true, maintainAspectRatio:false,
       interaction:{mode:'index',intersect:false},
       plugins:{
-        legend:{labels:{color:'#475569',font:{family:'Inter',size:11},padding:16}},
-        tooltip:{callbacks:{
-          label: ctx => ctx.datasetIndex===0
-            ? ' Receita: ' + fmtR(ctx.raw)
-            : ' Conversão: ' + ctx.raw + '%'
+        legend:{labels:{color:'#475569',font:{family:'Inter',size:11},padding:14,boxWidth:12}},
+        tooltip:{...TT, callbacks:{
+          label: ctx => {
+            if(ctx.datasetIndex===0) return ' Oportunidades: '+fmtN(ctx.raw);
+            if(ctx.datasetIndex===1) return ' Receita: '+fmtR(ctx.raw);
+            return ' Conversão: '+ctx.raw+'%';
+          }
         }}
       },
       scales:{
-        x: {ticks:{color:'#475569',font:{family:'Inter',size:10}},grid:{color:'#f1f5f9'}},
-        y: {position:'left', ticks:{color:'#1d4ed8',font:{family:'Inter',size:10},callback:v=>fmtR(v)},grid:{color:'#f1f5f9'},title:{display:true,text:'Receita',color:'#1d4ed8',font:{size:10}}},
-        y2:{position:'right',ticks:{color:'#ea580c',font:{family:'Inter',size:10},callback:v=>v+'%'},grid:{drawOnChartArea:false},max:100,title:{display:true,text:'Conversão %',color:'#ea580c',font:{size:10}}}
+        x: {ticks:{color:'#64748b',font:{family:'Inter',size:10},maxRotation:45},
+            grid:{color:'#f8fafc',drawBorder:false}},
+        y: {position:'left',  display:true,
+            ticks:{color:'rgba(29,78,216,.7)',font:{family:'Inter',size:9},callback:v=>fmtN(v)},
+            grid:{color:'#f1f5f9',drawBorder:false},
+            title:{display:true,text:'Oportunidades',color:'rgba(29,78,216,.7)',font:{size:9}}},
+        y2:{position:'right', display:true,
+            ticks:{color:'#ea580c',font:{family:'Inter',size:9},callback:v=>fmtR(v)},
+            grid:{drawOnChartArea:false,drawBorder:false},
+            title:{display:true,text:'Receita',color:'#ea580c',font:{size:9}}},
+        y3:{position:'right', display:false, max:100,
+            ticks:{color:'#15803d',font:{family:'Inter',size:9},callback:v=>v+'%'}}
       }
     }
   });
 
-  // ── 7. Funil de Conversão (horizontal bar + labels) ──
+  // ── 5. Funil do Processo Comercial ──
   dc('fn');
-  const fT=filtered.length;
-  const fP=filtered.filter(r=>r.participamos==='SIM').length;
-  const fPr=filtered.filter(r=>r.status==='Orçamento Enviado'||r.status==='Pedido Recebido').length;
-  const fV=filtered.filter(r=>r.venda==='SIM').length;
-  const fnData = [fT,fP,fPr,fV];
-  const fnLabels = ['Oportunidades','Participações','Propostas / Ganhos','Vendas'];
-  const fnColors = ['rgba(29,78,216,.85)','rgba(71,85,105,.85)','rgba(180,83,9,.85)','rgba(21,128,61,.85)'];
+  const fT   = filtered.length;
+  const fCot = filtered.filter(r=>r.status==='Cotando').length;
+  const fOrc = filtered.filter(r=>r.status==='Orçamento Enviado').length;
+  const fPed = filtered.filter(r=>r.status==='Pedido Recebido').length;
+  const fPer = filtered.filter(r=>r.status==='Perdido').length;
+  const fnData   = [fT, fCot, fOrc, fPed, fPer];
+  const fnLabels = ['Total de Oportunidades','Em Cotação','Orçamento Enviado','Pedido Recebido ✓','Perdido ✗'];
+  const fnColors = ['rgba(29,78,216,.85)','rgba(71,85,105,.85)','rgba(180,83,9,.85)','rgba(21,128,61,.85)','rgba(239,68,68,.75)'];
   const c7=document.getElementById('chartFN');
   if(c7) charts['fn']=new Chart(c7,{
     type:'bar',
     data:{
-      labels: fnLabels,
+      labels:fnLabels,
       datasets:[{
-        data: fnData,
-        backgroundColor: fnColors,
-        borderRadius: 5
+        data:fnData,
+        backgroundColor:fnColors,
+        borderRadius:5
       }]
     },
     options:{
-      responsive: true,
-      maintainAspectRatio: false,
+      responsive:true, maintainAspectRatio:false,
       indexAxis:'y',
+      layout:{ padding:{ right:80 } },
       plugins:{
         legend:{display:false},
-        tooltip:{callbacks:{label: ctx => ' ' + fmtN(ctx.raw) + ' registros'}}
+        tooltip:{...TT, callbacks:{label: ctx=>' '+fmtN(ctx.raw)+' registros'}}
       },
       scales:{
-        x:{ticks:{color:'#94a3b8',font:{family:'Inter',size:11},callback:v=>fmtN(v)},grid:{color:'#f1f5f9'}},
-        y:{ticks:{color:'#334155',font:{family:'Inter',size:12,weight:'600'}},grid:{display:false}}
+        x:{ticks:{color:'#94a3b8',font:{family:'Inter',size:11},callback:v=>fmtN(v)},
+           grid:{color:'#f1f5f9',drawBorder:false}, beginAtZero:true},
+        y:{ticks:{color:'#334155',font:{family:'Inter',size:11,weight:'600'}},
+           grid:{display:false}}
       }
     },
     plugins:[{
@@ -3269,23 +3243,21 @@ function renderCharts(filtered) {
         chart.getDatasetMeta(0).data.forEach((bar,i)=>{
           const val = fnData[i];
           if(!val) return;
-          const pct = fT>0 ? ' (' + (val/fT*100).toFixed(0)+'%)' : '';
+          const pct = fT>0?' ('+( val/fT*100).toFixed(1)+'%)':'';
+          const label = fmtN(val)+pct;
           ctx.save();
-          ctx.font = 'bold 12px Inter';
-          ctx.fillStyle = '#fff';
-          ctx.textAlign = 'left';
-          ctx.textBaseline = 'middle';
-          const x = bar.x - ctx.measureText(fmtN(val)+pct).width - 10;
-          const xPos = x < bar.base + 8 ? bar.base + 8 : x;
-          ctx.fillStyle = x < bar.base + 8 ? fnColors[i].replace('.85','1') : '#fff';
-          ctx.fillText(fmtN(val) + pct, xPos, bar.y);
+          ctx.font='bold 11px Inter';
+          ctx.fillStyle='#334155';
+          ctx.textAlign='left';
+          ctx.textBaseline='middle';
+          // Always draw label to the RIGHT of the bar, outside
+          ctx.fillText(label, bar.x + 8, bar.y);
           ctx.restore();
         });
       }
     }]
   });
 }
-
 // ══════════════════════════════════════════════════
 // RENDER OVERVIEW
 // ══════════════════════════════════════════════════
