@@ -2314,6 +2314,19 @@ function buildClientTabs() {
           <button class="btn-reset" onclick="resetClientFilters('${slug}','${client}')"
             style="font-size:11px;padding:4px 10px" title="Limpar filtros">↺</button>
         </div>
+        <!-- Barra de exclusão em massa -->
+        <div class="bulk-delete-bar" id="bulk-bar-${slug}">
+          <div class="bulk-delete-info">
+            <span class="bulk-delete-count" id="bulk-count-${slug}">0</span>
+            selecionada(s)
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn-deselect-all" onclick="deselectAll('${slug}')">✕ Desmarcar</button>
+            <button class="btn-bulk-delete" onclick="bulkDeleteSelected('${client}','${slug}')">
+              🗑 Excluir Selecionadas
+            </button>
+          </div>
+        </div>
         <div class="table-wrap">
           <table>
             <thead><tr>
@@ -2931,9 +2944,10 @@ function renderOverviewTable(filtered) {
     const recs       = filtered.filter(r => r.cliente === client);
     if (!recs.length) return null;
 
-    const total      = recs.length;
-    const particip   = recs.filter(r => r.participamos === 'SIM').length;
-    const vendas_recs= recs.filter(r => r.venda === 'SIM');
+    const _dr = dedupByNumero(recs);
+    const total      = _dr.length;
+    const particip   = _dr.filter(r => r.participamos === 'SIM').length;
+    const vendas_recs= _dr.filter(r => r.venda === 'SIM');
     const qtdVendas  = vendas_recs.length;
     const valorCotado  = dedupByNumero(recs).reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0);
     const valorVendido = dedupByNumero(recs.filter(r=>r.venda==='SIM')).reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0);
@@ -3013,10 +3027,11 @@ function exportSummary() {
 // KPIs
 // ══════════════════════════════════════════════════
 function renderKPIs(filtered) {
-  const total = filtered.length;
-  const particip = filtered.filter(r=>r.participamos==='SIM').length;
-  const vendas = filtered.filter(r=>r.venda==='SIM').length;
-  const receita = dedupByNumero(filtered.filter(r=>r.venda==='SIM')).reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0);
+  const _dd = dedupByNumero(filtered);
+  const total = _dd.length;
+  const particip = _dd.filter(r=>r.participamos==='SIM').length;
+  const vendas = _dd.filter(r=>r.venda==='SIM').length;
+  const receita = _dd.filter(r=>r.venda==='SIM').reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0);
   const conv = particip > 0 ? (vendas/particip*100).toFixed(1) : '0.0';
   const ciclos = filtered.filter(r=>r.ciclo!=null).map(r=>r.ciclo);
   const cicloMed = ciclos.length ? Math.round(ciclos.reduce((a,b)=>a+b,0)/ciclos.length) : '—';
@@ -3159,7 +3174,7 @@ function renderCharts(filtered) {
   // ── 2. Conversão por Cliente ──
   dc('cc');
   const ccData = rcClients.map(c => {
-    const recs = filtered.filter(x=>x.cliente===c);
+    const recs = dedupByNumero(filtered.filter(x=>x.cliente===c));
     const p = recs.filter(x=>x.participamos==='SIM').length;
     const v = recs.filter(x=>x.venda==='SIM').length;
     return p > 0 ? +(v/p*100).toFixed(1) : 0;
@@ -3211,8 +3226,9 @@ function renderCharts(filtered) {
 
   // ── 3. Pipeline por Status (doughnut) ──
   dc('st');
-  const stLabels = STATUS_OPTS.filter(s => filtered.some(r=>r.status===s));
-  const svData   = stLabels.map(s => filtered.filter(r=>r.status===s).length);
+  const stDedup  = dedupByNumero(filtered);
+  const stLabels = STATUS_OPTS.filter(s => stDedup.some(r=>r.status===s));
+  const svData   = stLabels.map(s => stDedup.filter(r=>r.status===s).length);
   const svTotal  = svData.reduce((a,b)=>a+b,0);
   const stPalette= ['rgba(29,78,216,.85)','rgba(180,83,9,.85)','rgba(21,128,61,.85)',
                     'rgba(239,68,68,.8)','rgba(71,85,105,.8)','rgba(148,163,184,.8)','rgba(234,88,12,.8)'];
@@ -3266,20 +3282,19 @@ function renderCharts(filtered) {
   dc('ev');
   dc('mo'); // remove standalone month chart if exists
   const evMonths={};
-  const evSeenNums={}; // track numero per month to avoid double-counting
+  // Dedup por número dentro de cada mês
+  const evSeenNums={};
   filtered.forEach(r=>{
     if(!r.mes||!r.ano)return;
     const k=r.ano+'-'+r.mes;
     if(!evMonths[k]){evMonths[k]={total:0,receita:0,particip:0,vendas:0}; evSeenNums[k]=new Set();}
+    // Só conta se número ainda não visto neste mês
+    if(r.numero && evSeenNums[k].has(r.numero)) return;
+    if(r.numero) evSeenNums[k].add(r.numero);
     evMonths[k].total++;
-    if(r.venda==='SIM' && r.numero && !evSeenNums[k].has(r.numero)){
-      evMonths[k].receita+=(parseFloat(String(r.valor||0).replace(',','.'))||0);
-      evSeenNums[k].add(r.numero);
-    } else if(r.venda==='SIM' && !r.numero){
-      evMonths[k].receita+=(parseFloat(String(r.valor||0).replace(',','.'))||0);
-    }
-    if(r.participamos==='SIM')evMonths[k].particip++;
-    if(r.venda==='SIM')evMonths[k].vendas++;
+    if(r.venda==='SIM') evMonths[k].receita+=(parseFloat(String(r.valor||0).replace(',','.'))||0);
+    if(r.participamos==='SIM') evMonths[k].particip++;
+    if(r.venda==='SIM') evMonths[k].vendas++;
   });
   const evKeys   = Object.keys(evMonths).sort();
   const evLabels = evKeys.map(k=>{const[y,m]=k.split('-');return MONTHS[parseInt(m)-1]+'/'+y.slice(2);});
@@ -3333,11 +3348,12 @@ function renderCharts(filtered) {
 
   // ── 5. Funil do Processo Comercial ──
   dc('fn');
-  const fT   = filtered.length;
-  const fCot = filtered.filter(r=>r.status==='Cotando').length;
-  const fOrc = filtered.filter(r=>r.status==='Orçamento Enviado').length;
-  const fPed = filtered.filter(r=>r.status==='Pedido Recebido').length;
-  const fPer = filtered.filter(r=>r.status==='Perdido').length;
+  const fnDedup = dedupByNumero(filtered);
+  const fT   = fnDedup.length;
+  const fCot = fnDedup.filter(r=>r.status==='Cotando').length;
+  const fOrc = fnDedup.filter(r=>r.status==='Orçamento Enviado').length;
+  const fPed = fnDedup.filter(r=>r.status==='Pedido Recebido').length;
+  const fPer = fnDedup.filter(r=>r.status==='Perdido').length;
   const fnData   = [fT, fCot, fOrc, fPed, fPer];
   const fnLabels = ['Total de Oportunidades','Em Cotação','Orçamento Enviado','Pedido Recebido ✓','Perdido ✗'];
   const fnColors = ['rgba(29,78,216,.85)','rgba(71,85,105,.85)','rgba(180,83,9,.85)','rgba(21,128,61,.85)','rgba(239,68,68,.75)'];
