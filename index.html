@@ -2906,11 +2906,10 @@ function renderOverviewTable(filtered) {
     const particip   = recs.filter(r => r.participamos === 'SIM').length;
     const vendas_recs= recs.filter(r => r.venda === 'SIM');
     const qtdVendas  = vendas_recs.length;
-
-    // Valor cotado = soma de todos com valor > 0
     const valorCotado  = dedupByNumero(recs).reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0);
-    const qtdVendas    = recs.filter(r=>r.venda==='SIM').length;
     const valorVendido = dedupByNumero(recs.filter(r=>r.venda==='SIM')).reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0);
+    const mediaCotada  = particip > 0 ? (valorCotado / particip) : 0;
+    const conversao    = particip > 0 ? (qtdVendas / particip * 100) : 0;
     const ticketMedio  = qtdVendas > 0 ? (valorVendido / qtdVendas) : 0;
 
     return { client, total, particip, valorCotado, mediaCotada, qtdVendas, valorVendido, conversao, ticketMedio };
