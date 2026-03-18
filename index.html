@@ -1378,6 +1378,165 @@ td.hi { color: var(--text); font-weight: 500; }
   .th-checkbox { width: 32px; padding: 0 8px !important; }
   .td-checkbox { width: 32px; padding: 0 8px !important; text-align: center; }
 
+
+  /* ── SIDEBAR LAYOUT ── */
+  .app-layout {
+    display: flex;
+    min-height: calc(100vh - 56px);
+  }
+
+  .sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    background: #1e293b;
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 56px;
+    height: calc(100vh - 56px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: #334155 transparent;
+    z-index: 50;
+    transition: width .25s ease;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
+
+  .sidebar-section {
+    padding: 6px 0;
+    border-bottom: 1px solid #334155;
+  }
+  .sidebar-section:last-child { border-bottom: none; }
+
+  .sidebar-section-header {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px 6px;
+    font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .8px;
+    color: #64748b;
+    cursor: pointer;
+    user-select: none;
+    transition: color .15s;
+  }
+  .sidebar-section-header:hover { color: #94a3b8; }
+  .sidebar-section-header .vendor-badge {
+    width: 20px; height: 20px; border-radius: 50%;
+    font-size: 9px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; flex-shrink: 0;
+  }
+  .badge-rodrigo { background: #ea580c; }
+  .badge-lenon   { background: #15803d; }
+  .badge-luiz    { background: #1d4ed8; }
+  .badge-geral   { background: #475569; }
+
+  .sidebar-section-header .collapse-icon {
+    margin-left: auto; font-size: 10px;
+    color: #475569; transition: transform .2s;
+  }
+  .sidebar-section.collapsed .collapse-icon { transform: rotate(-90deg); }
+  .sidebar-section.collapsed .sidebar-items { display: none; }
+
+  .sidebar-items { padding: 2px 0; }
+
+  .sidebar-item {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 14px 7px 20px;
+    font-size: 12px; font-weight: 500;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all .15s;
+    border: none; background: transparent;
+    width: 100%; text-align: left;
+    font-family: var(--font);
+    border-left: 2px solid transparent;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .sidebar-item:hover {
+    color: #e2e8f0;
+    background: rgba(255,255,255,.04);
+  }
+  .sidebar-item.active {
+    color: #fff;
+    background: rgba(255,255,255,.07);
+    font-weight: 600;
+  }
+  .sidebar-item.active.rodrigo { border-left-color: #ea580c; }
+  .sidebar-item.active.lenon   { border-left-color: #15803d; }
+  .sidebar-item.active.luiz    { border-left-color: #1d4ed8; }
+  .sidebar-item.active.geral   { border-left-color: #94a3b8; }
+  .sidebar-item.active.vendas  { border-left-color: #7c3aed; }
+
+  .sidebar-item .item-icon { font-size: 12px; flex-shrink: 0; }
+
+  /* Add client button in sidebar */
+  .sidebar-add-btn {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 14px 5px 20px;
+    font-size: 11px; color: #475569;
+    cursor: pointer; transition: color .15s;
+    border: none; background: transparent;
+    font-family: var(--font);
+  }
+  .sidebar-add-btn:hover { color: #94a3b8; }
+
+  /* Main content area */
+  .main-content {
+    flex: 1;
+    min-width: 0;
+    padding: 20px 28px;
+    background: var(--bg);
+    background-image: radial-gradient(circle at 1px 1px, rgba(29,78,216,.04) 1px, transparent 0);
+    background-size: 28px 28px;
+  }
+
+  /* Module header */
+  .module-header {
+    display: flex; align-items: center; gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--border);
+  }
+  .module-badge {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800; color: #fff;
+    flex-shrink: 0;
+  }
+  .module-badge.rodrigo { background: linear-gradient(135deg,#c2410c,#ea580c); }
+  .module-badge.lenon   { background: linear-gradient(135deg,#15803d,#16a34a); }
+  .module-badge.luiz    { background: linear-gradient(135deg,#1d4ed8,#3b82f6); }
+  .module-title { font-size: 20px; font-weight: 700; color: var(--text); }
+  .module-sub   { font-size: 12px; color: var(--text3); margin-top: 2px; }
+
+  /* Sidebar toggle for mobile */
+  .sidebar-toggle {
+    display: none;
+    position: fixed; bottom: 20px; left: 20px;
+    width: 44px; height: 44px;
+    background: var(--blue); border: none; border-radius: 50%;
+    color: #fff; font-size: 18px;
+    cursor: pointer; z-index: 200;
+    box-shadow: 0 4px 12px rgba(29,78,216,.4);
+  }
+  .sidebar.collapsed-mobile { width: 0; overflow: hidden; }
+
+  @media (max-width: 768px) {
+    .app-layout { position: relative; }
+    .sidebar {
+      position: fixed; left: 0; top: 56px;
+      height: calc(100vh - 56px);
+      z-index: 100;
+      transform: translateX(-100%);
+      transition: transform .25s ease;
+    }
+    .sidebar.open { transform: translateX(0); }
+    .sidebar-toggle { display: flex; align-items: center; justify-content: center; }
+    .main-content { padding: 14px; }
+  }
+
 </style>
 </head>
 <body>
@@ -1491,7 +1650,81 @@ td.hi { color: var(--text); font-weight: 500; }
 
 <!-- sync bar moved to footer -->
 
-<div class="main">
+<div class="app-layout">
+<aside class="sidebar" id="appSidebar">
+  <div class="sidebar-section" id="section-geral">
+    <div class="sidebar-section-header" onclick="toggleSidebarSection('geral')">
+      <div class="vendor-badge badge-geral">◈</div>
+      <span>Visão Geral</span>
+      <span class="collapse-icon">▾</span>
+    </div>
+    <div class="sidebar-items">
+      <button class="sidebar-item geral active" id="sb-overview" onclick="sidebarNav('overview')">
+        <span class="item-icon">📊</span> Dashboard Geral
+      </button>
+      <button class="sidebar-item vendas" id="sb-vendas-geral" onclick="sidebarNav('vendas-geral')">
+        <span class="item-icon">🛒</span> Vendas Geral
+      </button>
+    </div>
+  </div>
+
+  <div class="sidebar-section" id="section-rodrigo">
+    <div class="sidebar-section-header" onclick="toggleSidebarSection('rodrigo')">
+      <div class="vendor-badge badge-rodrigo">RO</div>
+      <span>Rodrigo</span>
+      <span class="collapse-icon">▾</span>
+    </div>
+    <div class="sidebar-items">
+      <button class="sidebar-item rodrigo" id="sb-rodrigo-overview" onclick="sidebarNav('rodrigo-overview')">
+        <span class="item-icon">📊</span> Visão Geral
+      </button>
+      <div id="sb-rodrigo-clients"></div>
+      <button class="sidebar-item vendas" id="sb-rodrigo-vendas" onclick="sidebarNav('rodrigo-vendas')">
+        <span class="item-icon">🛒</span> Vendas
+      </button>
+      <button class="sidebar-add-btn" onclick="openSettings()">＋ Gerenciar clientes</button>
+    </div>
+  </div>
+
+  <div class="sidebar-section" id="section-lenon">
+    <div class="sidebar-section-header" onclick="toggleSidebarSection('lenon')">
+      <div class="vendor-badge badge-lenon">LE</div>
+      <span>Lenon</span>
+      <span class="collapse-icon">▾</span>
+    </div>
+    <div class="sidebar-items">
+      <button class="sidebar-item lenon" id="sb-lenon-overview" onclick="sidebarNav('lenon-overview')">
+        <span class="item-icon">📊</span> Visão Geral
+      </button>
+      <div id="sb-lenon-clients"></div>
+      <button class="sidebar-item vendas" id="sb-lenon-vendas" onclick="sidebarNav('lenon-vendas')">
+        <span class="item-icon">🛒</span> Vendas
+      </button>
+    </div>
+  </div>
+
+  <div class="sidebar-section" id="section-luiz">
+    <div class="sidebar-section-header" onclick="toggleSidebarSection('luiz')">
+      <div class="vendor-badge badge-luiz">LU</div>
+      <span>Luiz</span>
+      <span class="collapse-icon">▾</span>
+    </div>
+    <div class="sidebar-items">
+      <button class="sidebar-item luiz" id="sb-luiz-overview" onclick="sidebarNav('luiz-overview')">
+        <span class="item-icon">📊</span> Visão Geral
+      </button>
+      <div id="sb-luiz-clients"></div>
+      <button class="sidebar-item vendas" id="sb-luiz-vendas" onclick="sidebarNav('luiz-vendas')">
+        <span class="item-icon">🛒</span> Vendas
+      </button>
+      <button class="sidebar-add-btn" onclick="openSettings()">＋ Adicionar cliente</button>
+    </div>
+  </div>
+</aside>
+
+<button class="sidebar-toggle" onclick="toggleMobileSidebar()">☰</button>
+
+<div class="main-content" id="appMainContent">
 
 <!-- OVERVIEW -->
 <div class="overview-section active" id="tab-overview">
@@ -1919,6 +2152,7 @@ async function loadFromSupabase() {
     await loadVendasFromSupabase();
     markSynced();
     renderNav();
+    buildSidebarClients();
     if (currentTab === 'overview') renderOverview();
     else if (currentTab === 'vendas') renderVendasModule();
     else renderClientTab(currentTab);
@@ -5553,6 +5787,347 @@ function dedupByNumero(records) {
   });
 }
 
+
+// ════════════════════════════════════════════════
+// SIDEBAR — Navegação por módulos de vendedor
+// ════════════════════════════════════════════════
+
+// Vendor config
+const VENDOR_CONFIG = {
+  rodrigo: {
+    name: 'Rodrigo',
+    badge: 'RO',
+    color: '#ea580c',
+    clients: ['Vale Ferrosos','Vale Metals','Suzano','Outros'],
+    allowNew: true,
+  },
+  lenon: {
+    name: 'Lenon',
+    badge: 'LE',
+    color: '#15803d',
+    clients: ['Petrobras','Eneva','Transpetro','Engie','TBG'],
+    allowNew: false,
+  },
+  luiz: {
+    name: 'Luiz',
+    badge: 'LU',
+    color: '#1d4ed8',
+    clients: [],
+    allowNew: true,
+  },
+};
+
+let currentSidebarNav = 'overview';
+
+function sidebarNav(target) {
+  currentSidebarNav = target;
+
+  // Hide all sections
+  const sections = [
+    '.overview-section',
+    '#tab-vendas',
+    '#module-rodrigo',
+    '#module-rodrigo-vendas',
+    '#module-lenon',
+    '#module-lenon-vendas',
+    '#module-luiz',
+    '#module-luiz-vendas',
+    '#clientTabsContainer',
+  ];
+  sections.forEach(sel => {
+    const el = document.querySelector(sel);
+    if (el) el.style.display = 'none';
+  });
+
+  // Update sidebar active state
+  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+
+  if (target === 'overview') {
+    const el = document.querySelector('.overview-section');
+    if (el) el.style.display = 'block';
+    document.getElementById('sb-overview')?.classList.add('active');
+    renderOverview();
+
+  } else if (target === 'vendas-geral') {
+    const el = document.getElementById('tab-vendas');
+    if (el) el.style.display = 'block';
+    document.getElementById('sb-vendas-geral')?.classList.add('active');
+    salesCurrentClient = null;
+    salesFilters = {status:'',cliente:'',atrasado:'',de:'',ate:''};
+    renderVendasModule();
+
+  } else if (target.endsWith('-overview')) {
+    const vendor = target.replace('-overview','');
+    showVendorModule(vendor);
+    document.getElementById(`sb-${vendor}-overview`)?.classList.add('active');
+
+  } else if (target.endsWith('-vendas')) {
+    const vendor = target.replace('-vendas','');
+    showVendorVendas(vendor);
+    document.getElementById(`sb-${vendor}-vendas`)?.classList.add('active');
+
+  } else if (target.startsWith('vendor-')) {
+    // vendor-rodrigo-client-Vale Ferrosos
+    const parts  = target.split('-');
+    const vendor = parts[1];
+    const client = parts.slice(3).join('-');
+    if (client) showVendorClientTab(vendor, client);
+  }
+}
+
+// ── Vendor Overview ──
+function showVendorModule(vendor) {
+  const cfg = VENDOR_CONFIG[vendor];
+  if (!cfg) return;
+
+  const el = document.getElementById('module-'+vendor);
+  if (!el) return;
+  el.style.display = 'block';
+
+  // Get clients for this vendor (from CLIENTS that match responsavel or fixed list)
+  const vendorClients = getVendorClients(vendor);
+  const filtered = getAllRecords().filter(r => vendorClients.includes(r.cliente));
+
+  const content = document.getElementById('module-'+vendor+'-content');
+  if (!content) return;
+
+  // Build mini-dashboard for vendor
+  const _dd = dedupByNumero(filtered);
+  const total   = _dd.length;
+  const particip= _dd.filter(r=>r.participamos==='SIM').length;
+  const vendas  = _dd.filter(r=>r.venda==='SIM').length;
+  const receita = _dd.filter(r=>r.venda==='SIM')
+    .reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0);
+  const conv    = particip>0?(vendas/particip*100).toFixed(1):'0.0';
+
+  content.innerHTML = `
+    <div class="kpi-grid" style="margin-bottom:16px">
+      <div class="kpi-card c-blue">
+        <div class="kpi-icon">📋</div>
+        <div class="kpi-label">Oportunidades</div>
+        <div class="kpi-value">${fmtNum(total)}</div>
+      </div>
+      <div class="kpi-card c-slate">
+        <div class="kpi-icon">🤝</div>
+        <div class="kpi-label">Participações</div>
+        <div class="kpi-value">${fmtNum(particip)}</div>
+      </div>
+      <div class="kpi-card c-green">
+        <div class="kpi-icon">✅</div>
+        <div class="kpi-label">Vendas</div>
+        <div class="kpi-value">${fmtNum(vendas)}</div>
+      </div>
+      <div class="kpi-card c-orange">
+        <div class="kpi-icon">💰</div>
+        <div class="kpi-label">Receita</div>
+        <div class="kpi-value kpi-currency">${fmtCurrency(receita)}</div>
+      </div>
+      <div class="kpi-card c-amber">
+        <div class="kpi-icon">🎯</div>
+        <div class="kpi-label">Conversão</div>
+        <div class="kpi-value">${conv}%</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:20px">
+      ${vendorClients.map(c => {
+        const recs = dedupByNumero(filtered.filter(r=>r.cliente===c));
+        const v = recs.filter(r=>r.venda==='SIM').length;
+        const p = recs.filter(r=>r.participamos==='SIM').length;
+        return `<div class="table-card" style="padding:14px;cursor:pointer"
+          onclick="sidebarNav('vendor-${vendor}-client-${c}')">
+          <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px">${c}</div>
+          <div style="font-size:11px;color:var(--text3)">${recs.length} oport. · ${v} vendas · ${p>0?(v/p*100).toFixed(0):0}% conv.</div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="font-size:12px;color:var(--text3);text-align:center;padding:8px">
+      Clique em um cliente para ver os registros detalhados
+    </div>`;
+}
+
+// ── Vendor Vendas (filtered by vendor name) ──
+function showVendorVendas(vendor) {
+  const cfg = VENDOR_CONFIG[vendor];
+  if (!cfg) return;
+
+  const el = document.getElementById('module-'+vendor+'-vendas');
+  if (!el) return;
+  el.style.display = 'block';
+
+  // Render vendas module filtered for this vendor
+  const vendorName = cfg.name; // 'Rodrigo', 'Lenon', 'Luiz'
+  const allVendas  = getAllVendas();
+  const vendorVendas = allVendas.filter(v =>
+    v.responsavel === vendorName ||
+    getVendorClients(vendor).includes(v.cliente)
+  );
+
+  const contentEl = document.getElementById('module-'+vendor+'-vendas-content');
+  if (!contentEl) return;
+
+  // KPIs
+  const hoje = new Date().toISOString().slice(0,7);
+  const totalVendas  = vendorVendas.length;
+  const valorTotal   = vendorVendas.reduce((s,v)=>s+(parseFloat(String(v.valor||0).replace(',','.'))||0),0);
+  const atrasados    = vendorVendas.filter(v=>getVendaSituacao(v)==='atrasado').length;
+  const entregMes    = vendorVendas.filter(v=>v.dataEntrega&&v.dataEntrega.slice(0,7)===hoje).length;
+  const mesAtual     = new Date().getMonth()+1;
+  const anoAtual     = new Date().getFullYear();
+  const nomeMes      = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+    'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][mesAtual-1];
+
+  const vendasMes = vendorVendas.filter(v=>{
+    if(!v.dataPedido)return false;
+    const [y,m]=v.dataPedido.split('-');
+    return parseInt(m)===mesAtual&&parseInt(y)===anoAtual;
+  });
+  const totalMes = vendasMes.reduce((s,v)=>s+(parseFloat(String(v.valor||0).replace(',','.'))||0),0);
+  const totalAno = vendorVendas.filter(v=>v.dataPedido&&v.dataPedido.startsWith(String(anoAtual)))
+    .reduce((s,v)=>s+(parseFloat(String(v.valor||0).replace(',','.'))||0),0);
+
+  contentEl.innerHTML = `
+    <!-- Highlights -->
+    <div class="vendas-highlights" style="margin-bottom:16px">
+      <div class="vendas-highlight-card">
+        <div class="vendas-highlight-icon">📅</div>
+        <div class="vendas-highlight-body">
+          <div class="vendas-highlight-label">Vendas — ${nomeMes} ${anoAtual}</div>
+          <div class="vendas-highlight-val">${fmtCurrency(totalMes)}</div>
+          <div class="vendas-highlight-sub">${vendasMes.length} pedido(s) no mês</div>
+        </div>
+      </div>
+      <div class="vendas-highlight-card orange">
+        <div class="vendas-highlight-icon">📊</div>
+        <div class="vendas-highlight-body">
+          <div class="vendas-highlight-label">Total Vendido — ${anoAtual}</div>
+          <div class="vendas-highlight-val">${fmtCurrency(totalAno)}</div>
+          <div class="vendas-highlight-sub">${vendorVendas.filter(v=>v.dataPedido&&v.dataPedido.startsWith(String(anoAtual))).length} pedido(s) no ano</div>
+        </div>
+      </div>
+    </div>
+    <!-- KPIs -->
+    <div class="vendas-kpi-grid" style="margin-bottom:16px">
+      <div class="vendas-kpi vk-blue"><div class="vendas-kpi-label">Em Aberto</div><div class="vendas-kpi-val">${fmtNum(totalVendas)}</div><div class="vendas-kpi-sub">pedidos</div></div>
+      <div class="vendas-kpi vk-orange"><div class="vendas-kpi-label">Valor Total</div><div class="vendas-kpi-val">${fmtCurrency(valorTotal)}</div><div class="vendas-kpi-sub">em pedidos</div></div>
+      <div class="vendas-kpi vk-red"><div class="vendas-kpi-label">Em Atraso</div><div class="vendas-kpi-val">${fmtNum(atrasados)}</div><div class="vendas-kpi-sub">prazo vencido</div></div>
+      <div class="vendas-kpi vk-green"><div class="vendas-kpi-label">Entregues Mês</div><div class="vendas-kpi-val">${fmtNum(entregMes)}</div><div class="vendas-kpi-sub">mês atual</div></div>
+    </div>
+    <!-- Table -->
+    <div class="table-card">
+      <div class="table-header">
+        <div class="table-title">Pedidos — ${cfg.name}</div>
+        <span style="font-size:12px;color:var(--text3)">${totalVendas} registro(s)</span>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Cliente</th><th>Nº PO</th><th>Nº Oportunidade</th>
+            <th>Valor</th><th>Data Pedido</th><th>Prazo</th>
+            <th>Situação</th><th>Status</th><th>Ações</th>
+          </tr></thead>
+          <tbody>
+            ${vendorVendas.length ? vendorVendas.map(v => {
+              const sit = getVendaSituacao(v);
+              const rowCls = sit==='atrasado'?'row-atrasado':sit==='alerta'?'row-alerta':'';
+              const stCls  = VENDA_STATUS_CSS[v.statusEntrega]||'';
+              const badge  = sit==='atrasado'
+                ?`<span class="atraso-badge">⚠ ATRASADO</span>`
+                :sit==='alerta'
+                ?`<span class="alerta-badge">⏰ ${diasParaPrazo(v.prazoEntrega)}d</span>`
+                :`<span style="font-size:10px;color:var(--green)">✓ OK</span>`;
+              return `<tr class="${rowCls}">
+                <td class="hi">${sanitize(v.cliente)}</td>
+                <td>${sanitize(v.numPO)||'—'}</td>
+                <td>${sanitize(v.numOportunidade)||'—'}</td>
+                <td class="hi">${v.valor?fmtCurrency(v.valor):'—'}</td>
+                <td>${v.dataPedido||'—'}</td>
+                <td>${v.prazoEntrega||'—'}</td>
+                <td>${badge}</td>
+                <td><span class="badge ${stCls}">${v.statusEntrega||'—'}</span></td>
+                <td>
+                  <button class="btn-icon-edit" onclick="openEditVenda('${v.id}')">✏</button>
+                  <button class="btn-icon-del" onclick="deleteVenda('${v.id}','${v.cliente}')">✕</button>
+                </td>
+              </tr>`;
+            }).join('') : '<tr><td colspan="9"><div class="empty-state"><div class="icon">🛒</div><p>Nenhuma venda registrada</p></div></td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+// Get clients for a vendor (fixed + dynamically assigned via RESPONSAVEL_MAP)
+function getVendorClients(vendor) {
+  const cfg = VENDOR_CONFIG[vendor];
+  if (!cfg) return [];
+  const fixed = [...cfg.clients];
+  // Also include any clients where responsavel matches vendor name
+  const vendorName = cfg.name;
+  CLIENTS.forEach(c => {
+    if (!fixed.includes(c)) {
+      const resp = RESPONSAVEL_MAP[c];
+      if (resp === vendorName) fixed.push(c);
+    }
+  });
+  return fixed.filter(c => CLIENTS.includes(c) || c);
+}
+
+// ── Show individual client tab within vendor context ──
+function showVendorClientTab(vendor, client) {
+  // Navigate to the existing client tab
+  sidebarHighlightClient(vendor, client);
+  const clientSection = document.getElementById('client-'+slugify(client));
+  if (clientSection) {
+    document.getElementById('clientTabsContainer').style.display = 'block';
+    document.querySelectorAll('.client-section').forEach(s=>s.classList.remove('active'));
+    clientSection.classList.add('active');
+    renderClientTab(client);
+  }
+}
+
+function sidebarHighlightClient(vendor, client) {
+  document.querySelectorAll('.sidebar-item').forEach(b=>b.classList.remove('active'));
+  const id = `sb-${vendor}-client-${slugify(client)}`;
+  document.getElementById(id)?.classList.add('active');
+}
+
+// ── Populate sidebar client items ──
+function buildSidebarClients() {
+  Object.keys(VENDOR_CONFIG).forEach(vendor => {
+    const cfg     = VENDOR_CONFIG[vendor];
+    const clients = getVendorClients(vendor);
+    const el      = document.getElementById(`sidebar-${vendor}-clients`);
+    if (!el) return;
+    el.innerHTML = clients.map(c => `
+      <button class="sidebar-item ${vendor}" id="sb-${vendor}-client-${slugify(c)}"
+        onclick="sidebarNav('vendor-${vendor}-client-${c}')">
+        <span class="item-icon">📁</span> ${c}
+      </button>`).join('');
+  });
+}
+
+// sidebarNav handles all routing including vendor-client
+
+// ── Toggle sidebar section collapse ──
+function toggleSidebarSection(section) {
+  const el = document.getElementById('section-'+section);
+  if (el) el.classList.toggle('collapsed');
+}
+
+// ── Mobile sidebar toggle ──
+function toggleMobileSidebar() {
+  document.getElementById('appSidebar')?.classList.toggle('open');
+}
+
+// Close sidebar on mobile when clicking outside
+document.addEventListener('click', e => {
+  const sidebar = document.getElementById('appSidebar');
+  const toggle  = document.querySelector('.sidebar-toggle');
+  if (sidebar && toggle && !sidebar.contains(e.target) && !toggle.contains(e.target)) {
+    sidebar.classList.remove('open');
+  }
+});
+
 // ════════════════════════════════════════════════
 // SYNC INDICATOR
 // ════════════════════════════════════════════════
@@ -5626,7 +6201,10 @@ async function init() {
   loadSalesLocal();
   buildClientTabs();
   renderNav();
+  buildSidebarClients();
   renderOverview();
+  // Start on overview
+  sidebarNav('overview');
   // Verifica regra de perdido no carregamento local
   setTimeout(() => aplicarRegraPerdido(), 2000);
   // Restore last sync time
@@ -5865,6 +6443,56 @@ CREATE POLICY "Allow authenticated" ON mro_oportunidades
   </div>
 </div>
 
+
+<!-- ═══ MÓDULOS DE VENDEDOR ═══ -->
+<div id="module-rodrigo" style="display:none">
+  <div class="module-header">
+    <div class="module-badge rodrigo">RO</div>
+    <div><div class="module-title">Módulo Rodrigo</div>
+    <div class="module-sub">Vale Ferrosos · Vale Metals · Suzano · Outros</div></div>
+  </div>
+  <div id="module-rodrigo-content"></div>
+</div>
+<div id="module-rodrigo-vendas" style="display:none">
+  <div class="module-header">
+    <div class="module-badge rodrigo">RO</div>
+    <div><div class="module-title">Vendas — Rodrigo</div>
+    <div class="module-sub">Pedidos e entregas</div></div>
+  </div>
+  <div id="module-rodrigo-vendas-content"></div>
+</div>
+<div id="module-lenon" style="display:none">
+  <div class="module-header">
+    <div class="module-badge lenon">LE</div>
+    <div><div class="module-title">Módulo Lenon</div>
+    <div class="module-sub">Petrobras · Eneva · Transpetro · Engie · TBG</div></div>
+  </div>
+  <div id="module-lenon-content"></div>
+</div>
+<div id="module-lenon-vendas" style="display:none">
+  <div class="module-header">
+    <div class="module-badge lenon">LE</div>
+    <div><div class="module-title">Vendas — Lenon</div>
+    <div class="module-sub">Pedidos e entregas</div></div>
+  </div>
+  <div id="module-lenon-vendas-content"></div>
+</div>
+<div id="module-luiz" style="display:none">
+  <div class="module-header">
+    <div class="module-badge luiz">LU</div>
+    <div><div class="module-title">Módulo Luiz</div>
+    <div class="module-sub">Clientes atribuídos</div></div>
+  </div>
+  <div id="module-luiz-content"></div>
+</div>
+<div id="module-luiz-vendas" style="display:none">
+  <div class="module-header">
+    <div class="module-badge luiz">LU</div>
+    <div><div class="module-title">Vendas — Luiz</div>
+    <div class="module-sub">Pedidos e entregas</div></div>
+  </div>
+  <div id="module-luiz-vendas-content"></div>
+</div>
 
 <!-- PDF REPORT (hidden, shown on print) -->
 <div id="pdfReport" style="display:none"></div>
