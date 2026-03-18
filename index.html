@@ -4133,34 +4133,7 @@ function getRecFromRow(tr, id, client) {
 }
 
 // Attach keyboard navigation to grid
-function attachGridEvents(slug, client) {
-  const tbody = document.getElementById('grid-body-'+slug);
-  if (!tbody) return;
-
-  tbody.querySelectorAll('input, select').forEach(el => {
-    // Tab navigation
-    el.addEventListener('keydown', e => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        const tr = el.closest('tr');
-        const id = tr?.dataset.id;
-        if (id) saveGridRow(id, client);
-      }
-      if (e.key === 'Escape') {
-        const tr = el.closest('tr');
-        if (tr?.classList.contains('row-new')) {
-          tr.remove();
-        }
-      }
-    });
-    // Update status color on change
-    if (el.dataset.field === 'status') {
-      el.addEventListener('change', () => {
-        el.style.color = STATUS_COLORS[el.value] || '#64748b';
-      });
-    }
-  });
-}
+// attachGridEvents — defined below in bulk register module
 
 // Toggle dataPedido visibility when venda changes in grid
 function gridToggleVenda(sel, id, slug) {
@@ -5626,7 +5599,19 @@ async function init() {
   document.getElementById('vendaModal').addEventListener('click', function(e) { if (e.target===this) closeVendaModal(); });
 }
 
-init();
+// Safe init with error display
+try {
+  init();
+} catch(e) {
+  console.error('Init error:', e);
+  document.getElementById('loginScreen').innerHTML =
+    '<div style="padding:40px;font-family:Inter,sans-serif;text-align:center">' +
+    '<div style="font-size:48px;margin-bottom:16px">⚠</div>' +
+    '<h2 style="color:#dc2626">Erro ao carregar o sistema</h2>' +
+    '<p style="color:#64748b;margin-bottom:12px">' + e.message + '</p>' +
+    '<button onclick="location.reload()" style="background:#1d4ed8;color:#fff;border:none;padding:10px 24px;border-radius:8px;cursor:pointer;font-size:14px">↺ Recarregar</button>' +
+    '</div>';
+}
 </script>
 
 <!-- SQL INSTRUCTIONS (hidden comment for developer) -->
