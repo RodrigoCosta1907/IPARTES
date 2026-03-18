@@ -1841,7 +1841,7 @@ td.hi { color: var(--text); font-weight: 500; }
   </div>
 </div>
 
-<div id="clientTabsContainer"></div>
+<div id="clientTabsContainer" style="display:none"></div>
 
 <!-- ── MÓDULO VENDAS ── -->
 <div class="vendas-section" id="tab-vendas">
@@ -1969,9 +1969,18 @@ const SUPABASE_KEY = 'sb_publishable_XSSBULwfcdlbICX148flDg_7NQGbSAU';
 // CLIENTS is now dynamic — managed via the settings panel
 function getClients() {
   const stored = localStorage.getItem('ipartes_clients');
-  if (stored) return JSON.parse(stored);
-  // Default clients
-  const defaults = ['Vale Ferrosos','Vale Metals','Suzano','Outros'];
+  if (stored) {
+    // Ensure Lenon clients are always present
+    const lenonClients = ['Petrobras','Eneva','Transpetro','Engie','TBG'];
+    const parsed = JSON.parse(stored);
+    let updated = false;
+    lenonClients.forEach(c => { if (!parsed.includes(c)) { parsed.push(c); updated = true; } });
+    if (updated) localStorage.setItem('ipartes_clients', JSON.stringify(parsed));
+    return parsed;
+  }
+  // Default clients — all vendors
+  const defaults = ['Vale Ferrosos','Vale Metals','Suzano','Outros',
+                    'Petrobras','Eneva','Transpetro','Engie','TBG'];
   localStorage.setItem('ipartes_clients', JSON.stringify(defaults));
   return defaults;
 }
@@ -1993,6 +2002,7 @@ const RESPONSAVEL_MAP = {
   'Transpetro':    'Lenon',
   'Eneva':         'Lenon',
   'Engie':         'Lenon',
+  'TBG':           'Lenon',
 };
 
 function getResponsavelPadrao(client) {
@@ -5934,7 +5944,7 @@ function showVendorModule(vendor) {
         const v = recs.filter(r=>r.venda==='SIM').length;
         const p = recs.filter(r=>r.participamos==='SIM').length;
         return `<div class="table-card" style="padding:14px;cursor:pointer"
-          onclick="sidebarNav('vendor-${vendor}-client-${c}')">
+          onclick="showVendorClientTab('${vendor}','${c}')">
           <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px">${c}</div>
           <div style="font-size:11px;color:var(--text3)">${recs.length} oport. · ${v} vendas · ${p>0?(v/p*100).toFixed(0):0}% conv.</div>
         </div>`;
@@ -6056,33 +6066,62 @@ function showVendorVendas(vendor) {
     </div>`;
 }
 
-// Get clients for a vendor (fixed + dynamically assigned via RESPONSAVEL_MAP)
+// Get clients for a vendor
 function getVendorClients(vendor) {
   const cfg = VENDOR_CONFIG[vendor];
   if (!cfg) return [];
   const fixed = [...cfg.clients];
-  // Also include any clients where responsavel matches vendor name
   const vendorName = cfg.name;
+  // Add any CLIENTS not in another vendor's fixed list that match responsavel
   CLIENTS.forEach(c => {
     if (!fixed.includes(c)) {
+      const allFixed = Object.values(VENDOR_CONFIG).flatMap(v => v.clients);
       const resp = RESPONSAVEL_MAP[c];
-      if (resp === vendorName) fixed.push(c);
+      // If not claimed by another vendor and matches this vendor's name
+      if (resp === vendorName && !allFixed.includes(c)) fixed.push(c);
+      // If not in any vendor list, add to Luiz (or vendor with allowNew)
+      if (!allFixed.includes(c) && !resp && cfg.allowNew && vendor === 'luiz') {
+        // Only add orphan clients to Luiz if not already in Rodrigo/Lenon
+        const inRodrigo = VENDOR_CONFIG.rodrigo.clients.includes(c);
+        const inLenon   = VENDOR_CONFIG.lenon.clients.includes(c);
+        if (!inRodrigo && !inLenon) fixed.push(c);
+      }
     }
   });
-  return fixed.filter(c => CLIENTS.includes(c) || c);
+  return fixed.filter(c => CLIENTS.includes(c));
 }
 
 // ── Show individual client tab within vendor context ──
 function showVendorClientTab(vendor, client) {
-  // Navigate to the existing client tab
-  sidebarHighlightClient(vendor, client);
+  // Hide all sections first
+  const sections = [
+    '.overview-section','#tab-vendas',
+    '#module-rodrigo','#module-rodrigo-vendas',
+    '#module-lenon','#module-lenon-vendas',
+    '#module-luiz','#module-luiz-vendas',
+    '#clientTabsContainer',
+  ];
+  sections.forEach(sel => {
+    const el = document.querySelector(sel);
+    if (el) el.style.display = 'none';
+  });
+
+  // Show client tabs container
+  const ct = document.getElementById('clientTabsContainer');
+  if (ct) ct.style.display = 'block';
+
+  // Show only this client section
+  document.querySelectorAll('.client-section').forEach(s => s.style.display = 'none');
   const clientSection = document.getElementById('client-'+slugify(client));
   if (clientSection) {
-    document.getElementById('clientTabsContainer').style.display = 'block';
-    document.querySelectorAll('.client-section').forEach(s=>s.classList.remove('active'));
-    clientSection.classList.add('active');
+    clientSection.style.display = 'block';
     renderClientTab(client);
   }
+
+  // Update sidebar highlight
+  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+  document.getElementById(`sb-${vendor}-client-${slugify(client)}`)?.classList.add('active');
+  currentSidebarNav = `vendor-${vendor}-client-${client}`;
 }
 
 function sidebarHighlightClient(vendor, client) {
@@ -6100,7 +6139,7 @@ function buildSidebarClients() {
     if (!el) return;
     el.innerHTML = clients.map(c => `
       <button class="sidebar-item ${vendor}" id="sb-${vendor}-client-${slugify(c)}"
-        onclick="sidebarNav('vendor-${vendor}-client-${c}')">
+        onclick="showVendorClientTab('${vendor}','${c}')">
         <span class="item-icon">📁</span> ${c}
       </button>`).join('');
   });
