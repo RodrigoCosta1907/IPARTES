@@ -2198,8 +2198,6 @@ async function loadFromSupabase() {
     renderNav();
     buildSidebarClients();
     sidebarNav(currentSidebarNav || 'overview');
-    else if (currentTab === 'vendas') renderVendasModule();
-    else renderClientTab(currentTab);
     // Aplica regra automática de Perdido após carregar dados
     setTimeout(() => aplicarRegraPerdido(), 1000);
   } catch (err) {
