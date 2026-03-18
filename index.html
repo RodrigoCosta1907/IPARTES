@@ -1340,7 +1340,7 @@ td.hi { color: var(--text); font-weight: 500; }
 
 <!-- ── LOGIN SCREEN ── -->
 <div id="loginScreen">
-  <div class="login-card">
+  <div class="login-card"><form autocomplete="on" onsubmit="return false" style="display:contents">
     <div class="login-logo">
       <img src="data:image/webp;base64,UklGRlQSAABXRUJQVlA4WAoAAAAQAAAAuQAAQwAAQUxQSMIHAAABoEZt2yFHer6q7h4l2e5kPGvbtm3btm3btm0jw7PW2LYnmE06SdX33T+qGtXnZH7uiYgJ0P9/NSY540VMnPFKMQW8Al6MMaUYySuHV5qRjDEFjEnI+NKqx5x9xunlP/uMrSXfSCZVl8vV1hiTrssVrq2RPC9iTKZnLpfrlTIFampzhWt9yZfpUpcrsbbKq8mVaIw8I2/js26//bZzNpR8k0hKfX6yJD3nUHmetL1rz4cjpCNoz8e3dTT/eqCMH9Eg8vk8r8pElJli8wXb22Y910e+zidfoh2imWG+2PbGnkrJu2I28VMOkOcl4GvdPM4lZOFOedJ2AMOlwyjxIxkjqW/gABq6KW4qxYcHSudS8iDNpvjlPaWeU8HGWHhMCRh1byAkcWc5VSltG/lLOhRwRVhelCfpAuIPKjCxOAtb67w4By5usGaU0NJTVQsJHfHOcrFM2aS7sVSgw/ZXCda25vN5i7NYNpeMfi3wvrwiXFs+n++AAMt4nU1bPt8aWLBhaz6fZ1iMa8vHB4299D6Bs7RNHj8bOqC1SuU3EymzLQHLW6XwbTq7Uu2A23BYXpDUP3A4LK6xm4oINuyezfbcfi4OywamLpfNZk4F+CiVzWbruqfnAB3rVWVja3MakAd4q9rzUquNxlpOSaB7Q2khTQsXtLpSYFGmlC8kI+kJgHGedDFYmnFwSDEdqys6IAQ4TrFHR95RbCbS3ldF7oeDWTJGnnIO+DSBHk2lMTjd3bsYW9LybClfSZLRrpE5GekPYMFpbTg+kCkUrBMx3tjISXEnRN6LS8esUszJAM1ZyUjmjLtvuO/oJBqLsDGWeyT1bsPiHLhCjTVl8XRYZHZaq4QO/tA8oKlKJflzwbJl+XoWMjoQh2XWgVWSjKKpSggJx4ODtSVPJ4BzzMPasr0bUfXkyM/SxTjHbXoD5zhEpkDHShFdg7PMlClXx/4bbhnddmOjfu1AAA1fXbJpRvI8JVhESLCtbm4O5u4kI3m6uJW263UZrmyTr7nnrnufayDAcoX0B8CmOgTg4yLsszffffdDv2BDx87yymUpOD9l9AzWEb/wta2kVCWQ31gpVa3sKZOt7S4pu0mVfJ1KuQLiLSGLumr1AJggdVsGLK9WnLPEOsuyPZVSuYqcnpLR9+BiHPBLTqlKOFIZk5I2f31yQ+P8wad4koyny8pWpMVtLF2Ghacyvbp8AZYjZGKK/nWVBFyheSn50tlzARzgLItzMhXwc8qk5H9EwZkbyJe2xZYrKMSkNeXrT8A1NzYtawH4uICzBYIAzpIpFzMmT4nOHepLvqf0fs+OCwALIYMrIeQqKT0d7LRfxjoC2EEpPVQ+pt3xxBNPPPHs3btIKa1pAUvUAv/VxGFfe+CJxx97Zg6hJeylcrWvbNLxxkgyktT/5A+bsA5n11Jy8L30BwFBP6nfR3TAGtI1hGV7RwWNZ3Q1lsIOy3GKa69WtHoxWI4uX38V9k1Mykjq9jwOOKYCQh7XSTgsc3tJeoGAOb5qmrDl+qpQ9C9wtC1vaWlpDpyDzwoE68ToC4ATyrdKETpt+l8jxvSUJ2OkCQAnJhUCC2o1Fgd5ZvUw6t1KyC3StoBNbg0Lrn2Dur59+1bvFPmvppQfIseUL1fMcQDPK7bHQnDsmJTr+Ou1nFYP+GqdFtp4SkpPBeZ2Ndpq2GKSMroeB78o1psKjhMqKrjw0BNiTz4uXdUMlvrDNt9kk6MmYx1LupqEuECS9obbtVoL3C5VzQHc1kpJ21XAcICrYoyeBPi6klxIkX11J6GzgHUQOMv5Smw7yegQeFRa/afHekub4YDDJaNNE9Oa1uFYK0baDQctVSUMixxerqKX95T+wkai1vG2vMQ2kHxtY5koX5LS8oYROI6UJ21WaOfIJOnYyC/FPA0wQyauRxPABZoLsH7cB5Eb4s6M/BCXaSihvbfkfUaR7TfIeErqq+Mz8no0wX2KzSgzEcte0lan/lJo/eGD6v95Rtph5KD64fcU8+Lf9fXjz1O80S0j6utH3qo3/qgfOmxA3JbDB9aPuTluz+GD6kffHJf66Lf6Yn/+YSWlpB2/mB+Aaxn3YD8ZX0kFML2H9CYBv+y/yhrn9lcXmVEs66mHgSDOU2wqo9hMAZNWbMbEKK3YLor1I2nFZiIZxWYinqdSjS/jSd1W23Cj9Xt6km+UGIT8Y9QncCF0tNPUR12kGT/oCJwltrFGnadRvFGyhQg5SzoF64CQlgHqom499RaOInzTWZTomeQcr8jTE1gLBLSupoykewmKMZlzrrqks71xG/nJhVwjz9PtxAa01UlSz6UUozfpjDdScozqLuNJGw/uAPjvk76SMtqjKDO5E3LcXwm7qIdi+x54wTm7V0tSRvqqKI3shOCdSli6tvq9M/Kz1eRJUvrmQW+uK/MjQVEjOqVXKyCg5eYGoG11+TLmd6Djsl8IWAEiBEIsc7sZo1OwWAcBKzJNhQqGHCvpMUpfAemyoCQYd8W1jzWVoTm7wqHvsKW0Ew1Lcg3VKxpGe5VWZscvWtGQp48JK8Gyv6QxKxr+FKxLyjlekSf93Sm9XT75ygylAh+RMdKDndLzCSgl7f7OyFHDExz91xMbyniSqr6ZOLyznfRDLgkZTwkbSb6RlJKMOlsjpZL4H5VWUDggbAoAABAqAJ0BKroARAA+kTiXSCWjIqEu9tx4sBIJbADNBPxJl9R5zVnblATvsTzif5X1AeYBzjPMR+vv7Ve7P/tf3A9zPoAf4b0ovUG9ADy6/ZJ/un/pwj7/D7b/lS+ASoiZvPh2WyzXTvMCgGpPrLq+0/732AP49/fP+Z6n+dd6r9hL9ferd+5fsY/tEoUlxKRqmP234Sp1fOIYp4DzVJXzvJbUAM7YY1YkrqxYKsI9XqpnsqXSV8uKBQrxZ1RheI76qedcCvgO7aWb0lQU1IY6jmq25038DqjEPXc8FlZByv2Xt73wJi090Hl4PVadqZko+eQByxuIw99CmOiZflDRVAQ72lceRj1BpVcTRZ4muhrt6Jvgjf8PM2q73iExDnV3Kq9wtwDgYvJgLdN7656r7H9m7Cbj88Lu3KyPFwMXlZ9hEGh0V+nWB9f2z39OfGuv0esNYaw1hrDRwAD+/Hr6Oxv8Fl8xIfXxeimEP+zUpTdSYCr+P00DQi/DDbsU6eeKoCGib27VFvTipHmxZhjRCf0ntTjQKitvhReaX3lU4W0kpjoAq8ntcPFIoyWizE6g5YxWaqhFepNYQI68IUytGWsiFy5u5H1mqiTwbRGRM7meGlSgO1d1YuOcIh13tafjdiRe6O2SL2aAenLnX2gMMq8SR0gCV0pa6OCczJgLvkkTkKsvAsi7qP6PCmBSEFZHw6IJCs5ay1QEWAq5pROVottaA63FbAQOutMlEaInCe7QxIajxgSOtcJVgl+vTgsZx2lYCl182dOcKMl1HeMT458a4hDpOm26ep3D25ZKC8R2YSodfxWW/2ON2/J46Vv1+7P4iycVW+7dVRRwTXA6tg0nlfsNtGDj/qZzOPwyyfvksLF59xLq2vURZ6ACYtvdLuyIH0NGvH9ce/cdxAA8Tw0lPU6xi4LkjtoJ9lyAIqbninF3cZ71tybL2ikwG8Vq/gwWcneL+VPA7I+NWe77uLuWJpBksn54ri8tAI7dA65Mbtg8EroXtSp3CZWaeHgQv19hvkdqpfL2F7xJ5ugrhdrthwk5v01IeuPmgY61WDx7x/cfQEGwZiFQR9xa3abjjOJ2Tx45TZadYsse7j4SzdSRnSxNFJJK2pZ9tCHDlHYpAcEOHKusMp9A1eCCHFTilvDjM92+PQ1uSivGaXaS3XS/jbSmPULrzSfENGQ/2CUrzX5ykyWG+xq1mrqCacVAntnbjk1Yy3PzFwPOmJGMFlLWwfwoWbtxdmqYmykGRtNelUxF0wsCCmjedP00kHACk+jOfnxKh2BJUAgU72cyetPjMOkZdE2pr+KGx/aAlILwgQMDU286zMS0iWaXmQdtn7e9hV+Fmhq3FRxp5wBcUarKfiK/f49wHRFpQlJQr+LqeA7VrMY3aIwhIP01RiT9vZXxFjwoLfgVgLHeorhnmtVHGl14oDWXltslvx4FsGAjH9bUu86Fz4BpF3ZjRo5DRLq9RUknLxmDp5yt1k0vudOlk15wEEH4aKar3SI4s0iDbUqBg6/L4vN1f1pUBCTMprIYa9Eu4pj9/zfDDhxWtcCxyZyrBYam9IxFWbRCKm3B4lPg0Z/Ep9dhbZGJRkTo+MzQ/VS7XTHXoq6EzjBe9KzuVLLnkCGigeurpOXQyC2cKYGMa4RCtaOIMkLXfDCUgDaxbt83IXhO5P0ogdNircqW8chCnnEOGX/chLQP8CLKeIAYyJBryR25J0jPfxxU3pLWFghoQERKarcK9Sxciqc30J7fNYFvxJs2AfBTgtT4FjH1H19qtzH+8TNbuvqLjfLxWEyYw8GHmMWB4Xf93jmZHVOav0c6b/LymDMzte4oznF4q8pXhaTwOfUtsrTZg6jLjB9aJFZR9GQYcsisDrdvU2Hty4Tg1ALWnRayHSN9FGKub2mi9hcFai3TF1I0bPHhgAJk9fv/PJDMr/rsoJRXLsRPW9KtSSkKd7VAzE2yS6XOBSTT0ae1Qsjj4uGRGJMoMUcKlgkbPvWqPME5c0XwpjGNOkpMJsHSM+l3UkGmH4E/3GDJAWCo+9Cx2oxFAjxU/8M5DViTu4srFF1VhCMeqQW18egeVpXlksk9TGnoTpB0hZg1CIgCgJwU+NzXH2Fz+u7jdS5WS2yOuSCjb7wMfzc+qogwdpx/N21Df5DdO9/H1wvNLZ1j1/TmzlYvsKpvMPKONOn9b1CdJ75z2v3Yz72btQXU9VCY/fUinj2RxpKB8trWrcmAD8I4GCZnPxo4Tm//uHR8OlwlfTPWAGFZVGHjxoVj41YqKaHt9zrVFjoeiLvoLc5TGjgfiOdGYC9CUMiHjl2k4zkjuWln//JA9fLz3dDscindKwqt8t3FQAilQKoI/uoKx1e4gz5BGzD3eKcFvzxvJEOS8xC89DPTHCtmpJrIFAVaFtlEEZ9ZkMxMpEoL/s8/JvNpVXkI3el/HyORu05pFhIicA3rNO9bMtmuGs2nYVbzkVlgnJz1yBOF5hPzXil5j6paUmstAcXBbBFijo+5g26UFOT/deqO5CF8ef60KcKrXZStn5V2CIoUT/6zTb4Vk2VVUWshv4Wvc8XG70ZM0LyUKboH4HRT9iusnrsyvNTndFzm0hgeWU8H+x1VzSUTNeqv1G1aISYd10mQb3JkmwLTfiQmduEBlCgpoajnGgjsCCxVcO2vEAVMdAKbX/n4SJELK1/6j5x2wPaI7cBwLM6gomVpuv/D1D/TOeqm2DADG9VaevN9S/4+uyKtZDoi4Z81mHplME6aoAXBBMRP/DXjdAhsNdFmY4yJsZV2xIRLMcBv9J7aQwh1xRLjOtCG6ilbTQ2eleTW/WeHD+AgaRmTloPIllcFKjqIlwWfDUv69t9bcKdbECUE30at06KK42l8gWphR0v7IPtVGA7iwpzQbpYB1Z09KioPINUSO7Hk57LU3Laly4ineef0Kd9kP5WbT+bhbQxwFg84RTtTZ29wMIkpMnB7uXwysKztotD/xD9FIITIdnpbvyvX5FT3KEhSBezwF8A3W0ME+4WVOe6JcsgnDxXFrp7w5c8areabN8ExbxoD3m00OnwuPL++0bvWejrbXP4OH/BWY+Js5eL/D8v3+GE+f3u0mZy9hgJyCH9NKSaLg+/H0o2QNsHt8pfeW8QfiACQXjb8yjsTvmB6JoA5S0OloTLn65m8mFIxdNy5bcgh141UuLeE41JIx3RZzzgHDu+CqBCpkmU+C5HwURyFymj4rQYfYfE6ZfvAfW1qMGTvizh7H5y1touqcNud8g8BvquQMihuPj/KdYfldaz+9KDRxwo9NGM6IqB+kqMeW0bwY7tsatKtQlSk7GKqUnlDq+Zx1NApn8wTDtTaNp46F81vkFwGt+dxQIyKRpF01iBhWiBNbZfgcDu8GyW47mWMBo/+qm0+SNpKbvjlTXdejRsxz/J2lftBtUl2o1v4qboqxQZzvL+FSEWk8g7VuZe6yZEsJpwmkS7BJUPShdVXecqiR70Ut90bM+0OvPPWjcwU9XgmjZbkhl+/hhPigXci7UeR6UH3aEZjp0ngNlkbYYL/EgAAAAAAAAAAAAA=" alt="IPARTES">
     </div>
@@ -1350,15 +1350,15 @@ td.hi { color: var(--text); font-weight: 500; }
 
     <div class="login-field">
       <label>E-mail</label>
-      <input type="email" id="loginEmail" placeholder="seu@email.com.br"
+      <input type="email" id="loginEmail" placeholder="seu@email.com.br" autocomplete="username"
              onkeydown="if(event.key==='Enter')document.getElementById('loginPassword').focus()">
     </div>
     <div class="login-field">
       <label>Senha</label>
-      <input type="password" id="loginPassword" placeholder="••••••••"
+      <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password"
              onkeydown="if(event.key==='Enter')doLogin()">
     </div>
-    <button class="btn-login" id="btnLogin" onclick="doLogin()">Entrar</button>
+    <button class="btn-login" id="btnLogin" onclick="doLogin()" type="button">Entrar</button></form>
 
     <div class="login-error" id="loginError"></div>
     <div class="login-loading" id="loginLoading">⏳ Verificando credenciais…</div>
@@ -1435,12 +1435,7 @@ td.hi { color: var(--text); font-weight: 500; }
   <span id="searchCount" style="font-size:11px;color:var(--text3);white-space:nowrap;display:none;"></span>
 </div>
 
-<!-- SYNC BAR -->
-<div class="sync-bar" id="syncBar">
-  <div class="sync-dot" id="syncDot"></div>
-  <span id="syncLabel">localStorage</span>
-  <span id="syncTime" style="color:var(--text4)"></span>
-</div>
+<!-- sync bar moved to footer -->
 
 <div class="main">
 
@@ -2703,18 +2698,26 @@ function renderClientTab(client) {
     ? `<tr><td colspan="14"><div class="empty-state"><div class="icon">📋</div><p>Nenhuma oportunidade encontrada</p></div></td></tr>`
     : paginated.map(r => rowHtml(r, client)).join('');
 
-  // Update sortable headers with client-specific sort
+  // Update sortable headers with ↑↓ indicators
   const table = document.getElementById('table-'+slug);
   if (table) {
+    const s = clientSortState[slug];
     table.querySelectorAll('thead th').forEach((th, i) => {
-      if (CLIENT_COL_FIELDS[i]) {
-        th.style.cursor = 'pointer';
-        th.onclick = () => sortClientCol(slug, client, i);
-        const s = clientSortState[slug];
-        th.classList.remove('sort-asc','sort-desc');
-        if (s && s.col === CLIENT_COL_FIELDS[i]) {
-          th.classList.add(s.dir === 'asc' ? 'sort-asc' : 'sort-desc');
-        }
+      if (!CLIENT_COL_FIELDS[i]) return;
+      th.style.cursor = 'pointer';
+      th.title = 'Clique para ordenar';
+      th.onclick = () => sortClientCol(slug, client, i);
+      // Remove old indicators
+      th.classList.remove('sort-asc','sort-desc');
+      // Add new visual indicator
+      const baseText = th.textContent.replace(/ [↑↓⇅].*$/, '').trim();
+      if (s && s.col === CLIENT_COL_FIELDS[i]) {
+        th.classList.add(s.dir === 'desc' ? 'sort-desc' : 'sort-asc');
+        th.innerHTML = baseText + (s.dir === 'desc'
+          ? ' <span style="font-size:9px;opacity:.8" title="Maior → Menor">↓</span>'
+          : ' <span style="font-size:9px;opacity:.8" title="Menor → Maior">↑</span>');
+      } else {
+        th.innerHTML = baseText + ' <span style="font-size:9px;opacity:.3">⇅</span>';
       }
     });
   }
@@ -4951,7 +4954,7 @@ function addGridRow(client) {
     numero:         '',
     finaliza:       prazo7dias(),
     valor:          '',
-    status:         'Cotando',
+    status:         'Não Interessa',
     participamos:   'NÃO',
     venda:          'NÃO',
     dataPedido:     '',
@@ -5259,10 +5262,17 @@ function sortClientCol(slug, client, colIdx) {
   const field = CLIENT_COL_FIELDS[colIdx];
   if (!field) return;
   const cur = clientSortState[slug] || {};
-  clientSortState[slug] = {
-    col: field,
-    dir: cur.col === field && cur.dir === 'asc' ? 'desc' : 'asc'
-  };
+  // Cycle: none → desc (maior primeiro) → asc (menor primeiro) → none
+  let newDir;
+  if (cur.col !== field)          newDir = 'desc'; // first click = maior primeiro
+  else if (cur.dir === 'desc')    newDir = 'asc';  // second click = menor primeiro
+  else                            newDir = null;   // third click = remove sort
+
+  if (newDir) {
+    clientSortState[slug] = { col: field, dir: newDir };
+  } else {
+    delete clientSortState[slug];
+  }
   clientPageState[slug] = 1;
   renderClientTab(client);
 }
@@ -5424,7 +5434,14 @@ init();
   font-size:11px;
   color:#94a3b8;
 ">
-  <span>© 2025 IPARTES — Industrial Parts</span>
+  <div style="display:flex;align-items:center;gap:12px">
+    <span>© 2025 IPARTES — Industrial Parts</span>
+    <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#94a3b8">
+      <div class="sync-dot" id="syncDot"></div>
+      <span id="syncLabel">localStorage</span>
+      <span id="syncTime"></span>
+    </div>
+  </div>
   <button onclick="openDbConfig()" style="
     background:transparent;
     border:1px solid #e2e8f0;
