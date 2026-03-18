@@ -116,6 +116,7 @@ body {
 
 /* ── NAV ── */
 .nav-tabs {
+  display: none !important;
   background: var(--blue2);
   padding: 0 28px;
   display: flex;
@@ -1968,21 +1969,22 @@ const SUPABASE_KEY = 'sb_publishable_XSSBULwfcdlbICX148flDg_7NQGbSAU';
 
 // CLIENTS is now dynamic — managed via the settings panel
 function getClients() {
+  const allRequired = [
+    'Vale Ferrosos','Vale Metals','Suzano','Outros',
+    'Petrobras','Eneva','Transpetro','Engie','TBG'
+  ];
   const stored = localStorage.getItem('ipartes_clients');
   if (stored) {
-    // Ensure Lenon clients are always present
-    const lenonClients = ['Petrobras','Eneva','Transpetro','Engie','TBG'];
     const parsed = JSON.parse(stored);
     let updated = false;
-    lenonClients.forEach(c => { if (!parsed.includes(c)) { parsed.push(c); updated = true; } });
+    allRequired.forEach(c => {
+      if (!parsed.includes(c)) { parsed.push(c); updated = true; }
+    });
     if (updated) localStorage.setItem('ipartes_clients', JSON.stringify(parsed));
     return parsed;
   }
-  // Default clients — all vendors
-  const defaults = ['Vale Ferrosos','Vale Metals','Suzano','Outros',
-                    'Petrobras','Eneva','Transpetro','Engie','TBG'];
-  localStorage.setItem('ipartes_clients', JSON.stringify(defaults));
-  return defaults;
+  localStorage.setItem('ipartes_clients', JSON.stringify(allRequired));
+  return allRequired;
 }
 function saveClients(list) {
   localStorage.setItem('ipartes_clients', JSON.stringify(list));
@@ -2300,8 +2302,19 @@ function daysBetween(d1, d2) {
 function computeRecord(rec) {
   rec.mesPedido = getM(rec.dataPedido);
   rec.anoPedido = getY(rec.dataPedido);
-  rec.ciclo = (rec.mes && rec.ano && rec.dataPedido)
-    ? daysBetween(rec.ano + '-' + rec.mes + '-01', rec.dataPedido) : null;
+  // Ciclo: days from launch/registration date to order date
+  // Use dataLancamento if available, else mes/ano start
+  if (rec.dataPedido) {
+    const startDate = rec.dataLancamento || (rec.ano && rec.mes ? rec.ano+'-'+rec.mes+'-01' : null);
+    if (startDate) {
+      const cicloRaw = daysBetween(startDate, rec.dataPedido);
+      rec.ciclo = cicloRaw !== null ? Math.max(0, cicloRaw) : null;
+    } else {
+      rec.ciclo = null;
+    }
+  } else {
+    rec.ciclo = null;
+  }
   rec.alertaMes = (rec.venda === 'SIM' && rec.mes && rec.mesPedido && rec.mes !== rec.mesPedido);
   return rec;
 }
@@ -2375,6 +2388,12 @@ function switchTab(tab) {
 // ══════════════════════════════════════════════════
 function buildClientTabs() {
   CLIENTS = getClients();
+  // Ensure all vendor fixed clients are present
+  const allVendorClients = Object.values(VENDOR_CONFIG).flatMap(v => v.clients);
+  allVendorClients.forEach(c => {
+    if (!CLIENTS.includes(c)) CLIENTS.push(c);
+  });
+  localStorage.setItem('ipartes_clients', JSON.stringify(CLIENTS));
   renderNav();
   const container = document.getElementById('clientTabsContainer');
   container.innerHTML = '';
@@ -6070,25 +6089,27 @@ function showVendorVendas(vendor) {
 function getVendorClients(vendor) {
   const cfg = VENDOR_CONFIG[vendor];
   if (!cfg) return [];
+
+  // Always include fixed clients — ensure they exist in CLIENTS array
   const fixed = [...cfg.clients];
-  const vendorName = cfg.name;
-  // Add any CLIENTS not in another vendor's fixed list that match responsavel
-  CLIENTS.forEach(c => {
-    if (!fixed.includes(c)) {
-      const allFixed = Object.values(VENDOR_CONFIG).flatMap(v => v.clients);
-      const resp = RESPONSAVEL_MAP[c];
-      // If not claimed by another vendor and matches this vendor's name
-      if (resp === vendorName && !allFixed.includes(c)) fixed.push(c);
-      // If not in any vendor list, add to Luiz (or vendor with allowNew)
-      if (!allFixed.includes(c) && !resp && cfg.allowNew && vendor === 'luiz') {
-        // Only add orphan clients to Luiz if not already in Rodrigo/Lenon
-        const inRodrigo = VENDOR_CONFIG.rodrigo.clients.includes(c);
-        const inLenon   = VENDOR_CONFIG.lenon.clients.includes(c);
-        if (!inRodrigo && !inLenon) fixed.push(c);
-      }
+  fixed.forEach(c => {
+    if (!CLIENTS.includes(c)) {
+      CLIENTS.push(c);
+      localStorage.setItem('ipartes_clients', JSON.stringify(CLIENTS));
     }
   });
-  return fixed.filter(c => CLIENTS.includes(c));
+
+  // Also add from CLIENTS any extras matching this vendor by RESPONSAVEL_MAP
+  const allFixed = Object.values(VENDOR_CONFIG).flatMap(v => v.clients);
+  CLIENTS.forEach(c => {
+    if (fixed.includes(c)) return;
+    const resp = RESPONSAVEL_MAP[c];
+    if (resp === cfg.name && !allFixed.includes(c)) fixed.push(c);
+    // Orphan clients (no responsavel, not in any vendor) → Luiz
+    if (!resp && !allFixed.includes(c) && vendor === 'luiz') fixed.push(c);
+  });
+
+  return fixed;
 }
 
 // ── Show individual client tab within vendor context ──
@@ -6133,15 +6154,34 @@ function sidebarHighlightClient(vendor, client) {
 // ── Populate sidebar client items ──
 function buildSidebarClients() {
   Object.keys(VENDOR_CONFIG).forEach(vendor => {
-    const cfg     = VENDOR_CONFIG[vendor];
-    const clients = getVendorClients(vendor);
-    const el      = document.getElementById(`sidebar-${vendor}-clients`);
+    const cfg      = VENDOR_CONFIG[vendor];
+    const fixed    = cfg.clients; // Fixed clients for this vendor
+    const all      = getVendorClients(vendor); // All including dynamic
+    const extras   = all.filter(c => !fixed.includes(c));
+    const el       = document.getElementById(`sidebar-${vendor}-clients`);
     if (!el) return;
-    el.innerHTML = clients.map(c => `
+
+    let html = '';
+
+    // Fixed clients
+    html += fixed.map(c => `
       <button class="sidebar-item ${vendor}" id="sb-${vendor}-client-${slugify(c)}"
         onclick="showVendorClientTab('${vendor}','${c}')">
         <span class="item-icon">📁</span> ${c}
       </button>`).join('');
+
+    // Extra / dynamic clients
+    if (extras.length > 0) {
+      html += `<div style="padding:6px 14px 2px 20px;font-size:9px;font-weight:700;
+        color:#475569;text-transform:uppercase;letter-spacing:.6px">Outros</div>`;
+      html += extras.map(c => `
+        <button class="sidebar-item ${vendor}" id="sb-${vendor}-client-${slugify(c)}"
+          onclick="showVendorClientTab('${vendor}','${c}')">
+          <span class="item-icon">📁</span> ${c}
+        </button>`).join('');
+    }
+
+    el.innerHTML = html;
   });
 }
 
