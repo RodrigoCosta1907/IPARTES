@@ -6512,62 +6512,65 @@ async function refreshCurrentUserData() {
       return;
     }
 
-    markSyncing();
     const access = getUserAccess();
 
-    // Get clients for current user
-    let clientsToLoad = [];
     if (access.canSeeAll) {
-      clientsToLoad = CLIENTS;
+      // ADM / Rodrigo — carrega TUDO com paginação completa
+      await loadFromSupabase();
     } else {
-      // Only load own vendor clients
-      const vendor = currentUserProfile;
-      clientsToLoad = getVendorClients(vendor);
-    }
+      // Vendedor — carrega só seus clientes com paginação
+      markSyncing();
+      const vendorClients = getVendorClients(currentUserProfile);
 
-    // Load only relevant clients
-    for (const client of clientsToLoad) {
-      const res = await sbFetch('GET',
-        `?cliente=eq.${encodeURIComponent(client)}&select=*&order=created_at.desc&limit=5000`
-      );
-      if (res.ok) {
-        const rows = await res.json();
-        data[client] = rows.map(r => rowToRec(r));
-        data[client].forEach(r => computeRecord(r));
+      for (const client of vendorClients) {
+        // Paginated load per client
+        const PAGE = 1000;
+        let page = 0, hasMore = true;
+        data[client] = [];
+        while (hasMore) {
+          const from = page * PAGE;
+          const to   = from + PAGE - 1;
+          const res  = await sbFetch('GET',
+            `?cliente=eq.${encodeURIComponent(client)}&select=*&order=ano.asc,mes.asc&offset=${from}&limit=${PAGE}`
+          );
+          if (!res.ok) break;
+          const rows = await res.json();
+          rows.forEach(r => {
+            const rec = rowToRec(r);
+            computeRecord(rec);
+            data[client].push(rec);
+          });
+          hasMore = rows.length === PAGE;
+          page++;
+        }
       }
-    }
 
-    saveLocal();
-    markSynced();
-    localStorage.setItem('ipartes_last_sync', new Date().toISOString());
-    // Remove cache banner if visible
-    document.getElementById('cache-banner')?.remove();
-    // Update refresh button
-    const _btn = document.getElementById('btn-refresh-data');
-    if (_btn) {
-      _btn.innerHTML = '✅ Atualizado';
-      _btn.style.background = 'rgba(21,128,61,.3)';
-      setTimeout(() => {
-        _btn.innerHTML = '🔄 Atualizar';
-        _btn.style.background = 'rgba(255,255,255,.12)';
-      }, 3000);
-    }
+      saveLocal();
+      markSynced();
+      localStorage.setItem('ipartes_last_sync', new Date().toISOString());
+      document.getElementById('cache-banner')?.remove();
 
-    // Re-render current view
-    if (currentSidebarNav === 'overview' || !currentSidebarNav) {
-      renderOverview();
-    } else {
-      sidebarNav(currentSidebarNav);
+      if (currentSidebarNav === 'overview' || !currentSidebarNav) {
+        renderOverview();
+      } else {
+        sidebarNav(currentSidebarNav);
+      }
+      showToast(`✅ Dados atualizados — ${vendorClients.length} cliente(s)`, '#15803d');
     }
-
-    const n = clientsToLoad.length;
-    showToast(`✅ Dados atualizados — ${n} cliente(s)`, '#15803d');
 
   } catch(e) {
     markSyncError(e.message);
     showToast('✗ Erro ao atualizar: ' + e.message, '#dc2626');
   } finally {
-    if (btn) { btn.disabled = false; btn.innerHTML = '🔄 Atualizar'; }
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '✅ Atualizado';
+      btn.style.background = 'rgba(21,128,61,.3)';
+      setTimeout(() => {
+        btn.innerHTML = '🔄 Atualizar';
+        btn.style.background = 'rgba(255,255,255,.12)';
+      }, 3000);
+    }
   }
 }
 
