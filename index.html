@@ -5678,33 +5678,42 @@ function showVendorVendas(vendor) {
     .filter(v=>v.dataPedido&&v.dataPedido.startsWith(String(anoAtual)))
     .reduce((s,v)=>s+(parseFloat(String(v.valor||0).replace(',','.'))||0),0);
 
-  // Build rows safely without nested template literals
-  let rowsHtml = '';
-  if (vendorVendas.length) {
-    vendorVendas.forEach(v => {
-      const sit   = getVendaSituacao(v);
-      const badge = sit==='atrasado'
-        ? '<span class="atraso-badge">⚠ ATRASADO</span>'
-        : sit==='alerta'
-        ? '<span class="alerta-badge">⏰</span>'
-        : '<span style="font-size:10px;color:var(--green)">✓ OK</span>';
-      const stCls = VENDA_STATUS_CSS[v.statusEntrega]||'';
-      rowsHtml += '<tr>'
-        + '<td class="hi">' + sanitize(v.cliente) + '</td>'
-        + '<td>' + sanitize(v.numOportunidade||'—') + '</td>'
-        + '<td class="hi">' + (v.valor?fmtCurrency(v.valor):'—') + '</td>'
-        + '<td>' + (v.dataPedido||'—') + '</td>'
-        + '<td>' + (v.prazoEntrega||'—') + '</td>'
-        + '<td>' + badge + '</td>'
-        + '<td><span class="badge ' + stCls + '">' + (v.statusEntrega||'—') + '</span></td>'
-        + '<td><button class="btn-icon-edit" onclick="openEditVenda('' + v.id + '')">✏</button>'
-        + '<button class="btn-icon-del" onclick="deleteVenda('' + v.id + '','' + v.cliente + '')">✕</button></td>'
-        + '</tr>';
-    });
-  } else {
-    rowsHtml = '<tr><td colspan="8"><div class="empty-state"><div class="icon">🛒</div><p>Nenhuma venda registrada</p></div></td></tr>';
+  // Build table rows without nested quotes in onclick
+  function buildVendaRow(v) {
+    const sit   = getVendaSituacao(v);
+    const badge = sit==='atrasado'
+      ? '<span class="atraso-badge">⚠ ATRASADO</span>'
+      : sit==='alerta'
+      ? '<span class="alerta-badge">⏰</span>'
+      : '<span style="font-size:10px;color:var(--green)">✓ OK</span>';
+    const stCls = VENDA_STATUS_CSS[v.statusEntrega] || '';
+    const tr = document.createElement('tr');
+    tr.innerHTML = [
+      '<td class="hi">' + sanitize(v.cliente) + '</td>',
+      '<td>' + sanitize(v.numOportunidade||'—') + '</td>',
+      '<td class="hi">' + (v.valor ? fmtCurrency(v.valor) : '—') + '</td>',
+      '<td>' + (v.dataPedido||'—') + '</td>',
+      '<td>' + (v.prazoEntrega||'—') + '</td>',
+      '<td>' + badge + '</td>',
+      '<td><span class="badge ' + stCls + '">' + (v.statusEntrega||'—') + '</span></td>',
+      '<td></td>',
+    ].join('');
+    // Add action buttons safely via JS (no inline onclick with quotes)
+    const actionTd = tr.lastElementChild;
+    const editBtn = document.createElement('button');
+    editBtn.className = 'btn-icon-edit';
+    editBtn.textContent = '✏';
+    editBtn.addEventListener('click', () => openEditVenda(v.id));
+    const delBtn = document.createElement('button');
+    delBtn.className = 'btn-icon-del';
+    delBtn.textContent = '✕';
+    delBtn.addEventListener('click', () => deleteVenda(v.id, v.cliente));
+    actionTd.appendChild(editBtn);
+    actionTd.appendChild(delBtn);
+    return tr;
   }
 
+  // Set highlights HTML
   contentEl.innerHTML = `
     <div class="vendas-highlights" style="margin-bottom:16px">
       <div class="vendas-highlight-card">
@@ -5735,10 +5744,20 @@ function showVendorVendas(vendor) {
             <th>Cliente</th><th>Nº Oportunidade</th><th>Valor</th>
             <th>Data Pedido</th><th>Prazo</th><th>Situação</th><th>Status</th><th>Ações</th>
           </tr></thead>
-          <tbody>${rowsHtml}</tbody>
+          <tbody id="vendor-vendas-tbody-${vendor}"></tbody>
         </table>
       </div>
     </div>`;
+
+  // Populate tbody safely
+  const tbody = document.getElementById('vendor-vendas-tbody-'+vendor);
+  if (tbody) {
+    if (vendorVendas.length) {
+      vendorVendas.forEach(v => tbody.appendChild(buildVendaRow(v)));
+    } else {
+      tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="icon">🛒</div><p>Nenhuma venda registrada</p></div></td></tr>';
+    }
+  }
 }
 
 function toggleSidebarSection(section) {
