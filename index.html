@@ -1691,7 +1691,24 @@ td.hi { color: var(--text); font-weight: 500; }
       <button class="sidebar-item rodrigo" id="sb-rodrigo-overview" onclick="sidebarNav('rodrigo-overview')">
         <span class="item-icon">📊</span> Visão Geral
       </button>
-      <div id="sb-rodrigo-clients"></div>
+      <div id="sb-rodrigo-clients">
+        <button class="sidebar-item rodrigo" id="sb-rodrigo-client-vale-ferrosos"
+          onclick="showVendorClientTab('rodrigo','Vale Ferrosos')">
+          <span class="item-icon">📁</span> Vale Ferrosos
+        </button>
+        <button class="sidebar-item rodrigo" id="sb-rodrigo-client-vale-metals"
+          onclick="showVendorClientTab('rodrigo','Vale Metals')">
+          <span class="item-icon">📁</span> Vale Metals
+        </button>
+        <button class="sidebar-item rodrigo" id="sb-rodrigo-client-suzano"
+          onclick="showVendorClientTab('rodrigo','Suzano')">
+          <span class="item-icon">📁</span> Suzano
+        </button>
+        <button class="sidebar-item rodrigo" id="sb-rodrigo-client-outros"
+          onclick="showVendorClientTab('rodrigo','Outros')">
+          <span class="item-icon">📁</span> Outros Clientes
+        </button>
+      </div>
       <button class="sidebar-item vendas" id="sb-rodrigo-vendas" onclick="sidebarNav('rodrigo-vendas')">
         <span class="item-icon">🛒</span> Vendas
       </button>
@@ -1709,7 +1726,28 @@ td.hi { color: var(--text); font-weight: 500; }
       <button class="sidebar-item lenon" id="sb-lenon-overview" onclick="sidebarNav('lenon-overview')">
         <span class="item-icon">📊</span> Visão Geral
       </button>
-      <div id="sb-lenon-clients"></div>
+      <div id="sb-lenon-clients">
+        <button class="sidebar-item lenon" id="sb-lenon-client-petrobras"
+          onclick="showVendorClientTab('lenon','Petrobras')">
+          <span class="item-icon">📁</span> Petrobras
+        </button>
+        <button class="sidebar-item lenon" id="sb-lenon-client-eneva"
+          onclick="showVendorClientTab('lenon','Eneva')">
+          <span class="item-icon">📁</span> Eneva
+        </button>
+        <button class="sidebar-item lenon" id="sb-lenon-client-transpetro"
+          onclick="showVendorClientTab('lenon','Transpetro')">
+          <span class="item-icon">📁</span> Transpetro
+        </button>
+        <button class="sidebar-item lenon" id="sb-lenon-client-engie"
+          onclick="showVendorClientTab('lenon','Engie')">
+          <span class="item-icon">📁</span> Engie
+        </button>
+        <button class="sidebar-item lenon" id="sb-lenon-client-tbg"
+          onclick="showVendorClientTab('lenon','TBG')">
+          <span class="item-icon">📁</span> TBG
+        </button>
+      </div>
       <button class="sidebar-item vendas" id="sb-lenon-vendas" onclick="sidebarNav('lenon-vendas')">
         <span class="item-icon">🛒</span> Vendas
       </button>
