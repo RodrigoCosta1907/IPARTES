@@ -2016,7 +2016,9 @@ async function sbFetch(method, query, body, extraHeaders) {
 async function loadFromSupabase() {
   showLoading('Carregando oportunidades…');
   try {
-    // Supabase limita 1000 linhas por request — busca em páginas até trazer tudo
+    // RESET data antes de carregar para evitar acúmulo/duplicação
+    CLIENTS.forEach(c => { data[c] = []; });
+
     const PAGE_SIZE = 1000;
     let allRows = [];
     let page = 0;
@@ -2095,12 +2097,28 @@ function recToRow(rec, client) {
 async function insertToSupabase(client, rec) {
   try {
     const row = recToRow(rec, client);
-    const res = await sbFetch('POST', '', row);
+    // Use upsert to prevent duplicates on (cliente, numero)
+    const url = sbClient.url + '/rest/v1/' + TABLE;
+    let token = sbClient.key;
+    try {
+      const s = JSON.parse(localStorage.getItem('ipartes_session_v1')||'{}');
+      if (s.access_token && Date.now() < s.expires_at-10000) token = s.access_token;
+    } catch(e2) {}
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type':  'application/json',
+        'apikey':        sbClient.key,
+        'Authorization': 'Bearer ' + token,
+        'Prefer':        'resolution=merge-duplicates,return=representation',
+      },
+      body: JSON.stringify([row])
+    });
     if (!res.ok) throw new Error('Falha ao inserir: ' + await res.text());
     const inserted = await res.json();
-    if (inserted && inserted[0]) rec.sb_id = inserted[0].id, rec.id = inserted[0].id;
+    if (inserted && inserted[0]) rec.sb_id = inserted[0].id;
   } catch(e) {
-    throw new Error('insertToSupabase: ' + e.message);
+    throw new Error('Erro ao salvar no Supabase: ' + e.message);
   }
 }
 
@@ -2120,7 +2138,26 @@ async function insertBatchToSupabase(client, recs) {
   if (!recs || recs.length === 0) return;
   const rows = recs.map(r => recToRow(r, client));
   try {
-    const res = await sbFetch('POST', '', rows);
+    // Use upsert with ON CONFLICT to prevent duplicates
+    const res = await fetch(
+      sbClient.url + '/rest/v1/' + TABLE,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': sbClient.key,
+          'Authorization': 'Bearer ' + ((() => {
+            try {
+              const s = JSON.parse(localStorage.getItem('ipartes_session_v1')||'{}');
+              return (s.access_token && Date.now() < s.expires_at-10000) ? s.access_token : sbClient.key;
+            } catch(e) { return sbClient.key; }
+          })()),
+          // Upsert: if same (cliente, numero) exists → update instead of duplicate
+          'Prefer': 'resolution=merge-duplicates,return=minimal',
+        },
+        body: JSON.stringify(rows)
+      }
+    );
     if (!res.ok) {
       let errMsg = 'Erro desconhecido';
       try { const j = await res.json(); errMsg = j.message || j.error || errMsg; } catch(e2) {}
@@ -2612,7 +2649,15 @@ async function addRecord(client) {
     } catch(e) { hideLoading(); markSyncError(e.message); showToast('✗ Erro ao salvar: '+e.message,'#dc2626'); return; }
   }
 
-  data[client].push(rec);
+  // Dedup: se número já existe, atualiza em vez de inserir
+  const _dup = (data[client]||[]).find(r => r.numero && r.numero === rec.numero);
+  if (_dup) {
+    Object.assign(_dup, rec, { id: _dup.id, sb_id: _dup.sb_id });
+    computeRecord(_dup);
+    showToast('ℹ Nº ' + rec.numero + ' já existe — registro atualizado', '#1d4ed8');
+  } else {
+    data[client].push(rec);
+  }
   // Verifica se já existe registro com mesmo número
   const existing = (data[client]||[]).find(r => r.numero && r.numero === rec.numero);
   if (existing) {
@@ -3905,13 +3950,14 @@ function onLoginSuccess(user) {
   if (_url && _key) {
     const elUrl = document.getElementById('sbUrl'); if (elUrl) elUrl.value = _url;
     const elKey = document.getElementById('sbKey'); if (elKey) elKey.value = _key;
-    // Always fetch fresh from Supabase — don't rely on localStorage cache
+    // Connect to Supabase but DON'T auto-load — user clicks Atualizar
     useSupabase = true;
     sbClient = { url: _url.replace(/\/$/,''), key: _key };
     document.getElementById('dbDot').className = 'db-dot online';
     document.getElementById('dbLabel').textContent = 'Supabase';
     updateFooterDot(true);
-    loadFromSupabase();  // fetch fresh data immediately, no timeout
+    // Show cache data immediately — fast load
+    showCacheNotice();
   }
 }
 
@@ -6484,6 +6530,19 @@ async function refreshCurrentUserData() {
 
     saveLocal();
     markSynced();
+    localStorage.setItem('ipartes_last_sync', new Date().toISOString());
+    // Remove cache banner if visible
+    document.getElementById('cache-banner')?.remove();
+    // Update refresh button
+    const _btn = document.getElementById('btn-refresh-data');
+    if (_btn) {
+      _btn.innerHTML = '✅ Atualizado';
+      _btn.style.background = 'rgba(21,128,61,.3)';
+      setTimeout(() => {
+        _btn.innerHTML = '🔄 Atualizar';
+        _btn.style.background = 'rgba(255,255,255,.12)';
+      }, 3000);
+    }
 
     // Re-render current view
     if (currentSidebarNav === 'overview' || !currentSidebarNav) {
@@ -6570,6 +6629,92 @@ function checkAutoBackup() {
   const dias = Math.floor((Date.now() - new Date(last).getTime()) / 86400000);
   if (dias >= 2) showToast('⚠ Último backup há '+dias+' dias. Backup automático às 19h.','#b45309');
 }
+
+
+// ════════════════════════════════════════════════
+// CACHE-FIRST LOADING
+// ════════════════════════════════════════════════
+
+// Called on login — shows cached data immediately with notice
+function showCacheNotice() {
+  // Data is already loaded from localStorage in init()
+  // Just show a subtle notice that data may not be current
+  const lastSync = localStorage.getItem('ipartes_last_sync');
+  const lastSyncText = lastSync
+    ? 'Última atualização: ' + new Date(lastSync).toLocaleString('pt-BR')
+    : 'Dados do cache local';
+
+  // Update sync indicator in footer
+  const syncEl = document.getElementById('syncStatus');
+  if (syncEl) syncEl.textContent = lastSyncText;
+
+  // Show update prompt in header refresh button
+  const btn = document.getElementById('btn-refresh-data');
+  if (btn) {
+    btn.innerHTML = '🔄 Atualizar dados';
+    btn.style.background = 'rgba(255,255,255,.15)';
+    btn.style.border = '1px solid rgba(255,255,255,.4)';
+    btn.title = lastSyncText;
+  }
+
+  // Show banner if cache is old (> 2 hours)
+  if (lastSync) {
+    const horasDesde = (Date.now() - new Date(lastSync).getTime()) / 3600000;
+    if (horasDesde > 2) {
+      showCacheBanner(Math.round(horasDesde));
+    }
+  } else {
+    // No cache at all — must load
+    showCacheBanner(null);
+  }
+}
+
+function showCacheBanner(horas) {
+  const existing = document.getElementById('cache-banner');
+  if (existing) existing.remove();
+
+  const banner = document.createElement('div');
+  banner.id = 'cache-banner';
+  banner.style.cssText = `
+    background: linear-gradient(135deg, #1e40af, #1d4ed8);
+    color: #fff;
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font);
+    font-size: 12px;
+    gap: 12px;
+    border-bottom: 1px solid rgba(255,255,255,.1);
+  `;
+
+  const msg = horas === null
+    ? '⚡ Nenhum dado em cache. Clique em <strong>Atualizar</strong> para carregar as oportunidades.'
+    : `⏱ Dados do cache (${horas}h atrás). Clique em <strong>Atualizar</strong> para buscar os dados mais recentes.`;
+
+  banner.innerHTML = `
+    <span>${msg}</span>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button onclick="refreshCurrentUserData();document.getElementById('cache-banner')?.remove()"
+        style="background:#fff;color:#1d4ed8;border:none;border-radius:6px;
+               padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;
+               font-family:var(--font)">
+        🔄 Atualizar agora
+      </button>
+      <button onclick="document.getElementById('cache-banner')?.remove()"
+        style="background:transparent;border:1px solid rgba(255,255,255,.3);color:#fff;
+               border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer">
+        Usar cache
+      </button>
+    </div>`;
+
+  // Insert after header
+  const header = document.querySelector('.header');
+  if (header && header.nextSibling) {
+    header.parentNode.insertBefore(banner, header.nextSibling);
+  }
+}
+
 
 // ════════════════════════════════════════════════
 // SYNC INDICATOR
