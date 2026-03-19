@@ -3236,7 +3236,13 @@ function rowHtml(r, client) {
     r.status==='Perdido'          ? 'row-perdido'  :
     r.status==='Cotando'          ? 'row-analise'  :
     r.status==='Orçamento Enviado'? 'row-proposta'  : '';
-  return `<tr class="${rowCls}">
+  const _slug = slugify(client);
+  return `<tr class="${rowCls}" data-id="${r.id}">
+    <td class="td-checkbox">
+      <input type="checkbox" class="row-checkbox row-select-cb"
+        data-id="${r.id}" data-client="${client}"
+        onchange="onRowSelect(this,'${_slug}')">
+    </td>
     ${client === 'Outros' ? `<td class="hi">${r.subcliente||'—'}</td>` : ''}
     <td class="hi">${r.mes||'—'}/${r.ano||'—'}${ai}</td>
     <td>${r.numero||'—'}</td>
@@ -5973,8 +5979,8 @@ function showVendorModule(vendor) {
   const vendorClients = getVendorClients(vendor);
   const filtered = getAllRecords().filter(r => vendorClients.includes(r.cliente));
 
-  const content = document.getElementById('module-'+vendor+'-content');
-  if (!content) return;
+  const contentEl = document.getElementById('module-'+vendor+'-content');
+  if (!contentEl) return;
 
   // Build mini-dashboard for vendor
   const _dd = dedupByNumero(filtered);
@@ -5985,7 +5991,7 @@ function showVendorModule(vendor) {
     .reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0);
   const conv    = particip>0?(vendas/particip*100).toFixed(1):'0.0';
 
-  content.innerHTML = `
+  contentEl.innerHTML = `
     <div class="kpi-grid" style="margin-bottom:16px">
       <div class="kpi-card c-blue">
         <div class="kpi-icon">📋</div>
