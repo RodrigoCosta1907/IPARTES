@@ -3682,10 +3682,6 @@ function updateFooterDot(online) {
 
 
 // ── SETTINGS — CLIENT MANAGEMENT ──
-function openSettings() {
-  renderSettingsModal();
-  document.getElementById('settingsModal').classList.remove('hidden');
-}
 function closeSettings() {
   document.getElementById('settingsModal').classList.add('hidden');
 }
@@ -3696,95 +3692,6 @@ function getArchivedClients() {
 }
 function saveArchivedClients(list) {
   localStorage.setItem('ipartes_archived', JSON.stringify(list));
-}
-
-function renderSettingsModal() {
-  const clients  = getClients();
-  const archived = getArchivedClients();
-  const listEl   = document.getElementById('clientsList');
-  const archEl   = document.getElementById('archivedList');
-  const archSec  = document.getElementById('archivedSection');
-
-  listEl.innerHTML = clients.map((c, i) => `
-    <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;
-                background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);">
-      <span style="font-size:13px;font-weight:500;color:var(--text);flex:1">${c}</span>
-      <span style="font-size:11px;color:var(--text4)">${(data[c]||[]).length} reg.</span>
-      ${i > 0 ? `<button onclick="moveClientUp(${i})" style="background:none;border:1px solid var(--border2);
-        color:var(--text3);padding:3px 7px;border-radius:4px;cursor:pointer;font-size:11px;" title="Mover para cima">↑</button>` : '<div style="width:28px"></div>'}
-      ${i < clients.length-1 ? `<button onclick="moveClientDown(${i})" style="background:none;border:1px solid var(--border2);
-        color:var(--text3);padding:3px 7px;border-radius:4px;cursor:pointer;font-size:11px;" title="Mover para baixo">↓</button>` : '<div style="width:28px"></div>'}
-      <button onclick="archiveClient('${c.replace(/'/g,"\\'")}','${i}')"
-        style="background:none;border:1px solid #fca5a5;color:#ef4444;padding:3px 9px;
-               border-radius:4px;cursor:pointer;font-size:11px;transition:all .15s;"
-        onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='none'"
-        title="Arquivar cliente">Arquivar</button>
-    </div>`).join('');
-
-  if (archived.length) {
-    archSec.style.display = '';
-    archEl.innerHTML = archived.map(c => `
-      <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;
-                  background:#fafafa;border:1px solid var(--border);border-radius:var(--radius);opacity:.8;">
-        <span style="font-size:13px;color:var(--text3);flex:1">${c}</span>
-        <span style="font-size:11px;color:var(--text4)">${(data[c]||[]).length} reg. arquivados</span>
-        <button onclick="restoreClient('${c.replace(/'/g,"\\'")}'")"
-          style="background:var(--blue-dim);border:1px solid var(--blue);color:var(--blue);
-                 padding:3px 9px;border-radius:4px;cursor:pointer;font-size:11px;">Restaurar</button>
-      </div>`).join('');
-  } else {
-    archSec.style.display = 'none';
-  }
-}
-
-function addClient() {
-  const input = document.getElementById('newClientName');
-  const name  = input.value.trim();
-  if (!name) { showToast('⚠ Digite o nome do cliente','#b45309'); return; }
-
-  const clients  = getClients();
-  const archived = getArchivedClients();
-
-  if (clients.includes(name)) { showToast('⚠ Cliente já existe','#b45309'); return; }
-  if (archived.includes(name)) { showToast('⚠ Cliente arquivado — use Restaurar','#b45309'); return; }
-
-  clients.push(name);
-  saveClients(clients);
-  if (!data[name]) data[name] = [];
-  saveLocal();
-  input.value = '';
-  renderSettingsModal();
-  buildClientTabs();
-  renderNav();
-  showToast(`✓ Cliente "${name}" adicionado!`);
-}
-
-function archiveClient(name) {
-  if (!confirm(`Arquivar "${name}"? A aba some da navegação, mas os dados são mantidos.`)) return;
-  const clients  = getClients().filter(c => c !== name);
-  const archived = getArchivedClients();
-  if (!archived.includes(name)) archived.push(name);
-  saveClients(clients);
-  saveArchivedClients(archived);
-  if (currentTab === name) { currentTab = 'overview'; }
-  renderSettingsModal();
-  buildClientTabs();
-  renderNav();
-  renderOverview();
-  showToast(`"${name}" arquivado.`);
-}
-
-function restoreClient(name) {
-  const clients  = getClients();
-  const archived = getArchivedClients().filter(c => c !== name);
-  if (!clients.includes(name)) clients.push(name);
-  saveClients(clients);
-  saveArchivedClients(archived);
-  if (!data[name]) data[name] = [];
-  renderSettingsModal();
-  buildClientTabs();
-  renderNav();
-  showToast(`✓ "${name}" restaurado!`);
 }
 
 function moveClientUp(i) {
@@ -5657,7 +5564,8 @@ function sidebarNav(target) {
     renderVendasModule();
   } else if (target.endsWith('-overview')) {
     const vendor = target.replace('-overview','');
-    document.getElementById('module-'+vendor)?.style && (document.getElementById('module-'+vendor).style.display = 'block');
+    const modEl = document.getElementById('module-'+vendor);
+    if (modEl) modEl.style.display = 'block';
     document.getElementById('sb-'+vendor+'-overview')?.classList.add('active');
     showVendorModule(vendor);
   } else if (target.endsWith('-vendas')) {
@@ -5751,42 +5659,83 @@ function showVendorVendas(vendor) {
   if (!cfg) return;
   const contentEl = document.getElementById('module-'+vendor+'-vendas-content');
   if (!contentEl) return;
+
   const vendorClients = getVendorClients(vendor);
   const vendorVendas  = getAllVendas().filter(v => vendorClients.includes(v.cliente));
-  const hoje = new Date();
-  const mesAtual = hoje.getMonth()+1, anoAtual = hoje.getFullYear();
-  const nomeMes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][mesAtual-1];
-  const vendasMes = vendorVendas.filter(v=>v.dataPedido&&parseInt(v.dataPedido.split('-')[1])===mesAtual&&parseInt(v.dataPedido.split('-')[0])===anoAtual);
+  const hoje     = new Date();
+  const mesAtual = hoje.getMonth()+1;
+  const anoAtual = hoje.getFullYear();
+  const nomeMes  = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+    'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][mesAtual-1];
+
+  const vendasMes = vendorVendas.filter(v => {
+    if (!v.dataPedido) return false;
+    const [y,m] = v.dataPedido.split('-');
+    return parseInt(m)===mesAtual && parseInt(y)===anoAtual;
+  });
   const totalMes = vendasMes.reduce((s,v)=>s+(parseFloat(String(v.valor||0).replace(',','.'))||0),0);
-  const totalAno = vendorVendas.filter(v=>v.dataPedido&&v.dataPedido.startsWith(String(anoAtual))).reduce((s,v)=>s+(parseFloat(String(v.valor||0).replace(',','.'))||0),0);
+  const totalAno = vendorVendas
+    .filter(v=>v.dataPedido&&v.dataPedido.startsWith(String(anoAtual)))
+    .reduce((s,v)=>s+(parseFloat(String(v.valor||0).replace(',','.'))||0),0);
+
+  // Build rows safely without nested template literals
+  let rowsHtml = '';
+  if (vendorVendas.length) {
+    vendorVendas.forEach(v => {
+      const sit   = getVendaSituacao(v);
+      const badge = sit==='atrasado'
+        ? '<span class="atraso-badge">⚠ ATRASADO</span>'
+        : sit==='alerta'
+        ? '<span class="alerta-badge">⏰</span>'
+        : '<span style="font-size:10px;color:var(--green)">✓ OK</span>';
+      const stCls = VENDA_STATUS_CSS[v.statusEntrega]||'';
+      rowsHtml += '<tr>'
+        + '<td class="hi">' + sanitize(v.cliente) + '</td>'
+        + '<td>' + sanitize(v.numOportunidade||'—') + '</td>'
+        + '<td class="hi">' + (v.valor?fmtCurrency(v.valor):'—') + '</td>'
+        + '<td>' + (v.dataPedido||'—') + '</td>'
+        + '<td>' + (v.prazoEntrega||'—') + '</td>'
+        + '<td>' + badge + '</td>'
+        + '<td><span class="badge ' + stCls + '">' + (v.statusEntrega||'—') + '</span></td>'
+        + '<td><button class="btn-icon-edit" onclick="openEditVenda('' + v.id + '')">✏</button>'
+        + '<button class="btn-icon-del" onclick="deleteVenda('' + v.id + '','' + v.cliente + '')">✕</button></td>'
+        + '</tr>';
+    });
+  } else {
+    rowsHtml = '<tr><td colspan="8"><div class="empty-state"><div class="icon">🛒</div><p>Nenhuma venda registrada</p></div></td></tr>';
+  }
 
   contentEl.innerHTML = `
     <div class="vendas-highlights" style="margin-bottom:16px">
-      <div class="vendas-highlight-card"><div class="vendas-highlight-icon">📅</div>
-        <div class="vendas-highlight-body"><div class="vendas-highlight-label">Vendas — ${nomeMes} ${anoAtual}</div>
-        <div class="vendas-highlight-val">${fmtCurrency(totalMes)}</div>
-        <div class="vendas-highlight-sub">${vendasMes.length} pedido(s) no mês</div></div>
+      <div class="vendas-highlight-card">
+        <div class="vendas-highlight-icon">📅</div>
+        <div class="vendas-highlight-body">
+          <div class="vendas-highlight-label">Vendas — ${nomeMes} ${anoAtual}</div>
+          <div class="vendas-highlight-val">${fmtCurrency(totalMes)}</div>
+          <div class="vendas-highlight-sub">${vendasMes.length} pedido(s) no mês</div>
+        </div>
       </div>
-      <div class="vendas-highlight-card orange"><div class="vendas-highlight-icon">📊</div>
-        <div class="vendas-highlight-body"><div class="vendas-highlight-label">Total — ${anoAtual}</div>
-        <div class="vendas-highlight-val">${fmtCurrency(totalAno)}</div>
-        <div class="vendas-highlight-sub">${vendorVendas.filter(v=>v.dataPedido&&v.dataPedido.startsWith(String(anoAtual))).length} pedido(s) no ano</div></div>
+      <div class="vendas-highlight-card orange">
+        <div class="vendas-highlight-icon">📊</div>
+        <div class="vendas-highlight-body">
+          <div class="vendas-highlight-label">Total — ${anoAtual}</div>
+          <div class="vendas-highlight-val">${fmtCurrency(totalAno)}</div>
+          <div class="vendas-highlight-sub">${vendorVendas.filter(v=>v.dataPedido&&v.dataPedido.startsWith(String(anoAtual))).length} pedido(s) no ano</div>
+        </div>
       </div>
     </div>
     <div class="table-card">
-      <div class="table-header"><div class="table-title">Pedidos — ${cfg.name}</div>
+      <div class="table-header">
+        <div class="table-title">Pedidos — ${cfg.name}</div>
         <span style="font-size:12px;color:var(--text3)">${vendorVendas.length} registro(s)</span>
       </div>
       <div class="table-wrap">
-        <table><thead><tr>
-          <th>Cliente</th><th>Nº Oportunidade</th><th>Valor</th>
-          <th>Data Pedido</th><th>Prazo</th><th>Situação</th><th>Status</th><th>Ações</th>
-        </tr></thead>
-        <tbody>${vendorVendas.length ? vendorVendas.map(v => {
-          const sit = getVendaSituacao(v);
-          const badge = sit==='atrasado'?'<span class="atraso-badge">⚠ ATRASADO</span>':sit==='alerta'?'<span class="alerta-badge">⏰</span>':'<span style="font-size:10px;color:var(--green)">✓ OK</span>';
-          return '<tr><td class="hi">'+sanitize(v.cliente)+'</td><td>'+sanitize(v.numOportunidade||'—')+'</td><td class="hi">'+(v.valor?fmtCurrency(v.valor):'—')+'</td><td>'+(v.dataPedido||'—')+'</td><td>'+(v.prazoEntrega||'—')+'</td><td>'+badge+'</td><td><span class="badge '+(VENDA_STATUS_CSS[v.statusEntrega]||'')+'">'+v.statusEntrega+'</span></td><td><button class="btn-icon-edit" onclick="openEditVenda(''+v.id+'')">✏</button></td></tr>';
-        }).join('') : '<tr><td colspan="8"><div class="empty-state"><div class="icon">🛒</div><p>Nenhuma venda registrada</p></div></td></tr>'}</tbody>
+        <table>
+          <thead><tr>
+            <th>Cliente</th><th>Nº Oportunidade</th><th>Valor</th>
+            <th>Data Pedido</th><th>Prazo</th><th>Situação</th><th>Status</th><th>Ações</th>
+          </tr></thead>
+          <tbody>${rowsHtml}</tbody>
         </table>
       </div>
     </div>`;
