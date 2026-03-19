@@ -1851,12 +1851,14 @@ const SUPABASE_KEY = 'sb_publishable_XSSBULwfcdlbICX148flDg_7NQGbSAU';
 
 // CLIENTS is now dynamic — managed via the settings panel
 function getClients() {
+  const required = ['Vale Ferrosos','Vale Metals','Suzano','Outros',
+                    'Petrobras','Eneva','Transpetro','Engie','TBG'];
   const stored = localStorage.getItem('ipartes_clients');
-  if (stored) return JSON.parse(stored);
-  // Default clients
-  const defaults = ['Vale Ferrosos','Vale Metals','Suzano','Outros'];
-  localStorage.setItem('ipartes_clients', JSON.stringify(defaults));
-  return defaults;
+  let list = stored ? JSON.parse(stored) : [...required];
+  required.forEach(c => { if (!list.includes(c)) list.push(c); });
+  list = [...new Set(list)];
+  localStorage.setItem('ipartes_clients', JSON.stringify(list));
+  return list;
 }
 function saveClients(list) {
   localStorage.setItem('ipartes_clients', JSON.stringify(list));
@@ -2169,8 +2171,13 @@ function daysBetween(d1, d2) {
 function computeRecord(rec) {
   rec.mesPedido = getM(rec.dataPedido);
   rec.anoPedido = getY(rec.dataPedido);
-  rec.ciclo = (rec.mes && rec.ano && rec.dataPedido)
-    ? daysBetween(rec.ano + '-' + rec.mes + '-01', rec.dataPedido) : null;
+  if (rec.dataPedido) {
+    const start = rec.dataLancamento || (rec.ano && rec.mes ? rec.ano+'-'+rec.mes+'-01' : null);
+    if (start) {
+      const raw = daysBetween(start, rec.dataPedido);
+      rec.ciclo = raw !== null ? Math.max(0, raw) : null;
+    } else { rec.ciclo = null; }
+  } else { rec.ciclo = null; }
   rec.alertaMes = (rec.venda === 'SIM' && rec.mes && rec.mesPedido && rec.mes !== rec.mesPedido);
   return rec;
 }
@@ -5541,11 +5548,11 @@ let currentSidebarNav = 'overview';
 
 function sidebarNav(target) {
   currentSidebarNav = target;
-  // Hide all
-  ['overview-section','tab-vendas','module-rodrigo','module-rodrigo-vendas',
-   'module-lenon','module-lenon-vendas','module-luiz','module-luiz-vendas',
-   'clientTabsContainer'].forEach(id => {
-    const el = document.getElementById(id) || document.querySelector('.'+id);
+  // Hide all sections
+  ['.overview-section','#tab-vendas','#module-rodrigo','#module-rodrigo-vendas',
+   '#module-lenon','#module-lenon-vendas','#module-luiz','#module-luiz-vendas',
+   '#clientTabsContainer'].forEach(sel => {
+    const el = document.querySelector(sel);
     if (el) el.style.display = 'none';
   });
   document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
@@ -5577,9 +5584,9 @@ function sidebarNav(target) {
 }
 
 function showVendorClientTab(vendor, client) {
-  ['overview-section','tab-vendas','module-rodrigo','module-rodrigo-vendas',
-   'module-lenon','module-lenon-vendas','module-luiz','module-luiz-vendas'].forEach(id => {
-    const el = document.getElementById(id) || document.querySelector('.'+id);
+  ['.overview-section','#tab-vendas','#module-rodrigo','#module-rodrigo-vendas',
+   '#module-lenon','#module-lenon-vendas','#module-luiz','#module-luiz-vendas'].forEach(sel => {
+    const el = document.querySelector(sel);
     if (el) el.style.display = 'none';
   });
   const ct = document.getElementById('clientTabsContainer');
@@ -5984,10 +5991,14 @@ async function init() {
 
   loadLocal();
   loadSalesLocal();
-  CLIENTS = getClients();
+  CLIENTS = getClients(); // deduplicated list
   buildClientTabs();
   renderNav();
-  sidebarNav('overview');
+  // Show overview by default
+  const ovEl = document.querySelector('.overview-section');
+  if (ovEl) ovEl.style.display = 'block';
+  renderOverview();
+  document.getElementById('sb-overview')?.classList.add('active');
   // Verifica regra de perdido no carregamento local
   setTimeout(() => aplicarRegraPerdido(), 2000);
   // Restore last sync time
