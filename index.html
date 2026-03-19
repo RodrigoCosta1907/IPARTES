@@ -4097,23 +4097,48 @@ function addClient() {
   if (clients.includes(name)) { showToast('⚠ Cliente já existe','#b45309'); return; }
   if (archived.includes(name)) { showToast('⚠ Cliente arquivado — use Restaurar','#b45309'); return; }
 
+  // 1. Add to clients list
   clients.push(name);
   CLIENTS = clients;
   saveClients(clients);
+
+  // 2. Init data bucket
   if (!data[name]) data[name] = [];
   saveLocal();
+
+  // 3. Assign to vendor
   const vendor = window._settingsVendorCtx;
-  if (vendor && VENDOR_CONFIG[vendor] && !VENDOR_CONFIG[vendor].clients.includes(name)) {
-    VENDOR_CONFIG[vendor].clients.push(name);
+  if (vendor && VENDOR_CONFIG[vendor]) {
+    if (!VENDOR_CONFIG[vendor].clients.includes(name)) {
+      VENDOR_CONFIG[vendor].clients.push(name);
+    }
   }
+
+  // 4. Rebuild UI
   input.value = '';
-  buildClientTabs();
-  buildSidebarClients();
+  buildClientTabs();       // creates the oportunidades tab
+  rebuildSidebarClients(); // injects button into sidebar immediately
   renderSettingsModal(vendor);
-  showToast(`✅ Cliente "${name}" adicionado!`);
-  buildClientTabs();
-  renderNav();
-  showToast(`✓ Cliente "${name}" adicionado!`);
+  showToast(`✅ Cliente "${name}" adicionado com sucesso!`);
+}
+
+// Rebuild sidebar client list for all vendors
+function rebuildSidebarClients() {
+  Object.keys(VENDOR_CONFIG).forEach(vendor => {
+    const cfg    = VENDOR_CONFIG[vendor];
+    const fixed  = cfg.clients;
+    const extras = CLIENTS.filter(c => !fixed.includes(c) && (RESPONSAVEL_MAP[c] === cfg.name ||
+      (!Object.values(VENDOR_CONFIG).flatMap(v=>v.clients).includes(c) && vendor === 'luiz')));
+    const all    = [...fixed.filter(c => CLIENTS.includes(c)), ...extras];
+    const el     = document.getElementById('sb-'+vendor+'-clients');
+    if (!el) return;
+
+    el.innerHTML = all.map(c => `
+      <button class="sidebar-item ${vendor}" id="sb-${vendor}-client-${slugify(c)}"
+        onclick="showVendorClientTab('${vendor}','${c}')">
+        <span class="item-icon">📁</span> ${c}
+      </button>`).join('');
+  });
 }
 
 function archiveClient(name) {
@@ -6341,7 +6366,10 @@ function buildSidebarClients() {
   allVendorClients.forEach(c => {
     if (!CLIENTS.includes(c)) CLIENTS.push(c);
   });
+  rebuildSidebarClients();
+}
 
+function _buildSidebarClientsLegacy() {
   Object.keys(VENDOR_CONFIG).forEach(vendor => {
     const cfg      = VENDOR_CONFIG[vendor];
     const fixed    = cfg.clients; // Fixed clients for this vendor
