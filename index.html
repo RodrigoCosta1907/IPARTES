@@ -116,7 +116,6 @@ body {
 
 /* ── NAV ── */
 .nav-tabs {
-  display: none !important;
   background: var(--blue2);
   padding: 0 28px;
   display: flex;
@@ -146,7 +145,7 @@ body {
 .tab.active { color: #fff; border-bottom-color: var(--orange); }
 
 /* ── MAIN ── */
-.main { padding: 0; }  /* legacy — content now in .main-content */
+.main { padding: 24px 28px; max-width: 1560px; margin: 0 auto; }
 
 /* ── PAGE HEADER ── */
 .page-header { margin-bottom: 20px; }
@@ -308,7 +307,7 @@ select option { background: #fff; }
 .client-section { display: none; }
 .client-section.active { display: block; }
 .overview-section { display: none; }
-.overview-section.active { display: block; width: 100%; box-sizing: border-box; }
+.overview-section.active { display: block; }
 
 /* ── FORM CARD ── */
 .form-card {
@@ -804,10 +803,8 @@ td.hi { color: var(--text); font-weight: 500; }
   .user-dropdown-item.danger:hover { background: #fee2e2; }
 
   /* Hide app content when not logged in */
-  #appContent { display: none;
-  width: 100%;
-  box-sizing: border-box; }
-  #appContent.visible { display: block; width: 100%; }
+  #appContent { display: none; }
+  #appContent.visible { display: block; }
 
 
   /* ── INLINE GRID ── */
@@ -1381,181 +1378,6 @@ td.hi { color: var(--text); font-weight: 500; }
   .th-checkbox { width: 32px; padding: 0 8px !important; }
   .td-checkbox { width: 32px; padding: 0 8px !important; text-align: center; }
 
-
-  /* ── SIDEBAR LAYOUT ── */
-  .app-layout {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    min-height: calc(100vh - 56px);
-    align-items: stretch;
-    box-sizing: border-box;
-  }
-
-  .sidebar {
-    width: 220px;
-    min-width: 220px;
-    max-width: 220px;
-    flex-shrink: 0;
-    flex-grow: 0;
-    background: #1e293b;
-    display: flex;
-    flex-direction: column;
-    position: sticky;
-    top: 56px;
-    height: calc(100vh - 56px);
-    overflow-y: auto;
-    overflow-x: hidden;
-    scrollbar-width: thin;
-    scrollbar-color: #334155 transparent;
-    z-index: 50;
-    transition: width .25s ease;
-  }
-  .sidebar::-webkit-scrollbar { width: 4px; }
-  .sidebar::-webkit-scrollbar-thumb { background: #334155; border-radius: 2px; }
-
-  .sidebar-section {
-    padding: 6px 0;
-    border-bottom: 1px solid #334155;
-  }
-  .sidebar-section:last-child { border-bottom: none; }
-
-  .sidebar-section-header {
-    display: flex; align-items: center; gap: 8px;
-    padding: 10px 14px 6px;
-    font-size: 10px; font-weight: 700;
-    text-transform: uppercase; letter-spacing: .8px;
-    color: #64748b;
-    cursor: pointer;
-    user-select: none;
-    transition: color .15s;
-  }
-  .sidebar-section-header:hover { color: #94a3b8; }
-  .sidebar-section-header .vendor-badge {
-    width: 20px; height: 20px; border-radius: 50%;
-    font-size: 9px; font-weight: 800;
-    display: flex; align-items: center; justify-content: center;
-    color: #fff; flex-shrink: 0;
-  }
-  .badge-rodrigo { background: #ea580c; }
-  .badge-lenon   { background: #15803d; }
-  .badge-luiz    { background: #1d4ed8; }
-  .badge-geral   { background: #475569; }
-
-  .sidebar-section-header .collapse-icon {
-    margin-left: auto; font-size: 10px;
-    color: #475569; transition: transform .2s;
-  }
-  .sidebar-section.collapsed .collapse-icon { transform: rotate(-90deg); }
-  .sidebar-section.collapsed .sidebar-items { display: none; }
-
-  .sidebar-items { padding: 2px 0; }
-
-  .sidebar-item {
-    display: flex; align-items: center; gap: 8px;
-    padding: 7px 14px 7px 20px;
-    font-size: 12px; font-weight: 500;
-    color: #94a3b8;
-    cursor: pointer;
-    transition: all .15s;
-    border: none; background: transparent;
-    width: 100%; text-align: left;
-    font-family: var(--font);
-    border-left: 2px solid transparent;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .sidebar-item:hover {
-    color: #e2e8f0;
-    background: rgba(255,255,255,.04);
-  }
-  .sidebar-item.active {
-    color: #fff;
-    background: rgba(255,255,255,.07);
-    font-weight: 600;
-  }
-  .sidebar-item.active.rodrigo { border-left-color: #ea580c; }
-  .sidebar-item.active.lenon   { border-left-color: #15803d; }
-  .sidebar-item.active.luiz    { border-left-color: #1d4ed8; }
-  .sidebar-item.active.geral   { border-left-color: #94a3b8; }
-  .sidebar-item.active.vendas  { border-left-color: #7c3aed; }
-
-  .sidebar-item .item-icon { font-size: 12px; flex-shrink: 0; }
-
-  /* Add client button in sidebar */
-  .sidebar-add-btn {
-    display: flex; align-items: center; gap: 6px;
-    padding: 5px 14px 5px 20px;
-    font-size: 11px; color: #475569;
-    cursor: pointer; transition: color .15s;
-    border: none; background: transparent;
-    font-family: var(--font);
-  }
-  .sidebar-add-btn:hover { color: #94a3b8; }
-
-  /* Main content area */
-  .main-content {
-    flex: 1 1 auto;
-    min-width: 0;
-    max-width: calc(100vw - 220px);
-    padding: 20px 28px;
-    background: var(--bg);
-    background-image: radial-gradient(circle at 1px 1px, rgba(29,78,216,.04) 1px, transparent 0);
-    background-size: 28px 28px;
-    overflow-x: hidden;
-    box-sizing: border-box;
-  }
-
-  /* Module header */
-  .module-header {
-    display: flex; align-items: center; gap: 12px;
-    margin-bottom: 20px;
-    padding-bottom: 16px;
-    border-bottom: 2px solid var(--border);
-    width: 100%;
-  }
-  #module-rodrigo, #module-lenon, #module-luiz,
-  #module-rodrigo-vendas, #module-lenon-vendas, #module-luiz-vendas {
-    width: 100%;
-    box-sizing: border-box;
-  }
-  .module-badge {
-    width: 36px; height: 36px; border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 14px; font-weight: 800; color: #fff;
-    flex-shrink: 0;
-  }
-  .module-badge.rodrigo { background: linear-gradient(135deg,#c2410c,#ea580c); }
-  .module-badge.lenon   { background: linear-gradient(135deg,#15803d,#16a34a); }
-  .module-badge.luiz    { background: linear-gradient(135deg,#1d4ed8,#3b82f6); }
-  .module-title { font-size: 20px; font-weight: 700; color: var(--text); }
-  .module-sub   { font-size: 12px; color: var(--text3); margin-top: 2px; }
-
-  /* Sidebar toggle for mobile */
-  .sidebar-toggle {
-    display: none; /* hidden on desktop, shown on mobile */
-    position: fixed; bottom: 20px; left: 20px;
-    width: 44px; height: 44px;
-    background: var(--blue); border: none; border-radius: 50%;
-    color: #fff; font-size: 18px;
-    cursor: pointer; z-index: 200;
-    box-shadow: 0 4px 12px rgba(29,78,216,.4);
-  }
-  .sidebar.collapsed-mobile { width: 0; overflow: hidden; }
-
-  @media (max-width: 768px) {
-    .app-layout { position: relative; }
-    .sidebar {
-      position: fixed; left: 0; top: 56px;
-      height: calc(100vh - 56px);
-      z-index: 100;
-      transform: translateX(-100%);
-      transition: transform .25s ease;
-    }
-    .sidebar.open { transform: translateX(0); }
-    .sidebar-toggle { display: flex; align-items: center; justify-content: center; }
-    .main-content { padding: 14px; }
-  }
-
 </style>
 </head>
 <body>
@@ -1669,126 +1491,7 @@ td.hi { color: var(--text); font-weight: 500; }
 
 <!-- sync bar moved to footer -->
 
-<div class="app-layout">
-<aside class="sidebar" id="appSidebar">
-  <div class="sidebar-section" id="section-geral">
-    <div class="sidebar-section-header" onclick="toggleSidebarSection('geral')">
-      <div class="vendor-badge badge-geral">◈</div>
-      <span>Visão Geral</span>
-      <span class="collapse-icon">▾</span>
-    </div>
-    <div class="sidebar-items">
-      <button class="sidebar-item geral active" id="sb-overview" onclick="sidebarNav('overview')">
-        <span class="item-icon">📊</span> Dashboard Geral
-      </button>
-      <button class="sidebar-item vendas" id="sb-vendas-geral" onclick="sidebarNav('vendas-geral')">
-        <span class="item-icon">🛒</span> Vendas Geral
-      </button>
-    </div>
-  </div>
-
-  <div class="sidebar-section" id="section-rodrigo">
-    <div class="sidebar-section-header" onclick="toggleSidebarSection('rodrigo')">
-      <div class="vendor-badge badge-rodrigo">RO</div>
-      <span>Rodrigo</span>
-      <span class="collapse-icon">▾</span>
-    </div>
-    <div class="sidebar-items">
-      <button class="sidebar-item rodrigo" id="sb-rodrigo-overview" onclick="sidebarNav('rodrigo-overview')">
-        <span class="item-icon">📊</span> Visão Geral
-      </button>
-      <div id="sb-rodrigo-clients">
-        <button class="sidebar-item rodrigo" id="sb-rodrigo-client-vale-ferrosos"
-          onclick="showVendorClientTab('rodrigo','Vale Ferrosos')">
-          <span class="item-icon">📁</span> Vale Ferrosos
-        </button>
-        <button class="sidebar-item rodrigo" id="sb-rodrigo-client-vale-metals"
-          onclick="showVendorClientTab('rodrigo','Vale Metals')">
-          <span class="item-icon">📁</span> Vale Metals
-        </button>
-        <button class="sidebar-item rodrigo" id="sb-rodrigo-client-suzano"
-          onclick="showVendorClientTab('rodrigo','Suzano')">
-          <span class="item-icon">📁</span> Suzano
-        </button>
-        <button class="sidebar-item rodrigo" id="sb-rodrigo-client-outros"
-          onclick="showVendorClientTab('rodrigo','Outros')">
-          <span class="item-icon">📁</span> Outros Clientes
-        </button>
-      </div>
-      <button class="sidebar-item vendas" id="sb-rodrigo-vendas" onclick="sidebarNav('rodrigo-vendas')">
-        <span class="item-icon">🛒</span> Vendas
-      </button>
-      <button class="sidebar-add-btn" onclick="openSettings('rodrigo')" style="color:#ea580c">
-        ＋ Adicionar cliente
-      </button>
-    </div>
-  </div>
-
-  <div class="sidebar-section" id="section-lenon">
-    <div class="sidebar-section-header" onclick="toggleSidebarSection('lenon')">
-      <div class="vendor-badge badge-lenon">LE</div>
-      <span>Lenon</span>
-      <span class="collapse-icon">▾</span>
-    </div>
-    <div class="sidebar-items">
-      <button class="sidebar-item lenon" id="sb-lenon-overview" onclick="sidebarNav('lenon-overview')">
-        <span class="item-icon">📊</span> Visão Geral
-      </button>
-      <div id="sb-lenon-clients">
-        <button class="sidebar-item lenon" id="sb-lenon-client-petrobras"
-          onclick="showVendorClientTab('lenon','Petrobras')">
-          <span class="item-icon">📁</span> Petrobras
-        </button>
-        <button class="sidebar-item lenon" id="sb-lenon-client-eneva"
-          onclick="showVendorClientTab('lenon','Eneva')">
-          <span class="item-icon">📁</span> Eneva
-        </button>
-        <button class="sidebar-item lenon" id="sb-lenon-client-transpetro"
-          onclick="showVendorClientTab('lenon','Transpetro')">
-          <span class="item-icon">📁</span> Transpetro
-        </button>
-        <button class="sidebar-item lenon" id="sb-lenon-client-engie"
-          onclick="showVendorClientTab('lenon','Engie')">
-          <span class="item-icon">📁</span> Engie
-        </button>
-        <button class="sidebar-item lenon" id="sb-lenon-client-tbg"
-          onclick="showVendorClientTab('lenon','TBG')">
-          <span class="item-icon">📁</span> TBG
-        </button>
-      </div>
-      <button class="sidebar-item vendas" id="sb-lenon-vendas" onclick="sidebarNav('lenon-vendas')">
-        <span class="item-icon">🛒</span> Vendas
-      </button>
-      <button class="sidebar-add-btn" onclick="openSettings('lenon')" style="color:#15803d">
-        ＋ Adicionar cliente
-      </button>
-    </div>
-  </div>
-
-  <div class="sidebar-section" id="section-luiz">
-    <div class="sidebar-section-header" onclick="toggleSidebarSection('luiz')">
-      <div class="vendor-badge badge-luiz">LU</div>
-      <span>Luiz</span>
-      <span class="collapse-icon">▾</span>
-    </div>
-    <div class="sidebar-items">
-      <button class="sidebar-item luiz" id="sb-luiz-overview" onclick="sidebarNav('luiz-overview')">
-        <span class="item-icon">📊</span> Visão Geral
-      </button>
-      <div id="sb-luiz-clients"></div>
-      <button class="sidebar-item vendas" id="sb-luiz-vendas" onclick="sidebarNav('luiz-vendas')">
-        <span class="item-icon">🛒</span> Vendas
-      </button>
-      <button class="sidebar-add-btn" onclick="openSettings('luiz')" style="color:#1d4ed8">
-        ＋ Adicionar cliente
-      </button>
-    </div>
-  </div>
-</aside>
-
-<button class="sidebar-toggle" onclick="toggleMobileSidebar()">☰</button>
-
-<div class="main-content" id="appMainContent">
+<div class="main">
 
 <!-- OVERVIEW -->
 <div class="overview-section active" id="tab-overview">
@@ -1905,7 +1608,7 @@ td.hi { color: var(--text); font-weight: 500; }
   </div>
 </div>
 
-<div id="clientTabsContainer" style="display:none"></div>
+<div id="clientTabsContainer"></div>
 
 <!-- ── MÓDULO VENDAS ── -->
 <div class="vendas-section" id="tab-vendas">
@@ -1993,57 +1696,6 @@ td.hi { color: var(--text); font-weight: 500; }
 
 </div>
 
-<!-- ═══ MÓDULOS DE VENDEDOR ═══ -->
-<div id="module-rodrigo" style="display:none">
-  <div class="module-header">
-    <div class="module-badge rodrigo">RO</div>
-    <div><div class="module-title">Módulo Rodrigo</div>
-    <div class="module-sub">Vale Ferrosos · Vale Metals · Suzano · Outros</div></div>
-  </div>
-  <div id="module-rodrigo-content"></div>
-</div>
-<div id="module-rodrigo-vendas" style="display:none">
-  <div class="module-header">
-    <div class="module-badge rodrigo">RO</div>
-    <div><div class="module-title">Vendas — Rodrigo</div>
-    <div class="module-sub">Pedidos e entregas</div></div>
-  </div>
-  <div id="module-rodrigo-vendas-content"></div>
-</div>
-<div id="module-lenon" style="display:none">
-  <div class="module-header">
-    <div class="module-badge lenon">LE</div>
-    <div><div class="module-title">Módulo Lenon</div>
-    <div class="module-sub">Petrobras · Eneva · Transpetro · Engie · TBG</div></div>
-  </div>
-  <div id="module-lenon-content"></div>
-</div>
-<div id="module-lenon-vendas" style="display:none">
-  <div class="module-header">
-    <div class="module-badge lenon">LE</div>
-    <div><div class="module-title">Vendas — Lenon</div>
-    <div class="module-sub">Pedidos e entregas</div></div>
-  </div>
-  <div id="module-lenon-vendas-content"></div>
-</div>
-<div id="module-luiz" style="display:none">
-  <div class="module-header">
-    <div class="module-badge luiz">LU</div>
-    <div><div class="module-title">Módulo Luiz</div>
-    <div class="module-sub">Clientes atribuídos</div></div>
-  </div>
-  <div id="module-luiz-content"></div>
-</div>
-<div id="module-luiz-vendas" style="display:none">
-  <div class="module-header">
-    <div class="module-badge luiz">LU</div>
-    <div><div class="module-title">Vendas — Luiz</div>
-    <div class="module-sub">Pedidos e entregas</div></div>
-  </div>
-  <div id="module-luiz-vendas-content"></div>
-</div>
-
-
 <!-- EDIT MODAL -->
 <div class="modal-overlay hidden" id="editModal">
   <div class="modal">
@@ -2083,22 +1735,12 @@ const SUPABASE_KEY = 'sb_publishable_XSSBULwfcdlbICX148flDg_7NQGbSAU';
 
 // CLIENTS is now dynamic — managed via the settings panel
 function getClients() {
-  const allRequired = [
-    'Vale Ferrosos','Vale Metals','Suzano','Outros',
-    'Petrobras','Eneva','Transpetro','Engie','TBG'
-  ];
   const stored = localStorage.getItem('ipartes_clients');
-  if (stored) {
-    const parsed = JSON.parse(stored);
-    let updated = false;
-    allRequired.forEach(c => {
-      if (!parsed.includes(c)) { parsed.push(c); updated = true; }
-    });
-    if (updated) localStorage.setItem('ipartes_clients', JSON.stringify(parsed));
-    return parsed;
-  }
-  localStorage.setItem('ipartes_clients', JSON.stringify(allRequired));
-  return allRequired;
+  if (stored) return JSON.parse(stored);
+  // Default clients
+  const defaults = ['Vale Ferrosos','Vale Metals','Suzano','Outros'];
+  localStorage.setItem('ipartes_clients', JSON.stringify(defaults));
+  return defaults;
 }
 function saveClients(list) {
   localStorage.setItem('ipartes_clients', JSON.stringify(list));
@@ -2118,33 +1760,7 @@ const RESPONSAVEL_MAP = {
   'Transpetro':    'Lenon',
   'Eneva':         'Lenon',
   'Engie':         'Lenon',
-  'TBG':           'Lenon',
 };
-
-const VENDOR_CONFIG = {
-  rodrigo: {
-    name: 'Rodrigo',
-    badge: 'RO',
-    color: '#ea580c',
-    clients: ['Vale Ferrosos','Vale Metals','Suzano','Outros'],
-    allowNew: true,
-  },
-  lenon: {
-    name: 'Lenon',
-    badge: 'LE',
-    color: '#15803d',
-    clients: ['Petrobras','Eneva','Transpetro','Engie','TBG'],
-    allowNew: false,
-  },
-  luiz: {
-    name: 'Luiz',
-    badge: 'LU',
-    color: '#1d4ed8',
-    clients: [],
-    allowNew: true,
-  },
-};
-
 
 function getResponsavelPadrao(client) {
   // Busca pelo nome exato ou por correspondência parcial (case insensitive)
@@ -2164,8 +1780,7 @@ const CHART_COLORS = ['#1d4ed8','#ea580c','#15803d','#b45309','#475569','#7c3aed
 const IMPORT_COLS = {
   subcliente:'Cliente Real', mes:'Mês', ano:'Ano', numero:'Nº Oportunidade', portal:'Portal',
   valor:'Valor', status:'Status', participamos:'Participamos',
-  venda:'Venda', dataPedido:'Data do Pedido',
-  finaliza:'Finaliza', responsavel:'Responsável', obs:'Observação'
+  venda:'Venda', dataPedido:'Data do Pedido', obs:'Observação'
 };
 const STORAGE_KEY = 'ipartes_v1';
 
@@ -2302,10 +1917,10 @@ async function loadFromSupabase() {
     saveLocal();
     await loadVendasFromSupabase();
     markSynced();
-    CLIENTS = getClients(); // ensure all vendor clients present
     renderNav();
-    buildSidebarClients();
-    sidebarNav(currentSidebarNav || 'overview');
+    if (currentTab === 'overview') renderOverview();
+    else if (currentTab === 'vendas') renderVendasModule();
+    else renderClientTab(currentTab);
     // Aplica regra automática de Perdido após carregar dados
     setTimeout(() => aplicarRegraPerdido(), 1000);
   } catch (err) {
@@ -2363,8 +1978,6 @@ async function updateInSupabase(client, rec) {
 }
 
 async function deleteFromSupabase(id) {
-  if (!id) return;
-  // Deleta SOMENTE pelo UUID exato — nunca por número de oportunidade
   const res = await sbFetch('DELETE', `?id=eq.${id}`);
   if (!res.ok) throw new Error('Falha ao deletar');
 }
@@ -2440,19 +2053,8 @@ function daysBetween(d1, d2) {
 function computeRecord(rec) {
   rec.mesPedido = getM(rec.dataPedido);
   rec.anoPedido = getY(rec.dataPedido);
-  // Ciclo: days from launch/registration date to order date
-  // Use dataLancamento if available, else mes/ano start
-  if (rec.dataPedido) {
-    const startDate = rec.dataLancamento || (rec.ano && rec.mes ? rec.ano+'-'+rec.mes+'-01' : null);
-    if (startDate) {
-      const cicloRaw = daysBetween(startDate, rec.dataPedido);
-      rec.ciclo = cicloRaw !== null ? Math.max(0, cicloRaw) : null;
-    } else {
-      rec.ciclo = null;
-    }
-  } else {
-    rec.ciclo = null;
-  }
+  rec.ciclo = (rec.mes && rec.ano && rec.dataPedido)
+    ? daysBetween(rec.ano + '-' + rec.mes + '-01', rec.dataPedido) : null;
   rec.alertaMes = (rec.venda === 'SIM' && rec.mes && rec.mesPedido && rec.mes !== rec.mesPedido);
   return rec;
 }
@@ -2526,12 +2128,6 @@ function switchTab(tab) {
 // ══════════════════════════════════════════════════
 function buildClientTabs() {
   CLIENTS = getClients();
-  // Ensure all vendor fixed clients are present
-  const allVendorClients = Object.values(VENDOR_CONFIG).flatMap(v => v.clients);
-  allVendorClients.forEach(c => {
-    if (!CLIENTS.includes(c)) CLIENTS.push(c);
-  });
-  localStorage.setItem('ipartes_clients', JSON.stringify(CLIENTS));
   renderNav();
   const container = document.getElementById('clientTabsContainer');
   container.innerHTML = '';
@@ -2714,19 +2310,6 @@ function buildClientTabs() {
           <div class="filter-sep"></div>
           <button class="btn-reset" onclick="resetClientFilters('${slug}','${client}')"
             style="font-size:11px;padding:4px 10px" title="Limpar filtros">↺</button>
-        </div>
-        <!-- Barra de exclusão em massa -->
-        <div class="bulk-delete-bar" id="bulk-bar-${slug}">
-          <div class="bulk-delete-info">
-            <span class="bulk-delete-count" id="bulk-count-${slug}">0</span>
-            selecionada(s)
-          </div>
-          <div style="display:flex;gap:8px">
-            <button class="btn-deselect-all" onclick="deselectAll('${slug}')">✕ Desmarcar</button>
-            <button class="btn-bulk-delete" onclick="bulkDeleteSelected('${client}','${slug}')">
-              🗑 Excluir Selecionadas
-            </button>
-          </div>
         </div>
         <div class="table-wrap">
           <table>
@@ -2925,9 +2508,8 @@ async function addRecord(client) {
 // ══════════════════════════════════════════════════
 async function deleteRecord(client, id) {
   if (!confirm('Confirmar exclusão?')) return;
-  const rec = (data[client]||[]).find(r => r.id === id);
   if (useSupabase) {
-    try { showLoading('Removendo…'); await deleteFromSupabase(rec?.sb_id || id); hideLoading(); }
+    try { showLoading('Removendo…'); await deleteFromSupabase(id); hideLoading(); }
     catch(e) { hideLoading(); showToast('✗ Erro ao remover','#dc2626'); return; }
   }
   data[client] = (data[client]||[]).filter(r => r.id !== id);
@@ -2998,26 +2580,7 @@ function processImportFile(file, client) {
         }
       } else {
         const wb = XLSX.read(e.target.result, {type:'array', cellDates:true});
-        // raw:true preserves exact numeric values — avoids locale formatting issues
-        // defval:'' ensures empty cells return empty string not undefined
-        rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {
-          raw: true,
-          dateNF: 'yyyy-mm-dd',
-          defval: ''
-        });
-      }
-
-      // Helper: convert Excel serial date to YYYY-MM-DD string
-      function excelDateToStr(val) {
-        if (!val) return '';
-        if (typeof val === 'string' && /\d{4}-\d{2}-\d{2}/.test(val)) return val.slice(0,10);
-        if (val instanceof Date) return val.toISOString().slice(0,10);
-        if (typeof val === 'number' && val > 40000) {
-          // Excel serial date
-          const d = new Date((val - 25569) * 86400 * 1000);
-          return d.toISOString().slice(0,10);
-        }
-        return String(val).slice(0,10);
+        rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {raw:false, dateNF:'yyyy-mm-dd'});
       }
 
       const colMap = {};
@@ -3034,33 +2597,27 @@ function processImportFile(file, client) {
         if (rec.ano) rec.ano = String(parseInt(rec.ano));
         if (rec.valor) {
           // Handle both BR string format "R$ 1.234,56" and already-numeric "1234.56"
-          let v = rec.valor;
-          if (typeof v === 'number') {
-            // Raw numeric from Excel — use directly (most accurate)
-            rec.valor = v.toString();
+          let v = rec.valor.toString().trim();
+          if (v.includes(',')) {
+            // BR format: R$ 1.234,56 → remove R$, spaces, dots (thousands), comma→dot
+            v = v.replace(/R\$\s*/g,'').replace(/\./g,'').replace(',','.').trim();
           } else {
-            v = v.toString().trim();
-            if (v.includes(',') && v.includes('.')) {
-              // BR format: R$ 1.234,56 → remove R$, dots (thousands), comma→dot
-              v = v.replace(/R\$\s*/g,'').replace(/\./g,'').replace(',','.').trim();
-            } else if (v.includes(',')) {
-              // Only comma: treat as decimal separator
-              v = v.replace(/R\$\s*/g,'').replace(',','.').trim();
-            } else {
-              // Plain number string or US format
-              v = v.replace(/R\$\s*/g,'').trim();
-            }
-            rec.valor = v;
+            // Already numeric string or plain number: just strip R$ and spaces
+            v = v.replace(/R\$\s*/g,'').trim();
           }
+          rec.valor = v;
         }
         if (rec.venda) rec.venda = rec.venda.toUpperCase().trim();
         if (rec.subcliente) rec.subcliente = rec.subcliente.trim();
         if (rec.participamos) rec.participamos = rec.participamos.toUpperCase().trim();
         if (rec.dataPedido) {
-          rec.dataPedido = excelDateToStr(rec.dataPedido);
-        }
-        if (rec.finaliza) {
-          rec.finaliza = excelDateToStr(rec.finaliza);
+          if (/^\d{5}$/.test(rec.dataPedido)) {
+            const d = new Date(Date.UTC(1899,11,30)+parseInt(rec.dataPedido)*86400000);
+            rec.dataPedido = d.toISOString().slice(0,10);
+          } else if (/^\d{2}\/\d{2}\/\d{4}$/.test(rec.dataPedido)) {
+            const [dd,mm,yyyy] = rec.dataPedido.split('/');
+            rec.dataPedido = `${yyyy}-${mm}-${dd}`;
+          }
         }
         if (!rec.mes || !rec.ano || !rec.numero) { errors.push(`Linha ${idx+2}: dados incompletos`); return; }
         computeRecord(rec);
@@ -3300,13 +2857,7 @@ function rowHtml(r, client) {
     r.status==='Perdido'          ? 'row-perdido'  :
     r.status==='Cotando'          ? 'row-analise'  :
     r.status==='Orçamento Enviado'? 'row-proposta'  : '';
-  const _slug = slugify(client);
-  return `<tr class="${rowCls}" data-id="${r.id}">
-    <td class="td-checkbox">
-      <input type="checkbox" class="row-checkbox row-select-cb"
-        data-id="${r.id}" data-client="${client}"
-        onchange="onRowSelect(this,'${_slug}')">
-    </td>
+  return `<tr class="${rowCls}">
     ${client === 'Outros' ? `<td class="hi">${r.subcliente||'—'}</td>` : ''}
     <td class="hi">${r.mes||'—'}/${r.ano||'—'}${ai}</td>
     <td>${r.numero||'—'}</td>
@@ -3351,10 +2902,9 @@ function renderOverviewTable(filtered) {
     const recs       = filtered.filter(r => r.cliente === client);
     if (!recs.length) return null;
 
-    const _dr = dedupByNumero(recs);
-    const total      = _dr.length;
-    const particip   = _dr.filter(r => r.participamos === 'SIM').length;
-    const vendas_recs= _dr.filter(r => r.venda === 'SIM');
+    const total      = recs.length;
+    const particip   = recs.filter(r => r.participamos === 'SIM').length;
+    const vendas_recs= recs.filter(r => r.venda === 'SIM');
     const qtdVendas  = vendas_recs.length;
     const valorCotado  = dedupByNumero(recs).reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0);
     const valorVendido = dedupByNumero(recs.filter(r=>r.venda==='SIM')).reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0);
@@ -3434,11 +2984,10 @@ function exportSummary() {
 // KPIs
 // ══════════════════════════════════════════════════
 function renderKPIs(filtered) {
-  const _dd = dedupByNumero(filtered);
-  const total = _dd.length;
-  const particip = _dd.filter(r=>r.participamos==='SIM').length;
-  const vendas = _dd.filter(r=>r.venda==='SIM').length;
-  const receita = _dd.filter(r=>r.venda==='SIM').reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0);
+  const total = filtered.length;
+  const particip = filtered.filter(r=>r.participamos==='SIM').length;
+  const vendas = filtered.filter(r=>r.venda==='SIM').length;
+  const receita = dedupByNumero(filtered.filter(r=>r.venda==='SIM')).reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0);
   const conv = particip > 0 ? (vendas/particip*100).toFixed(1) : '0.0';
   const ciclos = filtered.filter(r=>r.ciclo!=null).map(r=>r.ciclo);
   const cicloMed = ciclos.length ? Math.round(ciclos.reduce((a,b)=>a+b,0)/ciclos.length) : '—';
@@ -3581,7 +3130,7 @@ function renderCharts(filtered) {
   // ── 2. Conversão por Cliente ──
   dc('cc');
   const ccData = rcClients.map(c => {
-    const recs = dedupByNumero(filtered.filter(x=>x.cliente===c));
+    const recs = filtered.filter(x=>x.cliente===c);
     const p = recs.filter(x=>x.participamos==='SIM').length;
     const v = recs.filter(x=>x.venda==='SIM').length;
     return p > 0 ? +(v/p*100).toFixed(1) : 0;
@@ -3633,9 +3182,8 @@ function renderCharts(filtered) {
 
   // ── 3. Pipeline por Status (doughnut) ──
   dc('st');
-  const stDedup  = dedupByNumero(filtered);
-  const stLabels = STATUS_OPTS.filter(s => stDedup.some(r=>r.status===s));
-  const svData   = stLabels.map(s => stDedup.filter(r=>r.status===s).length);
+  const stLabels = STATUS_OPTS.filter(s => filtered.some(r=>r.status===s));
+  const svData   = stLabels.map(s => filtered.filter(r=>r.status===s).length);
   const svTotal  = svData.reduce((a,b)=>a+b,0);
   const stPalette= ['rgba(29,78,216,.85)','rgba(180,83,9,.85)','rgba(21,128,61,.85)',
                     'rgba(239,68,68,.8)','rgba(71,85,105,.8)','rgba(148,163,184,.8)','rgba(234,88,12,.8)'];
@@ -3689,19 +3237,20 @@ function renderCharts(filtered) {
   dc('ev');
   dc('mo'); // remove standalone month chart if exists
   const evMonths={};
-  // Dedup por número dentro de cada mês
-  const evSeenNums={};
+  const evSeenNums={}; // track numero per month to avoid double-counting
   filtered.forEach(r=>{
     if(!r.mes||!r.ano)return;
     const k=r.ano+'-'+r.mes;
     if(!evMonths[k]){evMonths[k]={total:0,receita:0,particip:0,vendas:0}; evSeenNums[k]=new Set();}
-    // Só conta se número ainda não visto neste mês
-    if(r.numero && evSeenNums[k].has(r.numero)) return;
-    if(r.numero) evSeenNums[k].add(r.numero);
     evMonths[k].total++;
-    if(r.venda==='SIM') evMonths[k].receita+=(parseFloat(String(r.valor||0).replace(',','.'))||0);
-    if(r.participamos==='SIM') evMonths[k].particip++;
-    if(r.venda==='SIM') evMonths[k].vendas++;
+    if(r.venda==='SIM' && r.numero && !evSeenNums[k].has(r.numero)){
+      evMonths[k].receita+=(parseFloat(String(r.valor||0).replace(',','.'))||0);
+      evSeenNums[k].add(r.numero);
+    } else if(r.venda==='SIM' && !r.numero){
+      evMonths[k].receita+=(parseFloat(String(r.valor||0).replace(',','.'))||0);
+    }
+    if(r.participamos==='SIM')evMonths[k].particip++;
+    if(r.venda==='SIM')evMonths[k].vendas++;
   });
   const evKeys   = Object.keys(evMonths).sort();
   const evLabels = evKeys.map(k=>{const[y,m]=k.split('-');return MONTHS[parseInt(m)-1]+'/'+y.slice(2);});
@@ -3755,12 +3304,11 @@ function renderCharts(filtered) {
 
   // ── 5. Funil do Processo Comercial ──
   dc('fn');
-  const fnDedup = dedupByNumero(filtered);
-  const fT   = fnDedup.length;
-  const fCot = fnDedup.filter(r=>r.status==='Cotando').length;
-  const fOrc = fnDedup.filter(r=>r.status==='Orçamento Enviado').length;
-  const fPed = fnDedup.filter(r=>r.status==='Pedido Recebido').length;
-  const fPer = fnDedup.filter(r=>r.status==='Perdido').length;
+  const fT   = filtered.length;
+  const fCot = filtered.filter(r=>r.status==='Cotando').length;
+  const fOrc = filtered.filter(r=>r.status==='Orçamento Enviado').length;
+  const fPed = filtered.filter(r=>r.status==='Pedido Recebido').length;
+  const fPer = filtered.filter(r=>r.status==='Perdido').length;
   const fnData   = [fT, fCot, fOrc, fPed, fPer];
   const fnLabels = ['Total de Oportunidades','Em Cotação','Orçamento Enviado','Pedido Recebido ✓','Perdido ✗'];
   const fnColors = ['rgba(29,78,216,.85)','rgba(71,85,105,.85)','rgba(180,83,9,.85)','rgba(21,128,61,.85)','rgba(239,68,68,.75)'];
@@ -4035,54 +3583,84 @@ function saveArchivedClients(list) {
 }
 
 function renderSettingsModal(vendorCtx) {
-  const clients  = getClients();
-  const archived = getArchivedClients();
-  const listEl   = document.getElementById('clientsList');
-  const archEl   = document.getElementById('archivedList');
-  const archSec  = document.getElementById('archivedSection');
-  // Store vendor context for adding new clients
   window._settingsVendorCtx = vendorCtx || null;
-  // Show vendor hint
+  const vendor = vendorCtx;
+  const cfg    = vendor ? VENDOR_CONFIG[vendor] : null;
+
+  // Clients for this vendor (or all if no vendor)
+  const allClients = getClients();
+  const archived   = getArchivedClients();
+
+  const vendorClients = vendor
+    ? allClients.filter(c => cfg.clients.includes(c) ||
+        RESPONSAVEL_MAP[c] === cfg.name)
+    : allClients;
+
+  const vendorArchived = vendor
+    ? archived.filter(c => cfg.clients.includes(c) ||
+        RESPONSAVEL_MAP[c] === cfg.name)
+    : archived;
+
+  // Modal title
+  const titleEl = document.querySelector('#settingsModal .modal-title');
+  if (titleEl) titleEl.innerHTML = cfg
+    ? `<span style="color:${cfg.color}">●</span> Clientes — ${cfg.name}`
+    : '👥 Gerenciar Clientes';
+
+  // Vendor hint
   const hintEl = document.getElementById('addClientVendorHint');
   if (hintEl) {
-    if (vendorCtx && VENDOR_CONFIG[vendorCtx]) {
-      const cfg = VENDOR_CONFIG[vendorCtx];
+    if (cfg) {
       hintEl.style.display = 'block';
-      hintEl.innerHTML = `📌 Será adicionado ao módulo <strong style="color:${cfg.color}">${cfg.name}</strong>`;
+      hintEl.innerHTML = `📌 Novo cliente será adicionado ao módulo <strong style="color:${cfg.color}">${cfg.name}</strong>`;
     } else {
       hintEl.style.display = 'none';
     }
   }
 
-  listEl.innerHTML = clients.map((c, i) => `
-    <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;
-                background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);">
-      <span style="font-size:13px;font-weight:500;color:var(--text);flex:1">${c}</span>
-      <span style="font-size:11px;color:var(--text4)">${(data[c]||[]).length} reg.</span>
-      ${i > 0 ? `<button onclick="moveClientUp(${i})" style="background:none;border:1px solid var(--border2);
-        color:var(--text3);padding:3px 7px;border-radius:4px;cursor:pointer;font-size:11px;" title="Mover para cima">↑</button>` : '<div style="width:28px"></div>'}
-      ${i < clients.length-1 ? `<button onclick="moveClientDown(${i})" style="background:none;border:1px solid var(--border2);
-        color:var(--text3);padding:3px 7px;border-radius:4px;cursor:pointer;font-size:11px;" title="Mover para baixo">↓</button>` : '<div style="width:28px"></div>'}
-      <button onclick="archiveClient('${c.replace(/'/g,"\\'")}','${i}')"
-        style="background:none;border:1px solid #fca5a5;color:#ef4444;padding:3px 9px;
-               border-radius:4px;cursor:pointer;font-size:11px;transition:all .15s;"
-        onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='none'"
-        title="Arquivar cliente">Arquivar</button>
-    </div>`).join('');
+  const listEl  = document.getElementById('clientsList');
+  const archEl  = document.getElementById('archivedList');
+  const archSec = document.getElementById('archivedSection');
+  if (!listEl) return;
 
-  if (archived.length) {
-    archSec.style.display = '';
-    archEl.innerHTML = archived.map(c => `
-      <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;
-                  background:#fafafa;border:1px solid var(--border);border-radius:var(--radius);opacity:.8;">
-        <span style="font-size:13px;color:var(--text3);flex:1">${c}</span>
-        <span style="font-size:11px;color:var(--text4)">${(data[c]||[]).length} reg. arquivados</span>
-        <button onclick="restoreClient('${c.replace(/'/g,"\\'")}'")"
-          style="background:var(--blue-dim);border:1px solid var(--blue);color:var(--blue);
-                 padding:3px 9px;border-radius:4px;cursor:pointer;font-size:11px;">Restaurar</button>
-      </div>`).join('');
-  } else {
-    archSec.style.display = 'none';
+  // Active clients
+  listEl.innerHTML = vendorClients.length
+    ? vendorClients.map((c, i) => `
+      <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;
+        background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius)">
+        <span style="font-size:13px;font-weight:500;color:var(--text);flex:1">📁 ${c}</span>
+        <span style="font-size:11px;color:var(--text3)">${(data[c]||[]).length} reg.</span>
+        <button onclick="moveClientUp('${c}')" title="Mover cima"
+          style="border:none;background:none;cursor:pointer;color:var(--text3);padding:2px 5px">↑</button>
+        <button onclick="moveClientDown('${c}')" title="Mover baixo"
+          style="border:none;background:none;cursor:pointer;color:var(--text3);padding:2px 5px">↓</button>
+        <button onclick="archiveClient('${c}')"
+          style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:4px;
+                 border:1px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer">
+          Arquivar
+        </button>
+      </div>`).join('')
+    : '<p style="font-size:12px;color:var(--text3);padding:8px 0">Nenhum cliente ativo.</p>';
+
+  // Archived section
+  if (archEl && archSec) {
+    if (vendorArchived.length > 0) {
+      archSec.style.display = 'block';
+      archEl.innerHTML = vendorArchived.map(c => `
+        <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;
+          background:#fafafa;border:1px solid var(--border);border-radius:var(--radius);opacity:.75">
+          <span style="font-size:13px;color:var(--text3);flex:1">📁 ${c}
+            <span style="font-size:10px;color:#94a3b8">(arquivado)</span>
+          </span>
+          <button onclick="restoreClient('${c}')"
+            style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:4px;
+                   border:1px solid #86efac;background:#f0fdf4;color:#15803d;cursor:pointer">
+            ↩ Restaurar
+          </button>
+        </div>`).join('');
+    } else {
+      archSec.style.display = 'none';
+    }
   }
 }
 
@@ -4097,31 +3675,23 @@ function addClient() {
   if (clients.includes(name)) { showToast('⚠ Cliente já existe','#b45309'); return; }
   if (archived.includes(name)) { showToast('⚠ Cliente arquivado — use Restaurar','#b45309'); return; }
 
-  // 1. Add to clients list
+  // Add to list
   clients.push(name);
   CLIENTS = clients;
   saveClients(clients);
-
-  // 2. Init data bucket
   if (!data[name]) data[name] = [];
   saveLocal();
 
-  // 3. Assign to vendor
+  // Assign to vendor
   const vendor = window._settingsVendorCtx;
-  if (vendor && VENDOR_CONFIG[vendor]) {
-    if (!VENDOR_CONFIG[vendor].clients.includes(name)) {
-      VENDOR_CONFIG[vendor].clients.push(name);
-    }
+  if (vendor && VENDOR_CONFIG[vendor] && !VENDOR_CONFIG[vendor].clients.includes(name)) {
+    VENDOR_CONFIG[vendor].clients.push(name);
   }
 
-  // 4. Rebuild UI — inject button directly into sidebar NOW
-  input.value = '';
-  buildClientTabs();
-
-  // Direct DOM injection for immediate feedback
+  // Inject into sidebar immediately
   if (vendor) {
     const el = document.getElementById('sb-'+vendor+'-clients');
-    if (el) {
+    if (el && !document.getElementById('sb-'+vendor+'-client-'+slugify(name))) {
       const btn = document.createElement('button');
       btn.className = 'sidebar-item '+vendor;
       btn.id = 'sb-'+vendor+'-client-'+slugify(name);
@@ -4131,57 +3701,59 @@ function addClient() {
     }
   }
 
-  rebuildSidebarClients();
+  input.value = '';
+  buildClientTabs();
   renderSettingsModal(vendor);
-  closeSettings();
-  showToast(`✅ Cliente "${name}" adicionado!`);
-}
-
-// Rebuild sidebar client list for all vendors
-function rebuildSidebarClients() {
-  Object.keys(VENDOR_CONFIG).forEach(vendor => {
-    const cfg    = VENDOR_CONFIG[vendor];
-    const fixed  = cfg.clients;
-    const extras = CLIENTS.filter(c => !fixed.includes(c) && (RESPONSAVEL_MAP[c] === cfg.name ||
-      (!Object.values(VENDOR_CONFIG).flatMap(v=>v.clients).includes(c) && vendor === 'luiz')));
-    const all    = [...fixed.filter(c => CLIENTS.includes(c)), ...extras];
-    const el     = document.getElementById('sb-'+vendor+'-clients');
-    if (!el) return;
-
-    el.innerHTML = all.map(c => `
-      <button class="sidebar-item ${vendor}" id="sb-${vendor}-client-${slugify(c)}"
-        onclick="showVendorClientTab('${vendor}','${c}')">
-        <span class="item-icon">📁</span> ${c}
-      </button>`).join('');
-  });
+  showToast('✅ Cliente "'+name+'" adicionado!');
 }
 
 function archiveClient(name) {
-  if (!confirm(`Arquivar "${name}"? A aba some da navegação, mas os dados são mantidos.`)) return;
-  const clients  = getClients().filter(c => c !== name);
+  if (!confirm(`Arquivar "${name}"? A pasta some da lista, mas os dados são mantidos.`)) return;
+  const clients = getClients().filter(c => c !== name);
   const archived = getArchivedClients();
   if (!archived.includes(name)) archived.push(name);
+  CLIENTS = clients;
   saveClients(clients);
   saveArchivedClients(archived);
-  if (currentTab === name) { currentTab = 'overview'; }
-  renderSettingsModal();
+  // Remove from sidebar immediately
+  const vendor = window._settingsVendorCtx;
+  if (vendor) {
+    const sbBtn = document.getElementById('sb-'+vendor+'-client-'+slugify(name));
+    if (sbBtn) sbBtn.remove();
+  }
   buildClientTabs();
-  renderNav();
-  renderOverview();
-  showToast(`"${name}" arquivado.`);
+  const v = window._settingsVendorCtx;
+  renderSettingsModal(v);
+  showToast('"'+name+'" arquivado — dados mantidos.', '#b45309');
 }
 
 function restoreClient(name) {
-  const clients  = getClients();
+  const clients = getClients();
   const archived = getArchivedClients().filter(c => c !== name);
   if (!clients.includes(name)) clients.push(name);
+  CLIENTS = clients;
   saveClients(clients);
   saveArchivedClients(archived);
   if (!data[name]) data[name] = [];
-  renderSettingsModal();
+  const vendor = window._settingsVendorCtx;
+  if (vendor && VENDOR_CONFIG[vendor] && !VENDOR_CONFIG[vendor].clients.includes(name)) {
+    VENDOR_CONFIG[vendor].clients.push(name);
+  }
   buildClientTabs();
-  renderNav();
-  showToast(`✓ "${name}" restaurado!`);
+  // Add to sidebar
+  if (vendor) {
+    const el = document.getElementById('sb-'+vendor+'-clients');
+    if (el && !document.getElementById('sb-'+vendor+'-client-'+slugify(name))) {
+      const btn = document.createElement('button');
+      btn.className = 'sidebar-item '+vendor;
+      btn.id = 'sb-'+vendor+'-client-'+slugify(name);
+      btn.onclick = () => showVendorClientTab(vendor, name);
+      btn.innerHTML = '<span class="item-icon">📁</span> '+name;
+      el.appendChild(btn);
+    }
+  }
+  renderSettingsModal(vendor);
+  showToast('✓ "'+name+'" restaurado na lista!');
 }
 
 function moveClientUp(i) {
@@ -4343,10 +3915,6 @@ function onLoginSuccess(user) {
   // Hide login, show app
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appContent').classList.add('visible');
-  // Build sidebar AFTER app is visible so DOM elements exist and are accessible
-  CLIENTS = getClients();
-  buildSidebarClients();
-  sidebarNav('overview');
 
   // Update user menu
   const email     = user.email || '';
@@ -5981,22 +5549,18 @@ Esta ação não pode ser desfeita.`;
 
   const ids = Array.from(selectedIds);
 
-  // Coleta sb_ids ANTES de remover localmente
-  const recsToDelete = (data[client]||[]).filter(r => ids.includes(r.id));
-  const sbIds = recsToDelete.map(r => r.sb_id || r.id).filter(Boolean);
-
-  // Remove SOMENTE os IDs locais selecionados — não afeta outros com mesmo número
+  // Remove ONLY selected IDs from local data (not all with same número)
   if (data[client]) {
     data[client] = data[client].filter(r => !ids.includes(r.id));
   }
   saveLocal();
 
-  // Deleta no Supabase usando UUID exato (sb_id) — nunca pelo número
-  if (useSupabase && sbIds.length > 0) {
+  // Delete from Supabase by ID (not by número — very important!)
+  if (useSupabase) {
     try {
       markSyncing();
-      for (let i = 0; i < sbIds.length; i += 50) {
-        const batch = sbIds.slice(i, i + 50);
+      for (let i = 0; i < ids.length; i += 50) {
+        const batch = ids.slice(i, i + 50);
         const inFilter = batch.map(id => `id.eq.${id}`).join(',');
         await sbFetch('DELETE', `?or=(${inFilter})`);
       }
@@ -6024,554 +5588,6 @@ function dedupByNumero(records) {
     return true;
   });
 }
-
-
-// ════════════════════════════════════════════════
-// SIDEBAR — Navegação por módulos de vendedor
-// ════════════════════════════════════════════════
-
-// Vendor config
-
-
-let currentSidebarNav = 'overview';
-
-function sidebarNav(target) {
-  currentSidebarNav = target;
-
-  // Hide all sections
-  const sections = [
-    '.overview-section',
-    '#tab-vendas',
-    '#module-rodrigo',
-    '#module-rodrigo-vendas',
-    '#module-lenon',
-    '#module-lenon-vendas',
-    '#module-luiz',
-    '#module-luiz-vendas',
-    '#clientTabsContainer',
-  ];
-  sections.forEach(sel => {
-    const el = document.querySelector(sel);
-    if (el) el.style.display = 'none';
-  });
-
-  // Update sidebar active state
-  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
-
-  if (target === 'overview') {
-    const el = document.querySelector('.overview-section');
-    if (el) el.style.display = 'block';
-    document.getElementById('sb-overview')?.classList.add('active');
-    renderOverview();
-
-  } else if (target === 'vendas-geral') {
-    const el = document.getElementById('tab-vendas');
-    if (el) el.style.display = 'block';
-    document.getElementById('sb-vendas-geral')?.classList.add('active');
-    salesCurrentClient = null;
-    salesFilters = {status:'',cliente:'',atrasado:'',de:'',ate:''};
-    renderVendasModule();
-
-  } else if (target.endsWith('-overview')) {
-    const vendor = target.replace('-overview','');
-    showVendorModule(vendor);
-    document.getElementById(`sb-${vendor}-overview`)?.classList.add('active');
-
-  } else if (target.endsWith('-vendas')) {
-    const vendor = target.replace('-vendas','');
-    showVendorVendas(vendor);
-    document.getElementById(`sb-${vendor}-vendas`)?.classList.add('active');
-
-  } else if (target.startsWith('vendor-')) {
-    // vendor-rodrigo-client-Vale Ferrosos
-    const parts  = target.split('-');
-    const vendor = parts[1];
-    const client = parts.slice(3).join('-');
-    if (client) showVendorClientTab(vendor, client);
-  }
-}
-
-// ── Vendor Overview ──
-function showVendorModule(vendor) {
-  const cfg = VENDOR_CONFIG[vendor];
-  if (!cfg) return;
-
-  const el = document.getElementById('module-'+vendor);
-  if (!el) return;
-  el.style.display = 'block';
-
-  const vendorClients = getVendorClients(vendor);
-  const filtered = getAllRecords().filter(r => vendorClients.includes(r.cliente));
-  const contentEl = document.getElementById('module-'+vendor+'-content');
-  if (!contentEl) return;
-
-  const _dd      = dedupByNumero(filtered);
-  const total    = _dd.length;
-  const particip = _dd.filter(r=>r.participamos==='SIM').length;
-  const vendas   = _dd.filter(r=>r.venda==='SIM').length;
-  const receita  = _dd.filter(r=>r.venda==='SIM')
-    .reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0);
-  const conv     = particip>0?(vendas/particip*100).toFixed(1):'0.0';
-  const ciclos   = _dd.filter(r=>r.ciclo!=null).map(r=>r.ciclo);
-  const cicloMed = ciclos.length ? Math.round(ciclos.reduce((a,b)=>a+b,0)/ciclos.length) : 0;
-
-  // Client cards
-  const clientCards = vendorClients.map(c => {
-    const recs = dedupByNumero(filtered.filter(r=>r.cliente===c));
-    const v = recs.filter(r=>r.venda==='SIM').length;
-    const p = recs.filter(r=>r.participamos==='SIM').length;
-    const cv = p>0?(v/p*100).toFixed(0):0;
-    return `<div class="table-card" style="padding:14px;cursor:pointer;transition:box-shadow .15s"
-      onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,.1)'"
-      onmouseout="this.style.boxShadow=''"
-      onclick="showVendorClientTab('${vendor}','${c}')">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-        <span>📁</span>
-        <span style="font-size:13px;font-weight:700;color:var(--text)">${c}</span>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;text-align:center">
-        <div><div style="font-size:16px;font-weight:700;color:var(--blue)">${fmtNum(recs.length)}</div><div style="font-size:10px;color:var(--text3)">oport.</div></div>
-        <div><div style="font-size:16px;font-weight:700;color:var(--green)">${fmtNum(v)}</div><div style="font-size:10px;color:var(--text3)">vendas</div></div>
-        <div><div style="font-size:16px;font-weight:700;color:var(--amber)">${cv}%</div><div style="font-size:10px;color:var(--text3)">conv.</div></div>
-      </div>
-    </div>`;
-  }).join('');
-
-  contentEl.innerHTML = `
-    <!-- KPIs — same as main dashboard -->
-    <div class="kpi-grid" style="margin-bottom:20px">
-      <div class="kpi-card c-blue">
-        <div class="kpi-icon">📋</div>
-        <div class="kpi-label">Oportunidades</div>
-        <div class="kpi-value">${fmtNum(total)}</div>
-        <div class="kpi-sub">total registradas</div>
-      </div>
-      <div class="kpi-card c-slate">
-        <div class="kpi-icon">🤝</div>
-        <div class="kpi-label">Participações</div>
-        <div class="kpi-value">${fmtNum(particip)}</div>
-        <div class="kpi-sub">${total>0?(particip/total*100).toFixed(0):0}% do total</div>
-      </div>
-      <div class="kpi-card c-green">
-        <div class="kpi-icon">✅</div>
-        <div class="kpi-label">Vendas</div>
-        <div class="kpi-value">${fmtNum(vendas)}</div>
-        <div class="kpi-sub">oportunidades convertidas</div>
-      </div>
-      <div class="kpi-card c-orange">
-        <div class="kpi-icon">💰</div>
-        <div class="kpi-label">Receita Total</div>
-        <div class="kpi-value kpi-currency">${fmtCurrency(receita)}</div>
-        <div class="kpi-sub">em pedidos fechados</div>
-      </div>
-      <div class="kpi-card c-amber">
-        <div class="kpi-icon">🎯</div>
-        <div class="kpi-label">Conversão</div>
-        <div class="kpi-value">${conv}%</div>
-        <div class="kpi-sub">vendas / participações</div>
-      </div>
-      <div class="kpi-card c-teal">
-        <div class="kpi-icon">⏱</div>
-        <div class="kpi-label">Ciclo Médio</div>
-        <div class="kpi-value">${cicloMed>0?cicloMed+'d':'—'}</div>
-        <div class="kpi-sub">dias oport. → pedido</div>
-      </div>
-    </div>
-
-    <!-- Charts Row 1: 3 colunas -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px">
-      <div class="chart-card">
-        <div class="chart-label">💰 Receita por Cliente</div>
-        <div class="chart-wrap" style="height:200px"><canvas id="vm-rc-${vendor}"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-label">🎯 Conversão por Cliente (%)</div>
-        <div class="chart-wrap" style="height:200px"><canvas id="vm-cc-${vendor}"></canvas></div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-label">📊 Pipeline por Status</div>
-        <div class="chart-wrap" style="height:200px"><canvas id="vm-st-${vendor}"></canvas></div>
-      </div>
-    </div>
-
-    <!-- Chart Row 2: Evolução -->
-    <div style="margin-bottom:14px">
-      <div class="chart-card">
-        <div class="chart-label">📈 Evolução Mensal</div>
-        <div class="chart-wrap" style="height:260px"><canvas id="vm-ev-${vendor}"></canvas></div>
-      </div>
-    </div>
-
-    <!-- Client cards -->
-    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Clientes</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:16px">
-      ${clientCards}
-    </div>
-
-    <!-- Add client button -->
-    <button onclick="openSettings('${vendor}')"
-      style="display:flex;align-items:center;gap:8px;padding:9px 18px;
-             background:transparent;border:2px dashed ${cfg.color}66;
-             border-radius:var(--radius);color:${cfg.color};
-             font-family:var(--font);font-size:13px;font-weight:600;
-             cursor:pointer;transition:all .15s;width:100%;justify-content:center"
-      onmouseover="this.style.background='${cfg.color}11'"
-      onmouseout="this.style.background='transparent'">
-      ＋ Adicionar / Gerenciar Clientes
-    </button>`;
-
-  // Render charts for vendor module
-  renderVendorCharts(vendor, filtered, vendorClients);
-}
-
-function renderVendorCharts(vendor, filtered, vendorClients) {
-  const TT = {
-    backgroundColor:'#fff', titleColor:'#0f172a', bodyColor:'#475569',
-    borderColor:'#e2e8f0', borderWidth:1, padding:10
-  };
-  const fmtR = v => {
-    const n = parseFloat(v)||0;
-    if(n>=1000000) return 'R$ '+(n/1000000).toFixed(1)+'M';
-    if(n>=1000)    return 'R$ '+(n/1000).toFixed(1)+'k';
-    return n>0?'R$ '+n.toLocaleString('pt-BR',{maximumFractionDigits:0}):'';
-  };
-
-  const colors = ['rgba(29,78,216,.8)','rgba(234,88,12,.8)','rgba(21,128,61,.8)',
-                  'rgba(180,83,9,.8)','rgba(71,85,105,.8)','rgba(124,58,237,.8)'];
-
-  // 1. Receita por cliente
-  const rcData = vendorClients.map(c =>
-    dedupByNumero(filtered.filter(r=>r.cliente===c&&r.venda==='SIM'))
-    .reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0)
-  );
-  const c1 = document.getElementById('vm-rc-'+vendor);
-  if(c1) new Chart(c1, {
-    type:'bar',
-    data:{ labels:vendorClients.map(c=>c.length>12?c.slice(0,12)+'…':c),
-           datasets:[{data:rcData,backgroundColor:colors,borderRadius:5,borderSkipped:false}] },
-    options:{ responsive:true,maintainAspectRatio:false,
-      layout:{padding:{top:24}},
-      plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:ctx=>' '+fmtR(ctx.raw)}}},
-      scales:{x:{ticks:{font:{size:10},maxRotation:20},grid:{display:false}},
-              y:{ticks:{font:{size:10},callback:v=>fmtR(v)},grid:{color:'#f1f5f9'},
-                 max:Math.max(...rcData,1)*1.3}} }
-  });
-
-  // 2. Conversão por cliente
-  const ccData = vendorClients.map(c => {
-    const recs = dedupByNumero(filtered.filter(x=>x.cliente===c));
-    const p = recs.filter(x=>x.participamos==='SIM').length;
-    const v = recs.filter(x=>x.venda==='SIM').length;
-    return p>0?+(v/p*100).toFixed(1):0;
-  });
-  const c2 = document.getElementById('vm-cc-'+vendor);
-  if(c2) new Chart(c2, {
-    type:'bar',
-    data:{ labels:vendorClients.map(c=>c.length>12?c.slice(0,12)+'…':c),
-           datasets:[{data:ccData,backgroundColor:ccData.map(v=>v>=15?'rgba(21,128,61,.8)':v>=8?'rgba(180,83,9,.8)':'rgba(29,78,216,.8)'),borderRadius:5,borderSkipped:false}] },
-    options:{ responsive:true,maintainAspectRatio:false,
-      layout:{padding:{top:24}},
-      plugins:{legend:{display:false},tooltip:{...TT,callbacks:{label:ctx=>' '+ctx.raw+'%'}}},
-      scales:{x:{ticks:{font:{size:10},maxRotation:20},grid:{display:false}},
-              y:{max:100,ticks:{font:{size:10},callback:v=>v+'%'},grid:{color:'#f1f5f9'}}} }
-  });
-
-  // 3. Pipeline por status (doughnut)
-  const stLabels = STATUS_OPTS.filter(s=>filtered.some(r=>r.status===s));
-  const svData   = stLabels.map(s=>dedupByNumero(filtered).filter(r=>r.status===s).length);
-  const c3 = document.getElementById('vm-st-'+vendor);
-  if(c3) new Chart(c3, {
-    type:'doughnut',
-    data:{ labels:stLabels, datasets:[{data:svData,
-      backgroundColor:['rgba(29,78,216,.85)','rgba(180,83,9,.85)','rgba(21,128,61,.85)',
-                       'rgba(239,68,68,.8)','rgba(71,85,105,.8)','rgba(148,163,184,.8)'],
-      borderWidth:2,borderColor:'#fff',hoverOffset:6}] },
-    options:{ responsive:true,maintainAspectRatio:false,cutout:'58%',
-      plugins:{legend:{position:'right',labels:{font:{size:10},boxWidth:10,padding:6}},
-               tooltip:{...TT,callbacks:{label:ctx=>' '+ctx.label+': '+ctx.raw}}} }
-  });
-
-  // 4. Evolução mensal
-  const evMonths={},evSeen={};
-  filtered.forEach(r=>{
-    if(!r.mes||!r.ano)return;
-    const k=r.ano+'-'+r.mes;
-    if(!evMonths[k]){evMonths[k]={total:0,receita:0,vendas:0,particip:0};evSeen[k]=new Set();}
-    if(r.numero&&evSeen[k].has(r.numero))return;
-    if(r.numero)evSeen[k].add(r.numero);
-    evMonths[k].total++;
-    if(r.venda==='SIM')evMonths[k].receita+=(parseFloat(String(r.valor||0).replace(',','.'))||0);
-    if(r.venda==='SIM')evMonths[k].vendas++;
-    if(r.participamos==='SIM')evMonths[k].particip++;
-  });
-  const evKeys=Object.keys(evMonths).sort();
-  const MONTHS=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  const evLabels=evKeys.map(k=>{const[y,m]=k.split('-');return MONTHS[parseInt(m)-1]+'/'+y.slice(2);});
-  const c4=document.getElementById('vm-ev-'+vendor);
-  if(c4) new Chart(c4,{
-    data:{labels:evLabels,datasets:[
-      {type:'bar',label:'Oportunidades',data:evKeys.map(k=>evMonths[k].total),
-       backgroundColor:'rgba(29,78,216,.12)',borderColor:'rgba(29,78,216,.4)',borderWidth:1,borderRadius:3,yAxisID:'y'},
-      {type:'line',label:'Receita',data:evKeys.map(k=>evMonths[k].receita),
-       borderColor:'#ea580c',backgroundColor:'rgba(234,88,12,.06)',tension:.4,pointRadius:3,fill:true,yAxisID:'y2'},
-      {type:'line',label:'Conversão %',data:evKeys.map(k=>evMonths[k].particip>0?+(evMonths[k].vendas/evMonths[k].particip*100).toFixed(1):0),
-       borderColor:'#15803d',tension:.4,pointRadius:3,borderDash:[4,3],yAxisID:'y3'}
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,
-      interaction:{mode:'index',intersect:false},
-      plugins:{legend:{labels:{font:{size:11},padding:14,boxWidth:12}},tooltip:{...TT}},
-      scales:{
-        x:{ticks:{font:{size:10},maxRotation:45},grid:{color:'#f8fafc'}},
-        y:{position:'left',ticks:{font:{size:9},callback:v=>fmtNum(v)},grid:{color:'#f1f5f9'},title:{display:true,text:'Oportunidades',font:{size:9}}},
-        y2:{position:'right',ticks:{font:{size:9},callback:v=>fmtR(v)},grid:{drawOnChartArea:false}},
-        y3:{position:'right',display:false,max:100}
-      }}
-  });
-}
-
-
-// ── Vendor Vendas (filtered by vendor name) ──
-function showVendorVendas(vendor) {
-  const cfg = VENDOR_CONFIG[vendor];
-  if (!cfg) return;
-
-  const el = document.getElementById('module-'+vendor+'-vendas');
-  if (!el) return;
-  el.style.display = 'block';
-
-  // Render vendas module filtered for this vendor
-  const vendorName = cfg.name; // 'Rodrigo', 'Lenon', 'Luiz'
-  const allVendas  = getAllVendas();
-  const vendorVendas = allVendas.filter(v =>
-    v.responsavel === vendorName ||
-    getVendorClients(vendor).includes(v.cliente)
-  );
-
-  const contentEl = document.getElementById('module-'+vendor+'-vendas-content');
-  if (!contentEl) return;
-
-  // KPIs
-  const hoje = new Date().toISOString().slice(0,7);
-  const totalVendas  = vendorVendas.length;
-  const valorTotal   = vendorVendas.reduce((s,v)=>s+(parseFloat(String(v.valor||0).replace(',','.'))||0),0);
-  const atrasados    = vendorVendas.filter(v=>getVendaSituacao(v)==='atrasado').length;
-  const entregMes    = vendorVendas.filter(v=>v.dataEntrega&&v.dataEntrega.slice(0,7)===hoje).length;
-  const mesAtual     = new Date().getMonth()+1;
-  const anoAtual     = new Date().getFullYear();
-  const nomeMes      = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
-    'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][mesAtual-1];
-
-  const vendasMes = vendorVendas.filter(v=>{
-    if(!v.dataPedido)return false;
-    const [y,m]=v.dataPedido.split('-');
-    return parseInt(m)===mesAtual&&parseInt(y)===anoAtual;
-  });
-  const totalMes = vendasMes.reduce((s,v)=>s+(parseFloat(String(v.valor||0).replace(',','.'))||0),0);
-  const totalAno = vendorVendas.filter(v=>v.dataPedido&&v.dataPedido.startsWith(String(anoAtual)))
-    .reduce((s,v)=>s+(parseFloat(String(v.valor||0).replace(',','.'))||0),0);
-
-  contentEl.innerHTML = `
-    <!-- Highlights -->
-    <div class="vendas-highlights" style="margin-bottom:16px">
-      <div class="vendas-highlight-card">
-        <div class="vendas-highlight-icon">📅</div>
-        <div class="vendas-highlight-body">
-          <div class="vendas-highlight-label">Vendas — ${nomeMes} ${anoAtual}</div>
-          <div class="vendas-highlight-val">${fmtCurrency(totalMes)}</div>
-          <div class="vendas-highlight-sub">${vendasMes.length} pedido(s) no mês</div>
-        </div>
-      </div>
-      <div class="vendas-highlight-card orange">
-        <div class="vendas-highlight-icon">📊</div>
-        <div class="vendas-highlight-body">
-          <div class="vendas-highlight-label">Total Vendido — ${anoAtual}</div>
-          <div class="vendas-highlight-val">${fmtCurrency(totalAno)}</div>
-          <div class="vendas-highlight-sub">${vendorVendas.filter(v=>v.dataPedido&&v.dataPedido.startsWith(String(anoAtual))).length} pedido(s) no ano</div>
-        </div>
-      </div>
-    </div>
-    <!-- KPIs -->
-    <div class="vendas-kpi-grid" style="margin-bottom:16px">
-      <div class="vendas-kpi vk-blue"><div class="vendas-kpi-label">Em Aberto</div><div class="vendas-kpi-val">${fmtNum(totalVendas)}</div><div class="vendas-kpi-sub">pedidos</div></div>
-      <div class="vendas-kpi vk-orange"><div class="vendas-kpi-label">Valor Total</div><div class="vendas-kpi-val">${fmtCurrency(valorTotal)}</div><div class="vendas-kpi-sub">em pedidos</div></div>
-      <div class="vendas-kpi vk-red"><div class="vendas-kpi-label">Em Atraso</div><div class="vendas-kpi-val">${fmtNum(atrasados)}</div><div class="vendas-kpi-sub">prazo vencido</div></div>
-      <div class="vendas-kpi vk-green"><div class="vendas-kpi-label">Entregues Mês</div><div class="vendas-kpi-val">${fmtNum(entregMes)}</div><div class="vendas-kpi-sub">mês atual</div></div>
-    </div>
-    <!-- Table -->
-    <div class="table-card">
-      <div class="table-header">
-        <div class="table-title">Pedidos — ${cfg.name}</div>
-        <span style="font-size:12px;color:var(--text3)">${totalVendas} registro(s)</span>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr>
-            <th>Cliente</th><th>Nº PO</th><th>Nº Oportunidade</th>
-            <th>Valor</th><th>Data Pedido</th><th>Prazo</th>
-            <th>Situação</th><th>Status</th><th>Ações</th>
-          </tr></thead>
-          <tbody>
-            ${vendorVendas.length ? vendorVendas.map(v => {
-              const sit = getVendaSituacao(v);
-              const rowCls = sit==='atrasado'?'row-atrasado':sit==='alerta'?'row-alerta':'';
-              const stCls  = VENDA_STATUS_CSS[v.statusEntrega]||'';
-              const badge  = sit==='atrasado'
-                ?`<span class="atraso-badge">⚠ ATRASADO</span>`
-                :sit==='alerta'
-                ?`<span class="alerta-badge">⏰ ${diasParaPrazo(v.prazoEntrega)}d</span>`
-                :`<span style="font-size:10px;color:var(--green)">✓ OK</span>`;
-              return `<tr class="${rowCls}">
-                <td class="hi">${sanitize(v.cliente)}</td>
-                <td>${sanitize(v.numPO)||'—'}</td>
-                <td>${sanitize(v.numOportunidade)||'—'}</td>
-                <td class="hi">${v.valor?fmtCurrency(v.valor):'—'}</td>
-                <td>${v.dataPedido||'—'}</td>
-                <td>${v.prazoEntrega||'—'}</td>
-                <td>${badge}</td>
-                <td><span class="badge ${stCls}">${v.statusEntrega||'—'}</span></td>
-                <td>
-                  <button class="btn-icon-edit" onclick="openEditVenda('${v.id}')">✏</button>
-                  <button class="btn-icon-del" onclick="deleteVenda('${v.id}','${v.cliente}')">✕</button>
-                </td>
-              </tr>`;
-            }).join('') : '<tr><td colspan="9"><div class="empty-state"><div class="icon">🛒</div><p>Nenhuma venda registrada</p></div></td></tr>'}
-          </tbody>
-        </table>
-      </div>
-    </div>`;
-}
-
-// Get clients for a vendor
-function getVendorClients(vendor) {
-  const cfg = VENDOR_CONFIG[vendor];
-  if (!cfg) return [];
-
-  // Always include fixed clients — ensure they exist in CLIENTS array
-  const fixed = [...cfg.clients];
-  fixed.forEach(c => {
-    if (!CLIENTS.includes(c)) {
-      CLIENTS.push(c);
-      localStorage.setItem('ipartes_clients', JSON.stringify(CLIENTS));
-    }
-  });
-
-  // Also add from CLIENTS any extras matching this vendor by RESPONSAVEL_MAP
-  const allFixed = Object.values(VENDOR_CONFIG).flatMap(v => v.clients);
-  CLIENTS.forEach(c => {
-    if (fixed.includes(c)) return;
-    const resp = RESPONSAVEL_MAP[c];
-    if (resp === cfg.name && !allFixed.includes(c)) fixed.push(c);
-    // Orphan clients (no responsavel, not in any vendor) → Luiz
-    if (!resp && !allFixed.includes(c) && vendor === 'luiz') fixed.push(c);
-  });
-
-  return fixed;
-}
-
-// ── Show individual client tab within vendor context ──
-function showVendorClientTab(vendor, client) {
-  // Hide all sections first
-  const sections = [
-    '.overview-section','#tab-vendas',
-    '#module-rodrigo','#module-rodrigo-vendas',
-    '#module-lenon','#module-lenon-vendas',
-    '#module-luiz','#module-luiz-vendas',
-    '#clientTabsContainer',
-  ];
-  sections.forEach(sel => {
-    const el = document.querySelector(sel);
-    if (el) el.style.display = 'none';
-  });
-
-  // Show client tabs container
-  const ct = document.getElementById('clientTabsContainer');
-  if (ct) ct.style.display = 'block';
-
-  // Show only this client section
-  document.querySelectorAll('.client-section').forEach(s => s.style.display = 'none');
-  const clientSection = document.getElementById('client-'+slugify(client));
-  if (clientSection) {
-    clientSection.style.display = 'block';
-    renderClientTab(client);
-  }
-
-  // Update sidebar highlight
-  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
-  document.getElementById(`sb-${vendor}-client-${slugify(client)}`)?.classList.add('active');
-  currentSidebarNav = `vendor-${vendor}-client-${client}`;
-}
-
-function sidebarHighlightClient(vendor, client) {
-  document.querySelectorAll('.sidebar-item').forEach(b=>b.classList.remove('active'));
-  const id = `sb-${vendor}-client-${slugify(client)}`;
-  document.getElementById(id)?.classList.add('active');
-}
-
-// ── Populate sidebar client items ──
-function buildSidebarClients() {
-  // Always ensure all vendor clients are in CLIENTS
-  CLIENTS = getClients();
-  const allVendorClients = Object.values(VENDOR_CONFIG).flatMap(v => v.clients);
-  allVendorClients.forEach(c => {
-    if (!CLIENTS.includes(c)) CLIENTS.push(c);
-  });
-  rebuildSidebarClients();
-}
-
-function _buildSidebarClientsLegacy() {
-  Object.keys(VENDOR_CONFIG).forEach(vendor => {
-    const cfg      = VENDOR_CONFIG[vendor];
-    const fixed    = cfg.clients; // Fixed clients for this vendor
-    const all      = getVendorClients(vendor); // All including dynamic
-    const extras   = all.filter(c => !fixed.includes(c));
-    const el       = document.getElementById(`sidebar-${vendor}-clients`);
-    if (!el) return;
-
-    let html = '';
-
-    // Fixed clients
-    html += fixed.map(c => `
-      <button class="sidebar-item ${vendor}" id="sb-${vendor}-client-${slugify(c)}"
-        onclick="showVendorClientTab('${vendor}','${c}')">
-        <span class="item-icon">📁</span> ${c}
-      </button>`).join('');
-
-    // Extra / dynamic clients
-    if (extras.length > 0) {
-      html += `<div style="padding:6px 14px 2px 20px;font-size:9px;font-weight:700;
-        color:#475569;text-transform:uppercase;letter-spacing:.6px">Outros</div>`;
-      html += extras.map(c => `
-        <button class="sidebar-item ${vendor}" id="sb-${vendor}-client-${slugify(c)}"
-          onclick="showVendorClientTab('${vendor}','${c}')">
-          <span class="item-icon">📁</span> ${c}
-        </button>`).join('');
-    }
-
-    el.innerHTML = html;
-  });
-}
-
-// sidebarNav handles all routing including vendor-client
-
-// ── Toggle sidebar section collapse ──
-function toggleSidebarSection(section) {
-  const el = document.getElementById('section-'+section);
-  if (el) el.classList.toggle('collapsed');
-}
-
-// ── Mobile sidebar toggle ──
-function toggleMobileSidebar() {
-  document.getElementById('appSidebar')?.classList.toggle('open');
-}
-
-// Close sidebar on mobile when clicking outside
-document.addEventListener('click', e => {
-  const sidebar = document.getElementById('appSidebar');
-  const toggle  = document.querySelector('.sidebar-toggle');
-  if (sidebar && toggle && !sidebar.contains(e.target) && !toggle.contains(e.target)) {
-    sidebar.classList.remove('open');
-  }
-});
 
 // ════════════════════════════════════════════════
 // SYNC INDICATOR
@@ -6644,12 +5660,8 @@ async function init() {
 
   loadLocal();
   loadSalesLocal();
-  // Ensure ALL vendor clients are in CLIENTS before building tabs
-  CLIENTS = getClients(); // refresh with all required clients
   buildClientTabs();
-  CLIENTS = getClients(); // refresh again after buildClientTabs adds any missing
   renderNav();
-  buildSidebarClients();
   renderOverview();
   // Verifica regra de perdido no carregamento local
   setTimeout(() => aplicarRegraPerdido(), 2000);
@@ -6734,7 +5746,45 @@ try {
 
 
 
-
+<!-- ── FOOTER ── -->
+<footer id="appFooter" style="
+  background:#f8fafc;
+  border-top:1px solid #e2e8f0;
+  padding:10px 28px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  font-family:'Inter',sans-serif;
+  font-size:11px;
+  color:#94a3b8;
+">
+  <div style="display:flex;align-items:center;gap:12px">
+    <span>© 2025 IPARTES — Industrial Parts</span>
+    <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#94a3b8">
+      <div class="sync-dot" id="syncDot"></div>
+      <span id="syncLabel">localStorage</span>
+      <span id="syncTime"></span>
+    </div>
+  </div>
+  <button onclick="openDbConfig()" style="
+    background:transparent;
+    border:1px solid #e2e8f0;
+    color:#94a3b8;
+    font-family:'Inter',sans-serif;
+    font-size:11px;
+    padding:4px 12px;
+    border-radius:20px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:5px;
+    transition:all .2s;
+  " onmouseover="this.style.borderColor='#1d4ed8';this.style.color='#1d4ed8'"
+     onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#94a3b8'">
+    <span id="footerDbDot" style="width:6px;height:6px;border-radius:50%;background:#94a3b8;display:inline-block;"></span>
+    Banco de Dados
+  </button>
+</footer>
 
 <!-- ── DB CONFIG MODAL ── -->
 <div class="modal-overlay hidden" id="dbConfigModal">
@@ -6808,10 +5858,10 @@ CREATE POLICY "Allow authenticated" ON mro_oportunidades
 <div class="modal-overlay hidden" id="settingsModal">
   <div class="modal" style="max-width:440px;">
     <div class="modal-title" style="display:flex;align-items:center;gap:10px;">
-      <span>👥</span> Gerenciar Clientes
+      <span>⚙</span> Gerenciar Clientes
     </div>
     <p style="font-size:12px;color:var(--text3);margin-bottom:16px;">
-      Adicione ou arquive clientes. Dados arquivados são mantidos.
+      Adicione ou arquive clientes. Dados arquivados são mantidos mas a aba some da navegação.
     </p>
 
     <!-- Current clients list -->
@@ -6852,48 +5902,8 @@ CREATE POLICY "Allow authenticated" ON mro_oportunidades
 </div>
 
 
-
 <!-- PDF REPORT (hidden, shown on print) -->
 <div id="pdfReport" style="display:none"></div>
 
-<!-- ── FOOTER ── -->
-<footer id="appFooter" style="
-  background:#f8fafc;
-  border-top:1px solid #e2e8f0;
-  padding:10px 28px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  font-family:'Inter',sans-serif;
-  font-size:11px;
-  color:#94a3b8;
-">
-  <div style="display:flex;align-items:center;gap:12px">
-    <span>© 2025 IPARTES — Industrial Parts</span>
-    <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:#94a3b8">
-      <div class="sync-dot" id="syncDot"></div>
-      <span id="syncLabel">localStorage</span>
-      <span id="syncTime"></span>
-    </div>
-  </div>
-  <button onclick="openDbConfig()" style="
-    background:transparent;
-    border:1px solid #e2e8f0;
-    color:#94a3b8;
-    font-family:'Inter',sans-serif;
-    font-size:11px;
-    padding:4px 12px;
-    border-radius:20px;
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    gap:5px;
-    transition:all .2s;
-  " onmouseover="this.style.borderColor='#1d4ed8';this.style.color='#1d4ed8'"
-     onmouseout="this.style.borderColor='#e2e8f0';this.style.color='#94a3b8'">
-    <span id="footerDbDot" style="width:6px;height:6px;border-radius:50%;background:#94a3b8;display:inline-block;"></span>
-    Banco de Dados
-  </button>
-</footer>
 </body>
 </html>
