@@ -1511,6 +1511,12 @@ td.hi { color: var(--text); font-weight: 500; }
     margin-bottom: 20px;
     padding-bottom: 16px;
     border-bottom: 2px solid var(--border);
+    width: 100%;
+  }
+  #module-rodrigo, #module-lenon, #module-luiz,
+  #module-rodrigo-vendas, #module-lenon-vendas, #module-luiz-vendas {
+    width: 100%;
+    box-sizing: border-box;
   }
   .module-badge {
     width: 36px; height: 36px; border-radius: 10px;
@@ -1712,7 +1718,9 @@ td.hi { color: var(--text); font-weight: 500; }
       <button class="sidebar-item vendas" id="sb-rodrigo-vendas" onclick="sidebarNav('rodrigo-vendas')">
         <span class="item-icon">🛒</span> Vendas
       </button>
-      <button class="sidebar-add-btn" onclick="openSettings('rodrigo')">＋ Gerenciar clientes</button>
+      <button class="sidebar-add-btn" onclick="openSettings('rodrigo')" style="color:#ea580c">
+        ＋ Adicionar cliente
+      </button>
     </div>
   </div>
 
@@ -1751,6 +1759,9 @@ td.hi { color: var(--text); font-weight: 500; }
       <button class="sidebar-item vendas" id="sb-lenon-vendas" onclick="sidebarNav('lenon-vendas')">
         <span class="item-icon">🛒</span> Vendas
       </button>
+      <button class="sidebar-add-btn" onclick="openSettings('lenon')" style="color:#15803d">
+        ＋ Adicionar cliente
+      </button>
     </div>
   </div>
 
@@ -1768,7 +1779,9 @@ td.hi { color: var(--text); font-weight: 500; }
       <button class="sidebar-item vendas" id="sb-luiz-vendas" onclick="sidebarNav('luiz-vendas')">
         <span class="item-icon">🛒</span> Vendas
       </button>
-      <button class="sidebar-add-btn" onclick="openSettings('luiz')">＋ Adicionar cliente</button>
+      <button class="sidebar-add-btn" onclick="openSettings('luiz')" style="color:#1d4ed8">
+        ＋ Adicionar cliente
+      </button>
     </div>
   </div>
 </aside>
@@ -6047,24 +6060,54 @@ function showVendorModule(vendor) {
   if (!el) return;
   el.style.display = 'block';
 
-  // Get clients for this vendor (from CLIENTS that match responsavel or fixed list)
   const vendorClients = getVendorClients(vendor);
   const filtered = getAllRecords().filter(r => vendorClients.includes(r.cliente));
 
   const contentEl = document.getElementById('module-'+vendor+'-content');
   if (!contentEl) return;
 
-  // Build mini-dashboard for vendor
-  const _dd = dedupByNumero(filtered);
-  const total   = _dd.length;
-  const particip= _dd.filter(r=>r.participamos==='SIM').length;
-  const vendas  = _dd.filter(r=>r.venda==='SIM').length;
-  const receita = _dd.filter(r=>r.venda==='SIM')
+  const _dd      = dedupByNumero(filtered);
+  const total    = _dd.length;
+  const particip = _dd.filter(r=>r.participamos==='SIM').length;
+  const vendas   = _dd.filter(r=>r.venda==='SIM').length;
+  const receita  = _dd.filter(r=>r.venda==='SIM')
     .reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0);
-  const conv    = particip>0?(vendas/particip*100).toFixed(1):'0.0';
+  const conv     = particip>0?(vendas/particip*100).toFixed(1):'0.0';
+
+  // Client cards
+  const clientCards = vendorClients.map(c => {
+    const recs = dedupByNumero(filtered.filter(r=>r.cliente===c));
+    const v = recs.filter(r=>r.venda==='SIM').length;
+    const p = recs.filter(r=>r.participamos==='SIM').length;
+    const conv = p>0?(v/p*100).toFixed(0):0;
+    return `<div class="table-card" style="padding:14px;cursor:pointer;transition:box-shadow .15s"
+      onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,.1)'"
+      onmouseout="this.style.boxShadow=''"
+      onclick="showVendorClientTab('${vendor}','${c}')">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="font-size:16px">📁</span>
+        <span style="font-size:13px;font-weight:700;color:var(--text)">${c}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;text-align:center">
+        <div>
+          <div style="font-size:18px;font-weight:700;color:var(--blue)">${fmtNum(recs.length)}</div>
+          <div style="font-size:10px;color:var(--text3)">oport.</div>
+        </div>
+        <div>
+          <div style="font-size:18px;font-weight:700;color:var(--green)">${fmtNum(v)}</div>
+          <div style="font-size:10px;color:var(--text3)">vendas</div>
+        </div>
+        <div>
+          <div style="font-size:18px;font-weight:700;color:var(--amber)">${conv}%</div>
+          <div style="font-size:10px;color:var(--text3)">conv.</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
 
   contentEl.innerHTML = `
-    <div class="kpi-grid" style="margin-bottom:16px">
+    <!-- KPIs -->
+    <div class="kpi-grid" style="margin-bottom:20px">
       <div class="kpi-card c-blue">
         <div class="kpi-icon">📋</div>
         <div class="kpi-label">Oportunidades</div>
@@ -6091,28 +6134,27 @@ function showVendorModule(vendor) {
         <div class="kpi-value">${conv}%</div>
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:20px">
-      ${vendorClients.map(c => {
-        const recs = dedupByNumero(filtered.filter(r=>r.cliente===c));
-        const v = recs.filter(r=>r.venda==='SIM').length;
-        const p = recs.filter(r=>r.participamos==='SIM').length;
-        return `<div class="table-card" style="padding:14px;cursor:pointer"
-          onclick="showVendorClientTab('${vendor}','${c}')">
-          <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px">${c}</div>
-          <div style="font-size:11px;color:var(--text3)">${recs.length} oport. · ${v} vendas · ${p>0?(v/p*100).toFixed(0):0}% conv.</div>
-        </div>`;
-      }).join('')}
+
+    <!-- Client cards -->
+    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;
+                letter-spacing:.6px;margin-bottom:10px">Clientes</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:16px">
+      ${clientCards}
     </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 4px 4px">
-      <span style="font-size:12px;color:var(--text3)">Clique em um cliente para ver os registros</span>
-      <button onclick="openSettings('${vendor}')"
-        style="display:flex;align-items:center;gap:6px;padding:7px 14px;
-               background:${cfg.color};border:none;border-radius:var(--radius);
-               color:#fff;font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer">
-        ＋ Adicionar Cliente
-      </button>
-    </div>`;
+
+    <!-- Add client button -->
+    <button onclick="openSettings('${vendor}')"
+      style="display:flex;align-items:center;gap:8px;padding:9px 18px;
+             background:transparent;border:2px dashed ${cfg.color}66;
+             border-radius:var(--radius);color:${cfg.color};
+             font-family:var(--font);font-size:13px;font-weight:600;
+             cursor:pointer;transition:all .15s;width:100%;justify-content:center"
+      onmouseover="this.style.background='${cfg.color}11'"
+      onmouseout="this.style.background='transparent'">
+      ＋ Adicionar / Gerenciar Clientes
+    </button>`;
 }
+
 
 // ── Vendor Vendas (filtered by vendor name) ──
 function showVendorVendas(vendor) {
