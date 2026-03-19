@@ -1712,7 +1712,7 @@ td.hi { color: var(--text); font-weight: 500; }
       <button class="sidebar-item vendas" id="sb-rodrigo-vendas" onclick="sidebarNav('rodrigo-vendas')">
         <span class="item-icon">🛒</span> Vendas
       </button>
-      <button class="sidebar-add-btn" onclick="openSettings()">＋ Gerenciar clientes</button>
+      <button class="sidebar-add-btn" onclick="openSettings('rodrigo')">＋ Gerenciar clientes</button>
     </div>
   </div>
 
@@ -1768,7 +1768,7 @@ td.hi { color: var(--text); font-weight: 500; }
       <button class="sidebar-item vendas" id="sb-luiz-vendas" onclick="sidebarNav('luiz-vendas')">
         <span class="item-icon">🛒</span> Vendas
       </button>
-      <button class="sidebar-add-btn" onclick="openSettings()">＋ Adicionar cliente</button>
+      <button class="sidebar-add-btn" onclick="openSettings('luiz')">＋ Adicionar cliente</button>
     </div>
   </div>
 </aside>
@@ -1979,6 +1979,57 @@ td.hi { color: var(--text); font-weight: 500; }
 </div>
 
 </div>
+
+<!-- ═══ MÓDULOS DE VENDEDOR ═══ -->
+<div id="module-rodrigo" style="display:none">
+  <div class="module-header">
+    <div class="module-badge rodrigo">RO</div>
+    <div><div class="module-title">Módulo Rodrigo</div>
+    <div class="module-sub">Vale Ferrosos · Vale Metals · Suzano · Outros</div></div>
+  </div>
+  <div id="module-rodrigo-content"></div>
+</div>
+<div id="module-rodrigo-vendas" style="display:none">
+  <div class="module-header">
+    <div class="module-badge rodrigo">RO</div>
+    <div><div class="module-title">Vendas — Rodrigo</div>
+    <div class="module-sub">Pedidos e entregas</div></div>
+  </div>
+  <div id="module-rodrigo-vendas-content"></div>
+</div>
+<div id="module-lenon" style="display:none">
+  <div class="module-header">
+    <div class="module-badge lenon">LE</div>
+    <div><div class="module-title">Módulo Lenon</div>
+    <div class="module-sub">Petrobras · Eneva · Transpetro · Engie · TBG</div></div>
+  </div>
+  <div id="module-lenon-content"></div>
+</div>
+<div id="module-lenon-vendas" style="display:none">
+  <div class="module-header">
+    <div class="module-badge lenon">LE</div>
+    <div><div class="module-title">Vendas — Lenon</div>
+    <div class="module-sub">Pedidos e entregas</div></div>
+  </div>
+  <div id="module-lenon-vendas-content"></div>
+</div>
+<div id="module-luiz" style="display:none">
+  <div class="module-header">
+    <div class="module-badge luiz">LU</div>
+    <div><div class="module-title">Módulo Luiz</div>
+    <div class="module-sub">Clientes atribuídos</div></div>
+  </div>
+  <div id="module-luiz-content"></div>
+</div>
+<div id="module-luiz-vendas" style="display:none">
+  <div class="module-header">
+    <div class="module-badge luiz">LU</div>
+    <div><div class="module-title">Vendas — Luiz</div>
+    <div class="module-sub">Pedidos e entregas</div></div>
+  </div>
+  <div id="module-luiz-vendas-content"></div>
+</div>
+
 
 <!-- EDIT MODAL -->
 <div class="modal-overlay hidden" id="editModal">
@@ -3954,8 +4005,8 @@ function updateFooterDot(online) {
 
 
 // ── SETTINGS — CLIENT MANAGEMENT ──
-function openSettings() {
-  renderSettingsModal();
+function openSettings(vendor) {
+  renderSettingsModal(vendor);
   document.getElementById('settingsModal').classList.remove('hidden');
 }
 function closeSettings() {
@@ -3970,12 +4021,25 @@ function saveArchivedClients(list) {
   localStorage.setItem('ipartes_archived', JSON.stringify(list));
 }
 
-function renderSettingsModal() {
+function renderSettingsModal(vendorCtx) {
   const clients  = getClients();
   const archived = getArchivedClients();
   const listEl   = document.getElementById('clientsList');
   const archEl   = document.getElementById('archivedList');
   const archSec  = document.getElementById('archivedSection');
+  // Store vendor context for adding new clients
+  window._settingsVendorCtx = vendorCtx || null;
+  // Show vendor hint
+  const hintEl = document.getElementById('addClientVendorHint');
+  if (hintEl) {
+    if (vendorCtx && VENDOR_CONFIG[vendorCtx]) {
+      const cfg = VENDOR_CONFIG[vendorCtx];
+      hintEl.style.display = 'block';
+      hintEl.innerHTML = `📌 Será adicionado ao módulo <strong style="color:${cfg.color}">${cfg.name}</strong>`;
+    } else {
+      hintEl.style.display = 'none';
+    }
+  }
 
   listEl.innerHTML = clients.map((c, i) => `
     <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;
@@ -4021,11 +4085,19 @@ function addClient() {
   if (archived.includes(name)) { showToast('⚠ Cliente arquivado — use Restaurar','#b45309'); return; }
 
   clients.push(name);
+  CLIENTS = clients;
   saveClients(clients);
   if (!data[name]) data[name] = [];
   saveLocal();
+  const vendor = window._settingsVendorCtx;
+  if (vendor && VENDOR_CONFIG[vendor] && !VENDOR_CONFIG[vendor].clients.includes(name)) {
+    VENDOR_CONFIG[vendor].clients.push(name);
+  }
   input.value = '';
-  renderSettingsModal();
+  buildClientTabs();
+  buildSidebarClients();
+  renderSettingsModal(vendor);
+  showToast(`✅ Cliente "${name}" adicionado!`);
   buildClientTabs();
   renderNav();
   showToast(`✓ Cliente "${name}" adicionado!`);
@@ -6031,8 +6103,14 @@ function showVendorModule(vendor) {
         </div>`;
       }).join('')}
     </div>
-    <div style="font-size:12px;color:var(--text3);text-align:center;padding:8px">
-      Clique em um cliente para ver os registros detalhados
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 4px 4px">
+      <span style="font-size:12px;color:var(--text3)">Clique em um cliente para ver os registros</span>
+      <button onclick="openSettings('${vendor}')"
+        style="display:flex;align-items:center;gap:6px;padding:7px 14px;
+               background:${cfg.color};border:none;border-radius:var(--radius);
+               color:#fff;font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer">
+        ＋ Adicionar Cliente
+      </button>
     </div>`;
 }
 
@@ -6511,10 +6589,10 @@ CREATE POLICY "Allow authenticated" ON mro_oportunidades
 <div class="modal-overlay hidden" id="settingsModal">
   <div class="modal" style="max-width:440px;">
     <div class="modal-title" style="display:flex;align-items:center;gap:10px;">
-      <span>⚙</span> Gerenciar Clientes
+      <span>👥</span> Gerenciar Clientes
     </div>
     <p style="font-size:12px;color:var(--text3);margin-bottom:16px;">
-      Adicione ou arquive clientes. Dados arquivados são mantidos mas a aba some da navegação.
+      Adicione ou arquive clientes. Dados arquivados são mantidos.
     </p>
 
     <!-- Current clients list -->
@@ -6555,55 +6633,6 @@ CREATE POLICY "Allow authenticated" ON mro_oportunidades
 </div>
 
 
-<!-- ═══ MÓDULOS DE VENDEDOR ═══ -->
-<div id="module-rodrigo" style="display:none">
-  <div class="module-header">
-    <div class="module-badge rodrigo">RO</div>
-    <div><div class="module-title">Módulo Rodrigo</div>
-    <div class="module-sub">Vale Ferrosos · Vale Metals · Suzano · Outros</div></div>
-  </div>
-  <div id="module-rodrigo-content"></div>
-</div>
-<div id="module-rodrigo-vendas" style="display:none">
-  <div class="module-header">
-    <div class="module-badge rodrigo">RO</div>
-    <div><div class="module-title">Vendas — Rodrigo</div>
-    <div class="module-sub">Pedidos e entregas</div></div>
-  </div>
-  <div id="module-rodrigo-vendas-content"></div>
-</div>
-<div id="module-lenon" style="display:none">
-  <div class="module-header">
-    <div class="module-badge lenon">LE</div>
-    <div><div class="module-title">Módulo Lenon</div>
-    <div class="module-sub">Petrobras · Eneva · Transpetro · Engie · TBG</div></div>
-  </div>
-  <div id="module-lenon-content"></div>
-</div>
-<div id="module-lenon-vendas" style="display:none">
-  <div class="module-header">
-    <div class="module-badge lenon">LE</div>
-    <div><div class="module-title">Vendas — Lenon</div>
-    <div class="module-sub">Pedidos e entregas</div></div>
-  </div>
-  <div id="module-lenon-vendas-content"></div>
-</div>
-<div id="module-luiz" style="display:none">
-  <div class="module-header">
-    <div class="module-badge luiz">LU</div>
-    <div><div class="module-title">Módulo Luiz</div>
-    <div class="module-sub">Clientes atribuídos</div></div>
-  </div>
-  <div id="module-luiz-content"></div>
-</div>
-<div id="module-luiz-vendas" style="display:none">
-  <div class="module-header">
-    <div class="module-badge luiz">LU</div>
-    <div><div class="module-title">Vendas — Luiz</div>
-    <div class="module-sub">Pedidos e entregas</div></div>
-  </div>
-  <div id="module-luiz-vendas-content"></div>
-</div>
 
 <!-- PDF REPORT (hidden, shown on print) -->
 <div id="pdfReport" style="display:none"></div>
