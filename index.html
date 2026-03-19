@@ -1428,6 +1428,12 @@ td.hi { color: var(--text); font-weight: 500; }
     .main-content { padding:14px; max-width:100%; }
   }
 
+
+  /* ── CONTROLE DE ACESSO ── */
+  .access-adm-only { /* visible only to ADM */ }
+  .sidebar-section.access-denied { display: none !important; }
+  #user-profile-badge { cursor: default; }
+
 </style>
 </head>
 <body>
@@ -1658,6 +1664,9 @@ td.hi { color: var(--text); font-weight: 500; }
   <div class="kpi-grid" id="kpiGrid"></div>
   <div class="insights-grid" id="insightsGrid"></div>
 
+  <!-- Meta Mensal por Vendedor -->
+  <div id="meta-vendedor-section" style="margin-bottom:20px"></div>
+
   <!-- Comparativo Mês a Mês -->
   <div class="comparativo-grid" id="comparativoGrid"></div>
 
@@ -1692,6 +1701,12 @@ td.hi { color: var(--text); font-weight: 500; }
       <div class="chart-wrap" style="height:220px"><canvas id="chartFN"></canvas></div>
     </div>
   </div>
+
+  <!-- Ranking de Clientes -->
+  <div id="ranking-clientes-section" style="margin-bottom:20px"></div>
+
+  <!-- Win/Loss por Portal -->
+  <div id="winloss-section" style="margin-bottom:20px"></div>
 
   <!-- SUMMARY TABLE -->
   <div class="table-card">
@@ -3600,8 +3615,11 @@ function renderOverview() {
   updateSearchCount(getAllRecords().length, filtered.length);
   renderKPIs(filtered);
   renderInsights(filtered);
+  renderMetaVendedor();
   renderComparativo(filtered);
   renderCharts(filtered);
+  renderRankingClientes();
+  renderWinLoss();
   renderOverviewTable(filtered);
   // Refresh client filter dropdown (no renderNav here — only on client list changes)
   const fCliente = document.getElementById('fCliente');
@@ -3861,8 +3879,12 @@ function onLoginSuccess(user) {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appContent').classList.add('visible');
 
+  // Detect user profile from email
+  currentUserEmail   = user.email || '';
+  currentUserProfile = detectUserProfile(currentUserEmail);
+
   // Update user menu
-  const email     = user.email || '';
+  const email     = currentUserEmail;
   const initials  = email.slice(0,2).toUpperCase();
   const nameShort = email.split('@')[0];
 
@@ -5547,6 +5569,8 @@ const VENDOR_CONFIG = {
 let currentSidebarNav = 'overview';
 
 function sidebarNav(target) {
+  // Access control check
+  if (!checkSectionAccess(target)) return;
   currentSidebarNav = target;
   // Hide all sections
   ['#tab-overview','#tab-vendas','#module-rodrigo','#module-rodrigo-vendas',
@@ -5922,6 +5946,484 @@ function restoreClient(name) {
   showToast('✓ "'+name+'" restaurado!');
 }
 
+
+// ════════════════════════════════════════════════
+// 1. NOTIFICAÇÕES DE PRAZO
+// ════════════════════════════════════════════════
+function checkPrazoNotifications() {
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const amanha = new Date(hoje); amanha.setDate(amanha.getDate()+1);
+  const em3dias = new Date(hoje); em3dias.setDate(em3dias.getDate()+3);
+
+  const alertas = [];
+  getAllRecords().forEach(r => {
+    if (!r.finaliza || ['Pedido Recebido','Cancelado','Perdido'].includes(r.status)) return;
+    const prazo = new Date(r.finaliza); prazo.setHours(0,0,0,0);
+    const diff = Math.ceil((prazo - hoje) / 86400000);
+    if (diff < 0) return; // já perdido, tratado em outro lugar
+    if (diff === 0) alertas.push({r, tipo:'hoje', label:'Vence HOJE', cor:'#dc2626'});
+    else if (diff === 1) alertas.push({r, tipo:'amanha', label:'Vence amanhã', cor:'#ea580c'});
+    else if (diff <= 3) alertas.push({r, tipo:'em3', label:`Vence em ${diff}d`, cor:'#b45309'});
+  });
+
+  if (alertas.length === 0) return;
+
+  // Show notification badge on header
+  let badge = document.getElementById('notif-badge');
+  if (!badge) {
+    const header = document.querySelector('.header');
+    if (header) {
+      badge = document.createElement('button');
+      badge.id = 'notif-badge';
+      badge.style.cssText = 'background:#dc2626;border:none;color:#fff;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:6px;';
+      badge.onclick = () => showNotifPanel();
+      header.querySelector('.header-right')?.prepend(badge);
+    }
+  }
+  if (badge) badge.innerHTML = `🔔 ${alertas.length} prazo${alertas.length>1?'s':''}`;
+
+  // Store for panel
+  window._notifAlertas = alertas;
+}
+
+function showNotifPanel() {
+  const alertas = window._notifAlertas || [];
+  const existing = document.getElementById('notifPanel');
+  if (existing) { existing.remove(); return; }
+
+  const panel = document.createElement('div');
+  panel.id = 'notifPanel';
+  panel.style.cssText = 'position:fixed;top:60px;right:16px;width:380px;max-height:480px;overflow-y:auto;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.15);z-index:9999;font-family:var(--font)';
+  panel.innerHTML = `
+    <div style="padding:14px 16px;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-weight:700;font-size:14px">🔔 Alertas de Prazo</span>
+      <button onclick="document.getElementById('notifPanel').remove()" style="border:none;background:none;cursor:pointer;font-size:18px;color:#94a3b8">×</button>
+    </div>
+    ${alertas.map(({r,label,cor}) => `
+      <div style="padding:12px 16px;border-bottom:1px solid #f8fafc;display:flex;gap:10px;align-items:flex-start">
+        <span style="background:${cor}22;color:${cor};font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;white-space:nowrap;margin-top:2px">${label}</span>
+        <div>
+          <div style="font-size:12px;font-weight:600;color:#0f172a">${r.cliente} — Nº ${r.numero}</div>
+          <div style="font-size:11px;color:#64748b">${r.portal} · ${r.status} · Finaliza: ${r.finaliza}</div>
+        </div>
+      </div>`).join('')}`;
+  document.body.appendChild(panel);
+  document.addEventListener('click', function handler(e) {
+    if (!panel.contains(e.target) && e.target.id !== 'notif-badge') {
+      panel.remove(); document.removeEventListener('click', handler);
+    }
+  }, true);
+}
+
+// ════════════════════════════════════════════════
+// 2. HISTÓRICO DE ALTERAÇÕES
+// ════════════════════════════════════════════════
+const HISTORY_KEY = 'ipartes_history_v1';
+
+function addHistory(action, record, oldVal, newVal) {
+  const hist = getHistory();
+  hist.unshift({
+    ts: new Date().toISOString(),
+    action,
+    cliente: record.cliente || '',
+    numero:  record.numero  || '',
+    field:   oldVal?.field  || '',
+    oldVal:  oldVal?.value  || '',
+    newVal:  newVal?.value  || '',
+    user:    document.getElementById('userNameShort')?.textContent || 'sistema'
+  });
+  // Keep last 500 entries
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(hist.slice(0,500)));
+}
+
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]'); } catch(e) { return []; }
+}
+
+function showHistoryModal() {
+  const hist = getHistory();
+  let modal = document.getElementById('historyModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'historyModal';
+    modal.className = 'modal-overlay';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;display:flex;align-items:center;justify-content:center';
+    document.body.appendChild(modal);
+  }
+  modal.innerHTML = `
+    <div style="background:#fff;border-radius:16px;width:640px;max-height:80vh;overflow:hidden;display:flex;flex-direction:column">
+      <div style="padding:20px 24px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:16px;font-weight:700;font-family:var(--font)">📋 Histórico de Alterações</span>
+        <button onclick="document.getElementById('historyModal').remove()" style="border:none;background:none;cursor:pointer;font-size:22px;color:#94a3b8">×</button>
+      </div>
+      <div style="overflow-y:auto;flex:1;padding:8px 0">
+        ${hist.length ? hist.map(h => `
+          <div style="padding:10px 24px;border-bottom:1px solid #f8fafc;font-family:var(--font)">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
+              <span style="font-size:12px;font-weight:600;color:#0f172a">${h.action}</span>
+              <span style="font-size:10px;color:#94a3b8">${new Date(h.ts).toLocaleString('pt-BR')}</span>
+            </div>
+            <div style="font-size:11px;color:#475569">
+              ${h.cliente} · Nº ${h.numero}
+              ${h.field ? ` · <em>${h.field}</em>: <span style="color:#dc2626">${h.oldVal}</span> → <span style="color:#15803d">${h.newVal}</span>` : ''}
+            </div>
+          </div>`).join('')
+        : '<div style="padding:40px;text-align:center;color:#94a3b8;font-family:var(--font)">Nenhum histórico ainda</div>'}
+      </div>
+    </div>`;
+  modal.onclick = e => { if (e.target === modal) modal.remove(); };
+}
+
+// ════════════════════════════════════════════════
+// 3. META MENSAL POR VENDEDOR (R$ 250.000)
+// ════════════════════════════════════════════════
+const META_VENDEDOR = 250000;
+
+function renderMetaVendedor() {
+  const hoje    = new Date();
+  const mesAtual= hoje.getMonth()+1;
+  const anoAtual= hoje.getFullYear();
+  const todos   = getAllRecords();
+
+  const metaData = Object.entries(VENDOR_CONFIG).map(([vendor, cfg]) => {
+    const clientes = getVendorClients(vendor);
+    const recsMes  = dedupByNumero(todos.filter(r =>
+      clientes.includes(r.cliente) &&
+      r.venda==='SIM' &&
+      parseInt(r.mes)===mesAtual &&
+      parseInt(r.ano)===anoAtual
+    ));
+    const receita = recsMes.reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0);
+    const pct     = Math.min(100, (receita/META_VENDEDOR*100));
+    return { vendor, cfg, receita, pct, clientes };
+  }).filter(d => d.clientes.length > 0);
+
+  const el = document.getElementById('meta-vendedor-section');
+  if (!el) return;
+
+  el.innerHTML = `
+    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">
+      🎯 Meta Mensal por Vendedor — ${['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][mesAtual-1]}/${anoAtual}
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">
+      ${metaData.map(({cfg, receita, pct}) => `
+        <div class="table-card" style="padding:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div style="width:28px;height:28px;border-radius:50%;background:${cfg.color};color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center">${cfg.badge}</div>
+              <span style="font-weight:700;font-size:14px;color:var(--text)">${cfg.name}</span>
+            </div>
+            <span style="font-size:13px;font-weight:700;color:${pct>=100?'#15803d':pct>=70?'#b45309':'#dc2626'}">${pct.toFixed(0)}%</span>
+          </div>
+          <div style="background:#f1f5f9;border-radius:8px;height:10px;overflow:hidden;margin-bottom:8px">
+            <div style="height:100%;width:${pct}%;background:${pct>=100?'#15803d':pct>=70?'#f59e0b':cfg.color};border-radius:8px;transition:width .6s ease"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3)">
+            <span>${fmtCurrency(receita)} realizados</span>
+            <span>Meta: ${fmtCurrency(META_VENDEDOR)}</span>
+          </div>
+          ${pct>=100?'<div style="font-size:11px;color:#15803d;font-weight:600;margin-top:4px">🏆 Meta atingida!</div>':''}
+        </div>`).join('')}
+    </div>`;
+}
+
+// ════════════════════════════════════════════════
+// 4. RANKING DE CLIENTES
+// ════════════════════════════════════════════════
+function renderRankingClientes() {
+  const el = document.getElementById('ranking-clientes-section');
+  if (!el) return;
+  const todos = dedupByNumero(getAllRecords());
+
+  const ranking = CLIENTS.map(c => {
+    const recs   = todos.filter(r=>r.cliente===c);
+    const vendas = recs.filter(r=>r.venda==='SIM');
+    const receita= vendas.reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0);
+    const particip = recs.filter(r=>r.participamos==='SIM').length;
+    const conv   = particip>0?(vendas.length/particip*100):0;
+    return { c, total:recs.length, receita, vendas:vendas.length, conv };
+  }).filter(d=>d.total>0).sort((a,b)=>b.receita-a.receita);
+
+  el.innerHTML = `
+    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">
+      🏅 Ranking de Clientes por Receita
+    </div>
+    <div class="table-card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th style="width:32px">#</th>
+            <th>Cliente</th>
+            <th style="text-align:right">Oport.</th>
+            <th style="text-align:right">Vendas</th>
+            <th style="text-align:right">Receita</th>
+            <th style="text-align:right">Conversão</th>
+          </tr></thead>
+          <tbody>
+            ${ranking.map((d,i) => `
+              <tr>
+                <td><span style="font-size:13px">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}</span></td>
+                <td style="font-weight:600">${d.c}</td>
+                <td style="text-align:right;color:var(--text3)">${fmtNum(d.total)}</td>
+                <td style="text-align:right;color:var(--green)">${fmtNum(d.vendas)}</td>
+                <td style="text-align:right;font-weight:700;color:var(--blue)">${fmtCurrency(d.receita)}</td>
+                <td style="text-align:right;color:${d.conv>=15?'var(--green)':d.conv>=8?'var(--amber)':'var(--text3)'}">${d.conv.toFixed(1)}%</td>
+              </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+// ════════════════════════════════════════════════
+// 5. TAXA WIN/LOSS POR PORTAL
+// ════════════════════════════════════════════════
+function renderWinLoss() {
+  const el = document.getElementById('winloss-section');
+  if (!el) return;
+  const todos = dedupByNumero(getAllRecords());
+
+  const portalData = PORTALS.map(p => {
+    const recs   = todos.filter(r=>r.portal===p && r.participamos==='SIM');
+    const wins   = recs.filter(r=>r.venda==='SIM').length;
+    const losses = recs.filter(r=>r.status==='Perdido').length;
+    const total  = recs.length;
+    const winRate= total>0?(wins/total*100):0;
+    return { p, total, wins, losses, winRate };
+  }).filter(d=>d.total>0).sort((a,b)=>b.winRate-a.winRate);
+
+  el.innerHTML = `
+    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">
+      ⚖ Taxa Win/Loss por Portal
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
+      ${portalData.map(d => `
+        <div class="table-card" style="padding:14px">
+          <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px">${d.p}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;text-align:center">
+            <div style="background:#f0fdf4;border-radius:6px;padding:6px">
+              <div style="font-size:16px;font-weight:800;color:#15803d">${d.wins}</div>
+              <div style="font-size:10px;color:#15803d">Wins</div>
+            </div>
+            <div style="background:#fef2f2;border-radius:6px;padding:6px">
+              <div style="font-size:16px;font-weight:800;color:#dc2626">${d.losses}</div>
+              <div style="font-size:10px;color:#dc2626">Losses</div>
+            </div>
+          </div>
+          <div style="background:#f1f5f9;border-radius:6px;height:6px;overflow:hidden;margin-bottom:6px">
+            <div style="height:100%;width:${d.winRate}%;background:#15803d;border-radius:6px"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3)">
+            <span>Win rate: <strong style="color:${d.winRate>=20?'#15803d':d.winRate>=10?'#b45309':'#dc2626'}">${d.winRate.toFixed(1)}%</strong></span>
+            <span>${d.total} particip.</span>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ════════════════════════════════════════════════
+// 6. SINCRONIZAÇÃO EM TEMPO REAL (polling 60s)
+// ════════════════════════════════════════════════
+let _realtimeInterval = null;
+let _lastSyncHash = '';
+
+function startRealtimeSync() {
+  if (_realtimeInterval) return;
+  _realtimeInterval = setInterval(async () => {
+    if (!useSupabase || !sbClient) return;
+    try {
+      // Get count from Supabase to detect changes
+      const res = await sbFetch('GET', `?select=id&limit=1&order=created_at.desc`);
+      if (!res.ok) return;
+      const data = await res.json();
+      const hash = JSON.stringify(data);
+      if (_lastSyncHash && hash !== _lastSyncHash) {
+        // Data changed — reload silently
+        await loadFromSupabase();
+        showToast('🔄 Dados atualizados por outro usuário', '#1d4ed8');
+      }
+      _lastSyncHash = hash;
+    } catch(e) { /* silent */ }
+  }, 60000); // 60 seconds
+  console.log('Real-time sync started (60s interval)');
+}
+
+function stopRealtimeSync() {
+  if (_realtimeInterval) {
+    clearInterval(_realtimeInterval);
+    _realtimeInterval = null;
+  }
+}
+
+// ════════════════════════════════════════════════
+// 7. BACKUP AUTOMÁTICO
+// ════════════════════════════════════════════════
+function backupData() {
+  const backup = {
+    ts:      new Date().toISOString(),
+    version: '2.0',
+    clients: getClients(),
+    data:    data,
+    sales:   getAllVendas(),
+  };
+  const blob = new Blob([JSON.stringify(backup, null, 2)], {type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `ipartes_backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ Backup exportado!');
+  localStorage.setItem('ipartes_last_backup', new Date().toISOString());
+}
+
+function checkAutoBackup() {
+  const last = localStorage.getItem('ipartes_last_backup');
+  if (!last) return;
+  const dias = Math.floor((Date.now() - new Date(last).getTime()) / 86400000);
+  if (dias >= 7) {
+    showToast('⚠ Backup automático recomendado — último há '+dias+' dias. Clique em Backup no rodapé.', '#b45309');
+  }
+}
+
+
+
+// ════════════════════════════════════════════════
+// CONTROLE DE ACESSO POR USUÁRIO
+// ════════════════════════════════════════════════
+
+// Perfil do usuário logado
+let currentUserProfile = 'adm'; // 'adm' | 'rodrigo' | 'lenon' | 'luiz'
+let currentUserEmail   = '';
+
+// Define perfil baseado no e-mail
+function detectUserProfile(email) {
+  const e = (email || '').toLowerCase();
+  if (e.includes('lenon'))   return 'lenon';
+  if (e.includes('luiz'))    return 'luiz';
+  if (e.includes('rodrigo')) return 'rodrigo';
+  return 'adm';
+}
+
+// Permissões por perfil
+const ACCESS_RULES = {
+  adm: {
+    sections: ['geral','rodrigo','lenon','luiz'],
+    canSeeAll: true,
+  },
+  rodrigo: {
+    sections: ['geral','rodrigo','lenon','luiz'],
+    canSeeAll: true, // Rodrigo vê tudo
+  },
+  lenon: {
+    sections: ['geral','lenon'],
+    canSeeAll: false,
+  },
+  luiz: {
+    sections: ['geral','luiz'],
+    canSeeAll: false,
+  },
+};
+
+function getUserAccess() {
+  return ACCESS_RULES[currentUserProfile] || ACCESS_RULES.adm;
+}
+
+function canAccessSection(section) {
+  return getUserAccess().sections.includes(section);
+}
+
+// Apply access control to sidebar — hide forbidden sections
+function applySidebarAccess() {
+  const access = getUserAccess();
+
+  // Section visibility
+  ['rodrigo','lenon','luiz'].forEach(vendor => {
+    const el = document.getElementById('section-'+vendor);
+    if (el) el.style.display = access.sections.includes(vendor) ? '' : 'none';
+  });
+
+  // If user has no access to a section, redirect to overview when clicking
+  document.querySelectorAll('.sidebar-item').forEach(btn => {
+    const onclick = btn.getAttribute('onclick') || '';
+    // Detect which vendor this button belongs to
+    const match = onclick.match(/(rodrigo|lenon|luiz)/);
+    if (match) {
+      const vendor = match[1];
+      if (!access.sections.includes(vendor)) {
+        btn.style.display = 'none';
+      }
+    }
+  });
+
+  // Show profile badge in sidebar top
+  renderUserProfileBadge();
+}
+
+function renderUserProfileBadge() {
+  const access = getUserAccess();
+  const existing = document.getElementById('user-profile-badge');
+  if (existing) existing.remove();
+
+  const badge = document.createElement('div');
+  badge.id = 'user-profile-badge';
+  badge.style.cssText = `
+    padding:12px 14px;
+    background:rgba(255,255,255,.05);
+    border-bottom:1px solid #334155;
+    display:flex;align-items:center;gap:8px;
+  `;
+
+  const profile = currentUserProfile;
+  const cfg = VENDOR_CONFIG[profile];
+  const color = cfg ? cfg.color : '#64748b';
+  const label = cfg ? cfg.name : 'Administrador';
+  const badge2 = cfg ? cfg.badge : 'ADM';
+
+  badge.innerHTML = `
+    <div style="width:28px;height:28px;border-radius:50%;background:${color};
+      color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;
+      justify-content:center;flex-shrink:0">${badge2}</div>
+    <div>
+      <div style="font-size:12px;font-weight:700;color:#e2e8f0">${label}</div>
+      <div style="font-size:10px;color:#64748b;white-space:nowrap;overflow:hidden;
+        text-overflow:ellipsis;max-width:140px">${currentUserEmail}</div>
+    </div>
+    ${!access.canSeeAll ? `<span style="font-size:9px;background:#1d4ed833;color:#60a5fa;
+      padding:1px 6px;border-radius:8px;margin-left:auto">Vendedor</span>` : ''}
+  `;
+
+  const sidebar = document.getElementById('appSidebar');
+  if (sidebar) sidebar.prepend(badge);
+}
+
+// Access check helper — used inside sidebarNav directly
+function checkSectionAccess(target) {
+  const vendorMatch = target.match(/^(rodrigo|lenon|luiz)/);
+  if (vendorMatch && !canAccessSection(vendorMatch[1])) {
+    showToast('⛔ Você não tem acesso a este módulo', '#dc2626');
+    return false;
+  }
+  return true;
+}
+
+// On first load — redirect vendor to their own module
+function applyInitialNavigation() {
+  const access = getUserAccess();
+  if (currentUserProfile === 'lenon') {
+    sidebarNav('lenon-overview');
+  } else if (currentUserProfile === 'luiz') {
+    sidebarNav('luiz-overview');
+  } else {
+    // ADM and Rodrigo start on dashboard geral
+    const el = document.getElementById('tab-overview');
+    if (el) el.style.display = 'block';
+    document.getElementById('sb-overview')?.classList.add('active');
+    renderOverview();
+  }
+}
+
+
 // ════════════════════════════════════════════════
 // SYNC INDICATOR
 // ════════════════════════════════════════════════
@@ -5996,13 +6498,15 @@ async function init() {
   CLIENTS = getClients();
   buildClientTabs();
   renderNav();
-  // Show overview on load
-  const _ovEl = document.querySelector('.overview-section');
-  if (_ovEl) _ovEl.style.display = 'block';
-  document.getElementById('sb-overview')?.classList.add('active');
-  renderOverview();
+  // Apply access control then navigate
+  applySidebarAccess();
+  applyInitialNavigation();
   // Verifica regra de perdido no carregamento local
   setTimeout(() => aplicarRegraPerdido(), 2000);
+  // Notificações de prazo
+  setTimeout(() => { checkPrazoNotifications(); checkAutoBackup(); }, 3000);
+  // Sincronização em tempo real
+  setTimeout(() => startRealtimeSync(), 5000);
   // Restore last sync time
   const lastSync = localStorage.getItem('ipartes_last_sync');
   if (lastSync) {
@@ -6142,7 +6646,15 @@ try {
       <span id="syncTime"></span>
     </div>
   </div>
-  <button onclick="openDbConfig()" style="
+  <div style="display:flex;gap:8px;align-items:center">
+  <button onclick="showHistoryModal()" style="background:transparent;border:1px solid #e2e8f0;color:#94a3b8;font-family:'Inter',sans-serif;font-size:11px;padding:4px 10px;border-radius:6px;cursor:pointer">
+    📋 Histórico
+  </button>
+  <button onclick="backupData()" style="background:transparent;border:1px solid #e2e8f0;color:#94a3b8;font-family:'Inter',sans-serif;font-size:11px;padding:4px 10px;border-radius:6px;cursor:pointer">
+    💾 Backup
+  </button>
+</div>
+<button onclick="openDbConfig()" style="
     background:transparent;
     border:1px solid #e2e8f0;
     color:#94a3b8;
