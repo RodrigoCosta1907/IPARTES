@@ -1610,7 +1610,7 @@ td.hi { color: var(--text); font-weight: 500; }
 <div class="main-content" id="appMainContent">
 
 <!-- OVERVIEW -->
-<div class="overview-section active" id="tab-overview">
+<div class="overview-section" id="tab-overview" id="tab-overview">
   <div class="page-header">
     <div class="page-title">Visão Geral</div>
     <div class="page-sub">Consolidado de todos os clientes · filtros globais</div>
@@ -5549,16 +5549,18 @@ let currentSidebarNav = 'overview';
 function sidebarNav(target) {
   currentSidebarNav = target;
   // Hide all sections
-  ['.overview-section','#tab-vendas','#module-rodrigo','#module-rodrigo-vendas',
+  ['#tab-overview','#tab-vendas','#module-rodrigo','#module-rodrigo-vendas',
    '#module-lenon','#module-lenon-vendas','#module-luiz','#module-luiz-vendas',
-   '#clientTabsContainer'].forEach(sel => {
-    const el = document.querySelector(sel);
+   '#clientTabsContainer'].forEach(id => {
+    const el = document.getElementById(id.slice(1));
     if (el) el.style.display = 'none';
   });
+  // Also hide overview-section class
+  document.querySelectorAll('.overview-section').forEach(el => el.style.display = 'none');
   document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
 
   if (target === 'overview') {
-    const el = document.querySelector('.overview-section');
+    const el = document.getElementById('tab-overview');
     if (el) el.style.display = 'block';
     document.getElementById('sb-overview')?.classList.add('active');
     renderOverview();
@@ -5584,9 +5586,9 @@ function sidebarNav(target) {
 }
 
 function showVendorClientTab(vendor, client) {
-  ['.overview-section','#tab-vendas','#module-rodrigo','#module-rodrigo-vendas',
-   '#module-lenon','#module-lenon-vendas','#module-luiz','#module-luiz-vendas'].forEach(sel => {
-    const el = document.querySelector(sel);
+  ['tab-overview','tab-vendas','module-rodrigo','module-rodrigo-vendas',
+   'module-lenon','module-lenon-vendas','module-luiz','module-luiz-vendas'].forEach(id => {
+    const el = document.getElementById(id);
     if (el) el.style.display = 'none';
   });
   const ct = document.getElementById('clientTabsContainer');
@@ -5991,14 +5993,14 @@ async function init() {
 
   loadLocal();
   loadSalesLocal();
-  CLIENTS = getClients(); // deduplicated list
+  CLIENTS = getClients();
   buildClientTabs();
   renderNav();
-  // Show overview by default
-  const ovEl = document.querySelector('.overview-section');
-  if (ovEl) ovEl.style.display = 'block';
-  renderOverview();
+  // Show overview on load
+  const _ovEl = document.querySelector('.overview-section');
+  if (_ovEl) _ovEl.style.display = 'block';
   document.getElementById('sb-overview')?.classList.add('active');
+  renderOverview();
   // Verifica regra de perdido no carregamento local
   setTimeout(() => aplicarRegraPerdido(), 2000);
   // Restore last sync time
@@ -6081,6 +6083,44 @@ try {
 -->
 
 
+
+
+<div id="module-rodrigo" style="display:none">
+  <div class="module-header"><div class="module-badge rodrigo">RO</div>
+    <div><div class="module-title">Módulo Rodrigo</div><div class="module-sub">Vale Ferrosos · Vale Metals · Suzano · Outros</div></div>
+  </div><div id="module-rodrigo-content"></div>
+</div>
+<div id="module-rodrigo-vendas" style="display:none">
+  <div class="module-header"><div class="module-badge rodrigo">RO</div>
+    <div><div class="module-title">Vendas — Rodrigo</div><div class="module-sub">Pedidos e entregas</div></div>
+  </div><div id="module-rodrigo-vendas-content"></div>
+</div>
+<div id="module-lenon" style="display:none">
+  <div class="module-header"><div class="module-badge lenon">LE</div>
+    <div><div class="module-title">Módulo Lenon</div><div class="module-sub">Petrobras · Eneva · Transpetro · Engie · TBG</div></div>
+  </div><div id="module-lenon-content"></div>
+</div>
+<div id="module-lenon-vendas" style="display:none">
+  <div class="module-header"><div class="module-badge lenon">LE</div>
+    <div><div class="module-title">Vendas — Lenon</div><div class="module-sub">Pedidos e entregas</div></div>
+  </div><div id="module-lenon-vendas-content"></div>
+</div>
+<div id="module-luiz" style="display:none">
+  <div class="module-header"><div class="module-badge luiz">LU</div>
+    <div><div class="module-title">Módulo Luiz</div><div class="module-sub">Clientes atribuídos</div></div>
+  </div><div id="module-luiz-content"></div>
+</div>
+<div id="module-luiz-vendas" style="display:none">
+  <div class="module-header"><div class="module-badge luiz">LU</div>
+    <div><div class="module-title">Vendas — Luiz</div><div class="module-sub">Pedidos e entregas</div></div>
+  </div><div id="module-luiz-vendas-content"></div>
+</div>
+
+</div><!-- /main-content -->
+</div><!-- /app-layout -->
+
+</div><!-- /main-content -->
+</div><!-- /app-layout -->
 
 <!-- ── FOOTER ── -->
 <footer id="appFooter" style="
@@ -6236,41 +6276,6 @@ CREATE POLICY "Allow authenticated" ON mro_oportunidades
     </div>
   </div>
 </div>
-
-
-<div id="module-rodrigo" style="display:none">
-  <div class="module-header"><div class="module-badge rodrigo">RO</div>
-    <div><div class="module-title">Módulo Rodrigo</div><div class="module-sub">Vale Ferrosos · Vale Metals · Suzano · Outros</div></div>
-  </div><div id="module-rodrigo-content"></div>
-</div>
-<div id="module-rodrigo-vendas" style="display:none">
-  <div class="module-header"><div class="module-badge rodrigo">RO</div>
-    <div><div class="module-title">Vendas — Rodrigo</div><div class="module-sub">Pedidos e entregas</div></div>
-  </div><div id="module-rodrigo-vendas-content"></div>
-</div>
-<div id="module-lenon" style="display:none">
-  <div class="module-header"><div class="module-badge lenon">LE</div>
-    <div><div class="module-title">Módulo Lenon</div><div class="module-sub">Petrobras · Eneva · Transpetro · Engie · TBG</div></div>
-  </div><div id="module-lenon-content"></div>
-</div>
-<div id="module-lenon-vendas" style="display:none">
-  <div class="module-header"><div class="module-badge lenon">LE</div>
-    <div><div class="module-title">Vendas — Lenon</div><div class="module-sub">Pedidos e entregas</div></div>
-  </div><div id="module-lenon-vendas-content"></div>
-</div>
-<div id="module-luiz" style="display:none">
-  <div class="module-header"><div class="module-badge luiz">LU</div>
-    <div><div class="module-title">Módulo Luiz</div><div class="module-sub">Clientes atribuídos</div></div>
-  </div><div id="module-luiz-content"></div>
-</div>
-<div id="module-luiz-vendas" style="display:none">
-  <div class="module-header"><div class="module-badge luiz">LU</div>
-    <div><div class="module-title">Vendas — Luiz</div><div class="module-sub">Pedidos e entregas</div></div>
-  </div><div id="module-luiz-vendas-content"></div>
-</div>
-
-</div><!-- /main-content -->
-</div><!-- /app-layout -->
 
 <!-- PDF REPORT (hidden, shown on print) -->
 <div id="pdfReport" style="display:none"></div>
