@@ -1378,6 +1378,56 @@ td.hi { color: var(--text); font-weight: 500; }
   .th-checkbox { width: 32px; padding: 0 8px !important; }
   .td-checkbox { width: 32px; padding: 0 8px !important; text-align: center; }
 
+
+  /* ══ SIDEBAR LAYOUT ══ */
+  .app-layout { display:flex; flex-direction:row; width:100%; min-height:calc(100vh - 56px); align-items:stretch; box-sizing:border-box; }
+  .sidebar { width:220px; min-width:220px; max-width:220px; flex-shrink:0; flex-grow:0; background:#1e293b; display:flex; flex-direction:column; position:sticky; top:56px; height:calc(100vh - 56px); overflow-y:auto; overflow-x:hidden; scrollbar-width:thin; scrollbar-color:#334155 transparent; z-index:50; }
+  .sidebar::-webkit-scrollbar { width:4px; }
+  .sidebar::-webkit-scrollbar-thumb { background:#334155; border-radius:2px; }
+  .main-content { flex:1 1 auto; min-width:0; max-width:calc(100vw - 220px); padding:20px 28px; background:var(--bg); overflow-x:hidden; box-sizing:border-box; }
+  .sidebar-section { padding:6px 0; border-bottom:1px solid #334155; }
+  .sidebar-section:last-child { border-bottom:none; }
+  .sidebar-section-header { display:flex; align-items:center; gap:8px; padding:10px 14px 6px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:#64748b; cursor:pointer; user-select:none; }
+  .sidebar-section-header:hover { color:#94a3b8; }
+  .sidebar-section-header .vendor-badge { width:20px; height:20px; border-radius:50%; font-size:9px; font-weight:800; display:flex; align-items:center; justify-content:center; color:#fff; flex-shrink:0; }
+  .badge-rodrigo { background:#ea580c; }
+  .badge-lenon   { background:#15803d; }
+  .badge-luiz    { background:#1d4ed8; }
+  .badge-geral   { background:#475569; }
+  .sidebar-section-header .collapse-icon { margin-left:auto; font-size:10px; color:#475569; transition:transform .2s; }
+  .sidebar-section.collapsed .collapse-icon { transform:rotate(-90deg); }
+  .sidebar-section.collapsed .sidebar-items { display:none; }
+  .sidebar-items { padding:2px 0; }
+  .sidebar-item { display:flex; align-items:center; gap:8px; padding:7px 14px 7px 20px; font-size:12px; font-weight:500; color:#94a3b8; cursor:pointer; transition:all .15s; border:none; background:transparent; width:100%; text-align:left; font-family:var(--font); border-left:2px solid transparent; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .sidebar-item:hover { color:#e2e8f0; background:rgba(255,255,255,.04); }
+  .sidebar-item.active { color:#fff; background:rgba(255,255,255,.07); font-weight:600; }
+  .sidebar-item.active.rodrigo { border-left-color:#ea580c; }
+  .sidebar-item.active.lenon   { border-left-color:#15803d; }
+  .sidebar-item.active.luiz    { border-left-color:#1d4ed8; }
+  .sidebar-item.active.geral   { border-left-color:#94a3b8; }
+  .sidebar-item.active.vendas  { border-left-color:#7c3aed; }
+  .sidebar-item .item-icon { font-size:12px; flex-shrink:0; }
+  .sidebar-add-btn { display:flex; align-items:center; gap:6px; padding:5px 14px 5px 20px; font-size:11px; color:#475569; cursor:pointer; transition:color .15s; border:none; background:transparent; font-family:var(--font); width:100%; text-align:left; }
+  .sidebar-add-btn:hover { color:#94a3b8; }
+  .sidebar-toggle { display:none; position:fixed; bottom:20px; left:20px; width:44px; height:44px; background:var(--blue); border:none; border-radius:50%; color:#fff; font-size:18px; cursor:pointer; z-index:200; box-shadow:0 4px 12px rgba(29,78,216,.4); align-items:center; justify-content:center; }
+  .module-header { display:flex; align-items:center; gap:12px; margin-bottom:20px; padding-bottom:16px; border-bottom:2px solid var(--border); width:100%; }
+  .module-badge { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:800; color:#fff; flex-shrink:0; }
+  .module-badge.rodrigo { background:linear-gradient(135deg,#c2410c,#ea580c); }
+  .module-badge.lenon   { background:linear-gradient(135deg,#15803d,#16a34a); }
+  .module-badge.luiz    { background:linear-gradient(135deg,#1d4ed8,#3b82f6); }
+  .module-title { font-size:20px; font-weight:700; color:var(--text); }
+  .module-sub   { font-size:12px; color:var(--text3); margin-top:2px; }
+  #module-rodrigo, #module-lenon, #module-luiz,
+  #module-rodrigo-vendas, #module-lenon-vendas, #module-luiz-vendas { width:100%; box-sizing:border-box; }
+  .nav-tabs { display:none !important; }
+  @media (max-width:768px) {
+    .app-layout { position:relative; }
+    .sidebar { position:fixed; left:0; top:56px; height:calc(100vh - 56px); z-index:100; transform:translateX(-100%); transition:transform .25s ease; }
+    .sidebar.open { transform:translateX(0); }
+    .sidebar-toggle { display:flex; }
+    .main-content { padding:14px; max-width:100%; }
+  }
+
 </style>
 </head>
 <body>
@@ -1491,7 +1541,73 @@ td.hi { color: var(--text); font-weight: 500; }
 
 <!-- sync bar moved to footer -->
 
-<div class="main">
+<div class="app-layout">
+<aside class="sidebar" id="appSidebar">
+
+  <div class="sidebar-section" id="section-geral">
+    <div class="sidebar-section-header" onclick="toggleSidebarSection('geral')">
+      <div class="vendor-badge badge-geral">◈</div><span>Visão Geral</span>
+      <span class="collapse-icon">▾</span>
+    </div>
+    <div class="sidebar-items">
+      <button class="sidebar-item geral active" id="sb-overview" onclick="sidebarNav('overview')"><span class="item-icon">📊</span> Dashboard Geral</button>
+      <button class="sidebar-item vendas" id="sb-vendas-geral" onclick="sidebarNav('vendas-geral')"><span class="item-icon">🛒</span> Vendas Geral</button>
+    </div>
+  </div>
+
+  <div class="sidebar-section" id="section-rodrigo">
+    <div class="sidebar-section-header" onclick="toggleSidebarSection('rodrigo')">
+      <div class="vendor-badge badge-rodrigo">RO</div><span>Rodrigo</span>
+      <span class="collapse-icon">▾</span>
+    </div>
+    <div class="sidebar-items">
+      <button class="sidebar-item rodrigo" id="sb-rodrigo-overview" onclick="sidebarNav('rodrigo-overview')"><span class="item-icon">📊</span> Visão Geral</button>
+      <div id="sb-rodrigo-clients">
+        <button class="sidebar-item rodrigo" id="sb-rodrigo-client-vale-ferrosos" onclick="showVendorClientTab('rodrigo','Vale Ferrosos')"><span class="item-icon">📁</span> Vale Ferrosos</button>
+        <button class="sidebar-item rodrigo" id="sb-rodrigo-client-vale-metals" onclick="showVendorClientTab('rodrigo','Vale Metals')"><span class="item-icon">📁</span> Vale Metals</button>
+        <button class="sidebar-item rodrigo" id="sb-rodrigo-client-suzano" onclick="showVendorClientTab('rodrigo','Suzano')"><span class="item-icon">📁</span> Suzano</button>
+        <button class="sidebar-item rodrigo" id="sb-rodrigo-client-outros" onclick="showVendorClientTab('rodrigo','Outros')"><span class="item-icon">📁</span> Outros Clientes</button>
+      </div>
+      <button class="sidebar-item vendas" id="sb-rodrigo-vendas" onclick="sidebarNav('rodrigo-vendas')"><span class="item-icon">🛒</span> Vendas</button>
+      <button class="sidebar-add-btn" onclick="openSettings('rodrigo')" style="color:#ea580c">＋ Adicionar cliente</button>
+    </div>
+  </div>
+
+  <div class="sidebar-section" id="section-lenon">
+    <div class="sidebar-section-header" onclick="toggleSidebarSection('lenon')">
+      <div class="vendor-badge badge-lenon">LE</div><span>Lenon</span>
+      <span class="collapse-icon">▾</span>
+    </div>
+    <div class="sidebar-items">
+      <button class="sidebar-item lenon" id="sb-lenon-overview" onclick="sidebarNav('lenon-overview')"><span class="item-icon">📊</span> Visão Geral</button>
+      <div id="sb-lenon-clients">
+        <button class="sidebar-item lenon" id="sb-lenon-client-petrobras" onclick="showVendorClientTab('lenon','Petrobras')"><span class="item-icon">📁</span> Petrobras</button>
+        <button class="sidebar-item lenon" id="sb-lenon-client-eneva" onclick="showVendorClientTab('lenon','Eneva')"><span class="item-icon">📁</span> Eneva</button>
+        <button class="sidebar-item lenon" id="sb-lenon-client-transpetro" onclick="showVendorClientTab('lenon','Transpetro')"><span class="item-icon">📁</span> Transpetro</button>
+        <button class="sidebar-item lenon" id="sb-lenon-client-engie" onclick="showVendorClientTab('lenon','Engie')"><span class="item-icon">📁</span> Engie</button>
+        <button class="sidebar-item lenon" id="sb-lenon-client-tbg" onclick="showVendorClientTab('lenon','TBG')"><span class="item-icon">📁</span> TBG</button>
+      </div>
+      <button class="sidebar-item vendas" id="sb-lenon-vendas" onclick="sidebarNav('lenon-vendas')"><span class="item-icon">🛒</span> Vendas</button>
+      <button class="sidebar-add-btn" onclick="openSettings('lenon')" style="color:#15803d">＋ Adicionar cliente</button>
+    </div>
+  </div>
+
+  <div class="sidebar-section" id="section-luiz">
+    <div class="sidebar-section-header" onclick="toggleSidebarSection('luiz')">
+      <div class="vendor-badge badge-luiz">LU</div><span>Luiz</span>
+      <span class="collapse-icon">▾</span>
+    </div>
+    <div class="sidebar-items">
+      <button class="sidebar-item luiz" id="sb-luiz-overview" onclick="sidebarNav('luiz-overview')"><span class="item-icon">📊</span> Visão Geral</button>
+      <div id="sb-luiz-clients"></div>
+      <button class="sidebar-item vendas" id="sb-luiz-vendas" onclick="sidebarNav('luiz-vendas')"><span class="item-icon">🛒</span> Vendas</button>
+      <button class="sidebar-add-btn" onclick="openSettings('luiz')" style="color:#1d4ed8">＋ Adicionar cliente</button>
+    </div>
+  </div>
+
+</aside>
+<button class="sidebar-toggle" onclick="toggleMobileSidebar()">☰</button>
+<div class="main-content" id="appMainContent">
 
 <!-- OVERVIEW -->
 <div class="overview-section active" id="tab-overview">
@@ -1608,7 +1724,7 @@ td.hi { color: var(--text); font-weight: 500; }
   </div>
 </div>
 
-<div id="clientTabsContainer"></div>
+<div id="clientTabsContainer" style="display:none"></div>
 
 <!-- ── MÓDULO VENDAS ── -->
 <div class="vendas-section" id="tab-vendas">
@@ -3566,8 +3682,8 @@ function updateFooterDot(online) {
 
 
 // ── SETTINGS — CLIENT MANAGEMENT ──
-function openSettings(vendor) {
-  renderSettingsModal(vendor);
+function openSettings() {
+  renderSettingsModal();
   document.getElementById('settingsModal').classList.remove('hidden');
 }
 function closeSettings() {
@@ -3582,85 +3698,42 @@ function saveArchivedClients(list) {
   localStorage.setItem('ipartes_archived', JSON.stringify(list));
 }
 
-function renderSettingsModal(vendorCtx) {
-  window._settingsVendorCtx = vendorCtx || null;
-  const vendor = vendorCtx;
-  const cfg    = vendor ? VENDOR_CONFIG[vendor] : null;
+function renderSettingsModal() {
+  const clients  = getClients();
+  const archived = getArchivedClients();
+  const listEl   = document.getElementById('clientsList');
+  const archEl   = document.getElementById('archivedList');
+  const archSec  = document.getElementById('archivedSection');
 
-  // Clients for this vendor (or all if no vendor)
-  const allClients = getClients();
-  const archived   = getArchivedClients();
+  listEl.innerHTML = clients.map((c, i) => `
+    <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;
+                background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);">
+      <span style="font-size:13px;font-weight:500;color:var(--text);flex:1">${c}</span>
+      <span style="font-size:11px;color:var(--text4)">${(data[c]||[]).length} reg.</span>
+      ${i > 0 ? `<button onclick="moveClientUp(${i})" style="background:none;border:1px solid var(--border2);
+        color:var(--text3);padding:3px 7px;border-radius:4px;cursor:pointer;font-size:11px;" title="Mover para cima">↑</button>` : '<div style="width:28px"></div>'}
+      ${i < clients.length-1 ? `<button onclick="moveClientDown(${i})" style="background:none;border:1px solid var(--border2);
+        color:var(--text3);padding:3px 7px;border-radius:4px;cursor:pointer;font-size:11px;" title="Mover para baixo">↓</button>` : '<div style="width:28px"></div>'}
+      <button onclick="archiveClient('${c.replace(/'/g,"\\'")}','${i}')"
+        style="background:none;border:1px solid #fca5a5;color:#ef4444;padding:3px 9px;
+               border-radius:4px;cursor:pointer;font-size:11px;transition:all .15s;"
+        onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='none'"
+        title="Arquivar cliente">Arquivar</button>
+    </div>`).join('');
 
-  const vendorClients = vendor
-    ? allClients.filter(c => cfg.clients.includes(c) ||
-        RESPONSAVEL_MAP[c] === cfg.name)
-    : allClients;
-
-  const vendorArchived = vendor
-    ? archived.filter(c => cfg.clients.includes(c) ||
-        RESPONSAVEL_MAP[c] === cfg.name)
-    : archived;
-
-  // Modal title
-  const titleEl = document.querySelector('#settingsModal .modal-title');
-  if (titleEl) titleEl.innerHTML = cfg
-    ? `<span style="color:${cfg.color}">●</span> Clientes — ${cfg.name}`
-    : '👥 Gerenciar Clientes';
-
-  // Vendor hint
-  const hintEl = document.getElementById('addClientVendorHint');
-  if (hintEl) {
-    if (cfg) {
-      hintEl.style.display = 'block';
-      hintEl.innerHTML = `📌 Novo cliente será adicionado ao módulo <strong style="color:${cfg.color}">${cfg.name}</strong>`;
-    } else {
-      hintEl.style.display = 'none';
-    }
-  }
-
-  const listEl  = document.getElementById('clientsList');
-  const archEl  = document.getElementById('archivedList');
-  const archSec = document.getElementById('archivedSection');
-  if (!listEl) return;
-
-  // Active clients
-  listEl.innerHTML = vendorClients.length
-    ? vendorClients.map((c, i) => `
-      <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;
-        background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius)">
-        <span style="font-size:13px;font-weight:500;color:var(--text);flex:1">📁 ${c}</span>
-        <span style="font-size:11px;color:var(--text3)">${(data[c]||[]).length} reg.</span>
-        <button onclick="moveClientUp('${c}')" title="Mover cima"
-          style="border:none;background:none;cursor:pointer;color:var(--text3);padding:2px 5px">↑</button>
-        <button onclick="moveClientDown('${c}')" title="Mover baixo"
-          style="border:none;background:none;cursor:pointer;color:var(--text3);padding:2px 5px">↓</button>
-        <button onclick="archiveClient('${c}')"
-          style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:4px;
-                 border:1px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer">
-          Arquivar
-        </button>
-      </div>`).join('')
-    : '<p style="font-size:12px;color:var(--text3);padding:8px 0">Nenhum cliente ativo.</p>';
-
-  // Archived section
-  if (archEl && archSec) {
-    if (vendorArchived.length > 0) {
-      archSec.style.display = 'block';
-      archEl.innerHTML = vendorArchived.map(c => `
-        <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;
-          background:#fafafa;border:1px solid var(--border);border-radius:var(--radius);opacity:.75">
-          <span style="font-size:13px;color:var(--text3);flex:1">📁 ${c}
-            <span style="font-size:10px;color:#94a3b8">(arquivado)</span>
-          </span>
-          <button onclick="restoreClient('${c}')"
-            style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:4px;
-                   border:1px solid #86efac;background:#f0fdf4;color:#15803d;cursor:pointer">
-            ↩ Restaurar
-          </button>
-        </div>`).join('');
-    } else {
-      archSec.style.display = 'none';
-    }
+  if (archived.length) {
+    archSec.style.display = '';
+    archEl.innerHTML = archived.map(c => `
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;
+                  background:#fafafa;border:1px solid var(--border);border-radius:var(--radius);opacity:.8;">
+        <span style="font-size:13px;color:var(--text3);flex:1">${c}</span>
+        <span style="font-size:11px;color:var(--text4)">${(data[c]||[]).length} reg. arquivados</span>
+        <button onclick="restoreClient('${c.replace(/'/g,"\\'")}'")"
+          style="background:var(--blue-dim);border:1px solid var(--blue);color:var(--blue);
+                 padding:3px 9px;border-radius:4px;cursor:pointer;font-size:11px;">Restaurar</button>
+      </div>`).join('');
+  } else {
+    archSec.style.display = 'none';
   }
 }
 
@@ -3675,85 +3748,43 @@ function addClient() {
   if (clients.includes(name)) { showToast('⚠ Cliente já existe','#b45309'); return; }
   if (archived.includes(name)) { showToast('⚠ Cliente arquivado — use Restaurar','#b45309'); return; }
 
-  // Add to list
   clients.push(name);
-  CLIENTS = clients;
   saveClients(clients);
   if (!data[name]) data[name] = [];
   saveLocal();
-
-  // Assign to vendor
-  const vendor = window._settingsVendorCtx;
-  if (vendor && VENDOR_CONFIG[vendor] && !VENDOR_CONFIG[vendor].clients.includes(name)) {
-    VENDOR_CONFIG[vendor].clients.push(name);
-  }
-
-  // Inject into sidebar immediately
-  if (vendor) {
-    const el = document.getElementById('sb-'+vendor+'-clients');
-    if (el && !document.getElementById('sb-'+vendor+'-client-'+slugify(name))) {
-      const btn = document.createElement('button');
-      btn.className = 'sidebar-item '+vendor;
-      btn.id = 'sb-'+vendor+'-client-'+slugify(name);
-      btn.onclick = () => showVendorClientTab(vendor, name);
-      btn.innerHTML = '<span class="item-icon">📁</span> '+name;
-      el.appendChild(btn);
-    }
-  }
-
   input.value = '';
+  renderSettingsModal();
   buildClientTabs();
-  renderSettingsModal(vendor);
-  showToast('✅ Cliente "'+name+'" adicionado!');
+  renderNav();
+  showToast(`✓ Cliente "${name}" adicionado!`);
 }
 
 function archiveClient(name) {
-  if (!confirm(`Arquivar "${name}"? A pasta some da lista, mas os dados são mantidos.`)) return;
-  const clients = getClients().filter(c => c !== name);
+  if (!confirm(`Arquivar "${name}"? A aba some da navegação, mas os dados são mantidos.`)) return;
+  const clients  = getClients().filter(c => c !== name);
   const archived = getArchivedClients();
   if (!archived.includes(name)) archived.push(name);
-  CLIENTS = clients;
   saveClients(clients);
   saveArchivedClients(archived);
-  // Remove from sidebar immediately
-  const vendor = window._settingsVendorCtx;
-  if (vendor) {
-    const sbBtn = document.getElementById('sb-'+vendor+'-client-'+slugify(name));
-    if (sbBtn) sbBtn.remove();
-  }
+  if (currentTab === name) { currentTab = 'overview'; }
+  renderSettingsModal();
   buildClientTabs();
-  const v = window._settingsVendorCtx;
-  renderSettingsModal(v);
-  showToast('"'+name+'" arquivado — dados mantidos.', '#b45309');
+  renderNav();
+  renderOverview();
+  showToast(`"${name}" arquivado.`);
 }
 
 function restoreClient(name) {
-  const clients = getClients();
+  const clients  = getClients();
   const archived = getArchivedClients().filter(c => c !== name);
   if (!clients.includes(name)) clients.push(name);
-  CLIENTS = clients;
   saveClients(clients);
   saveArchivedClients(archived);
   if (!data[name]) data[name] = [];
-  const vendor = window._settingsVendorCtx;
-  if (vendor && VENDOR_CONFIG[vendor] && !VENDOR_CONFIG[vendor].clients.includes(name)) {
-    VENDOR_CONFIG[vendor].clients.push(name);
-  }
+  renderSettingsModal();
   buildClientTabs();
-  // Add to sidebar
-  if (vendor) {
-    const el = document.getElementById('sb-'+vendor+'-clients');
-    if (el && !document.getElementById('sb-'+vendor+'-client-'+slugify(name))) {
-      const btn = document.createElement('button');
-      btn.className = 'sidebar-item '+vendor;
-      btn.id = 'sb-'+vendor+'-client-'+slugify(name);
-      btn.onclick = () => showVendorClientTab(vendor, name);
-      btn.innerHTML = '<span class="item-icon">📁</span> '+name;
-      el.appendChild(btn);
-    }
-  }
-  renderSettingsModal(vendor);
-  showToast('✓ "'+name+'" restaurado na lista!');
+  renderNav();
+  showToast(`✓ "${name}" restaurado!`);
 }
 
 function moveClientUp(i) {
@@ -5589,6 +5620,331 @@ function dedupByNumero(records) {
   });
 }
 
+
+// ════════════════════════════════════════════════
+// SIDEBAR & VENDOR MODULES
+// ════════════════════════════════════════════════
+const VENDOR_CONFIG = {
+  rodrigo: { name:'Rodrigo', badge:'RO', color:'#ea580c', clients:['Vale Ferrosos','Vale Metals','Suzano','Outros'] },
+  lenon:   { name:'Lenon',   badge:'LE', color:'#15803d', clients:['Petrobras','Eneva','Transpetro','Engie','TBG'] },
+  luiz:    { name:'Luiz',    badge:'LU', color:'#1d4ed8', clients:[] },
+};
+
+let currentSidebarNav = 'overview';
+
+function sidebarNav(target) {
+  currentSidebarNav = target;
+  // Hide all
+  ['overview-section','tab-vendas','module-rodrigo','module-rodrigo-vendas',
+   'module-lenon','module-lenon-vendas','module-luiz','module-luiz-vendas',
+   'clientTabsContainer'].forEach(id => {
+    const el = document.getElementById(id) || document.querySelector('.'+id);
+    if (el) el.style.display = 'none';
+  });
+  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+
+  if (target === 'overview') {
+    const el = document.querySelector('.overview-section');
+    if (el) el.style.display = 'block';
+    document.getElementById('sb-overview')?.classList.add('active');
+    renderOverview();
+  } else if (target === 'vendas-geral') {
+    const el = document.getElementById('tab-vendas');
+    if (el) el.style.display = 'block';
+    document.getElementById('sb-vendas-geral')?.classList.add('active');
+    salesCurrentClient = null;
+    salesFilters = {status:'',cliente:'',atrasado:'',de:'',ate:''};
+    renderVendasModule();
+  } else if (target.endsWith('-overview')) {
+    const vendor = target.replace('-overview','');
+    document.getElementById('module-'+vendor)?.style && (document.getElementById('module-'+vendor).style.display = 'block');
+    document.getElementById('sb-'+vendor+'-overview')?.classList.add('active');
+    showVendorModule(vendor);
+  } else if (target.endsWith('-vendas')) {
+    const vendor = target.replace('-vendas','');
+    document.getElementById('module-'+vendor+'-vendas')?.style && (document.getElementById('module-'+vendor+'-vendas').style.display = 'block');
+    document.getElementById('sb-'+vendor+'-vendas')?.classList.add('active');
+    showVendorVendas(vendor);
+  }
+}
+
+function showVendorClientTab(vendor, client) {
+  ['overview-section','tab-vendas','module-rodrigo','module-rodrigo-vendas',
+   'module-lenon','module-lenon-vendas','module-luiz','module-luiz-vendas'].forEach(id => {
+    const el = document.getElementById(id) || document.querySelector('.'+id);
+    if (el) el.style.display = 'none';
+  });
+  const ct = document.getElementById('clientTabsContainer');
+  if (ct) ct.style.display = 'block';
+  document.querySelectorAll('.client-section').forEach(s => s.style.display = 'none');
+  const section = document.getElementById('client-'+slugify(client));
+  if (section) { section.style.display = 'block'; renderClientTab(client); }
+  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('sb-'+vendor+'-client-'+slugify(client))?.classList.add('active');
+  currentSidebarNav = 'vendor-'+vendor+'-'+client;
+}
+
+function getVendorClients(vendor) {
+  const cfg = VENDOR_CONFIG[vendor];
+  if (!cfg) return [];
+  return cfg.clients.filter(c => CLIENTS.includes(c));
+}
+
+function showVendorModule(vendor) {
+  const cfg = VENDOR_CONFIG[vendor];
+  if (!cfg) return;
+  const contentEl = document.getElementById('module-'+vendor+'-content');
+  if (!contentEl) return;
+
+  const vendorClients = getVendorClients(vendor);
+  const filtered = getAllRecords().filter(r => vendorClients.includes(r.cliente));
+  const _dd      = dedupByNumero(filtered);
+  const total    = _dd.length;
+  const particip = _dd.filter(r=>r.participamos==='SIM').length;
+  const vendas   = _dd.filter(r=>r.venda==='SIM').length;
+  const receita  = _dd.filter(r=>r.venda==='SIM').reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0);
+  const conv     = particip>0?(vendas/particip*100).toFixed(1):'0.0';
+  const ciclos   = _dd.filter(r=>r.ciclo!=null).map(r=>r.ciclo);
+  const cicloMed = ciclos.length?Math.round(ciclos.reduce((a,b)=>a+b,0)/ciclos.length):0;
+
+  const clientCards = vendorClients.map(c => {
+    const recs = dedupByNumero(filtered.filter(r=>r.cliente===c));
+    const v = recs.filter(r=>r.venda==='SIM').length;
+    const p = recs.filter(r=>r.participamos==='SIM').length;
+    const cv = p>0?(v/p*100).toFixed(0):0;
+    return `<div class="table-card" style="padding:14px;cursor:pointer;transition:box-shadow .15s"
+      onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,.1)'" onmouseout="this.style.boxShadow=''"
+      onclick="showVendorClientTab('${vendor}','${c}')">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span>📁</span><span style="font-size:13px;font-weight:700;color:var(--text)">${c}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;text-align:center">
+        <div><div style="font-size:16px;font-weight:700;color:var(--blue)">${fmtNum(recs.length)}</div><div style="font-size:10px;color:var(--text3)">oport.</div></div>
+        <div><div style="font-size:16px;font-weight:700;color:var(--green)">${fmtNum(v)}</div><div style="font-size:10px;color:var(--text3)">vendas</div></div>
+        <div><div style="font-size:16px;font-weight:700;color:var(--amber)">${cv}%</div><div style="font-size:10px;color:var(--text3)">conv.</div></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  contentEl.innerHTML = `
+    <div class="kpi-grid" style="margin-bottom:20px">
+      <div class="kpi-card c-blue"><div class="kpi-icon">📋</div><div class="kpi-label">Oportunidades</div><div class="kpi-value">${fmtNum(total)}</div><div class="kpi-sub">total registradas</div></div>
+      <div class="kpi-card c-slate"><div class="kpi-icon">🤝</div><div class="kpi-label">Participações</div><div class="kpi-value">${fmtNum(particip)}</div><div class="kpi-sub">${total>0?(particip/total*100).toFixed(0):0}% do total</div></div>
+      <div class="kpi-card c-green"><div class="kpi-icon">✅</div><div class="kpi-label">Vendas</div><div class="kpi-value">${fmtNum(vendas)}</div><div class="kpi-sub">convertidas</div></div>
+      <div class="kpi-card c-orange"><div class="kpi-icon">💰</div><div class="kpi-label">Receita Total</div><div class="kpi-value kpi-currency">${fmtCurrency(receita)}</div><div class="kpi-sub">em pedidos fechados</div></div>
+      <div class="kpi-card c-amber"><div class="kpi-icon">🎯</div><div class="kpi-label">Conversão</div><div class="kpi-value">${conv}%</div><div class="kpi-sub">vendas / participações</div></div>
+      <div class="kpi-card c-teal"><div class="kpi-icon">⏱</div><div class="kpi-label">Ciclo Médio</div><div class="kpi-value">${cicloMed>0?cicloMed+'d':'—'}</div><div class="kpi-sub">oport. → pedido</div></div>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Clientes</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:16px">${clientCards}</div>
+    <button onclick="openSettings('${vendor}')"
+      style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 18px;width:100%;
+             background:transparent;border:2px dashed ${cfg.color}66;border-radius:var(--radius);
+             color:${cfg.color};font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer"
+      onmouseover="this.style.background='${cfg.color}11'" onmouseout="this.style.background='transparent'">
+      ＋ Adicionar / Gerenciar Clientes
+    </button>`;
+}
+
+function showVendorVendas(vendor) {
+  const cfg = VENDOR_CONFIG[vendor];
+  if (!cfg) return;
+  const contentEl = document.getElementById('module-'+vendor+'-vendas-content');
+  if (!contentEl) return;
+  const vendorClients = getVendorClients(vendor);
+  const vendorVendas  = getAllVendas().filter(v => vendorClients.includes(v.cliente));
+  const hoje = new Date();
+  const mesAtual = hoje.getMonth()+1, anoAtual = hoje.getFullYear();
+  const nomeMes = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][mesAtual-1];
+  const vendasMes = vendorVendas.filter(v=>v.dataPedido&&parseInt(v.dataPedido.split('-')[1])===mesAtual&&parseInt(v.dataPedido.split('-')[0])===anoAtual);
+  const totalMes = vendasMes.reduce((s,v)=>s+(parseFloat(String(v.valor||0).replace(',','.'))||0),0);
+  const totalAno = vendorVendas.filter(v=>v.dataPedido&&v.dataPedido.startsWith(String(anoAtual))).reduce((s,v)=>s+(parseFloat(String(v.valor||0).replace(',','.'))||0),0);
+
+  contentEl.innerHTML = `
+    <div class="vendas-highlights" style="margin-bottom:16px">
+      <div class="vendas-highlight-card"><div class="vendas-highlight-icon">📅</div>
+        <div class="vendas-highlight-body"><div class="vendas-highlight-label">Vendas — ${nomeMes} ${anoAtual}</div>
+        <div class="vendas-highlight-val">${fmtCurrency(totalMes)}</div>
+        <div class="vendas-highlight-sub">${vendasMes.length} pedido(s) no mês</div></div>
+      </div>
+      <div class="vendas-highlight-card orange"><div class="vendas-highlight-icon">📊</div>
+        <div class="vendas-highlight-body"><div class="vendas-highlight-label">Total — ${anoAtual}</div>
+        <div class="vendas-highlight-val">${fmtCurrency(totalAno)}</div>
+        <div class="vendas-highlight-sub">${vendorVendas.filter(v=>v.dataPedido&&v.dataPedido.startsWith(String(anoAtual))).length} pedido(s) no ano</div></div>
+      </div>
+    </div>
+    <div class="table-card">
+      <div class="table-header"><div class="table-title">Pedidos — ${cfg.name}</div>
+        <span style="font-size:12px;color:var(--text3)">${vendorVendas.length} registro(s)</span>
+      </div>
+      <div class="table-wrap">
+        <table><thead><tr>
+          <th>Cliente</th><th>Nº Oportunidade</th><th>Valor</th>
+          <th>Data Pedido</th><th>Prazo</th><th>Situação</th><th>Status</th><th>Ações</th>
+        </tr></thead>
+        <tbody>${vendorVendas.length ? vendorVendas.map(v => {
+          const sit = getVendaSituacao(v);
+          const badge = sit==='atrasado'?'<span class="atraso-badge">⚠ ATRASADO</span>':sit==='alerta'?'<span class="alerta-badge">⏰</span>':'<span style="font-size:10px;color:var(--green)">✓ OK</span>';
+          return '<tr><td class="hi">'+sanitize(v.cliente)+'</td><td>'+sanitize(v.numOportunidade||'—')+'</td><td class="hi">'+(v.valor?fmtCurrency(v.valor):'—')+'</td><td>'+(v.dataPedido||'—')+'</td><td>'+(v.prazoEntrega||'—')+'</td><td>'+badge+'</td><td><span class="badge '+(VENDA_STATUS_CSS[v.statusEntrega]||'')+'">'+v.statusEntrega+'</span></td><td><button class="btn-icon-edit" onclick="openEditVenda(''+v.id+'')">✏</button></td></tr>';
+        }).join('') : '<tr><td colspan="8"><div class="empty-state"><div class="icon">🛒</div><p>Nenhuma venda registrada</p></div></td></tr>'}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function toggleSidebarSection(section) {
+  document.getElementById('section-'+section)?.classList.toggle('collapsed');
+}
+function toggleMobileSidebar() {
+  document.getElementById('appSidebar')?.classList.toggle('open');
+}
+
+// ════════════════════════════════════════════════
+// VENDOR SETTINGS MODAL (per-vendor client management)
+// ════════════════════════════════════════════════
+function openSettings(vendor) {
+  window._settingsVendorCtx = vendor || null;
+  renderSettingsModal(vendor);
+  document.getElementById('settingsModal').classList.remove('hidden');
+}
+
+function renderSettingsModal(vendorCtx) {
+  window._settingsVendorCtx = vendorCtx || null;
+  const cfg = vendorCtx ? VENDOR_CONFIG[vendorCtx] : null;
+  const allClients = getClients();
+  const archived   = getArchivedClients();
+
+  const vendorClients  = vendorCtx ? allClients.filter(c => cfg.clients.includes(c)) : allClients;
+  const vendorArchived = vendorCtx ? archived.filter(c => cfg.clients.includes(c)) : archived;
+
+  const titleEl = document.querySelector('#settingsModal .modal-title');
+  if (titleEl) titleEl.innerHTML = cfg ? `<span style="color:${cfg.color}">●</span> Clientes — ${cfg.name}` : '👥 Gerenciar Clientes';
+
+  const hintEl = document.getElementById('addClientVendorHint');
+  if (hintEl) {
+    hintEl.style.display = cfg ? 'block' : 'none';
+    if (cfg) hintEl.innerHTML = `📌 Será adicionado ao módulo <strong style="color:${cfg.color}">${cfg.name}</strong>`;
+  }
+
+  const listEl  = document.getElementById('clientsList');
+  const archEl  = document.getElementById('archivedList');
+  const archSec = document.getElementById('archivedSection');
+  if (!listEl) return;
+
+  listEl.innerHTML = vendorClients.length
+    ? vendorClients.map(c => `
+      <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;
+        background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:4px">
+        <span style="font-size:13px;font-weight:500;color:var(--text);flex:1">📁 ${c}</span>
+        <span style="font-size:11px;color:var(--text3)">${(data[c]||[]).length} reg.</span>
+        <button onclick="archiveClient('${c}')"
+          style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:4px;
+                 border:1px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer">
+          Arquivar
+        </button>
+      </div>`).join('')
+    : '<p style="font-size:12px;color:var(--text3)">Nenhum cliente ativo.</p>';
+
+  if (archEl && archSec) {
+    archSec.style.display = vendorArchived.length ? 'block' : 'none';
+    archEl.innerHTML = vendorArchived.map(c => `
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;
+        background:#fafafa;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:4px;opacity:.75">
+        <span style="font-size:13px;color:var(--text3);flex:1">📁 ${c} <span style="font-size:10px">(arquivado)</span></span>
+        <button onclick="restoreClient('${c}')"
+          style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:4px;
+                 border:1px solid #86efac;background:#f0fdf4;color:#15803d;cursor:pointer">
+          ↩ Restaurar
+        </button>
+      </div>`).join('');
+  }
+}
+
+function addClient() {
+  const input = document.getElementById('newClientName');
+  const name  = input.value.trim();
+  if (!name) { showToast('⚠ Digite o nome do cliente','#b45309'); return; }
+  const clients  = getClients();
+  const archived = getArchivedClients();
+  if (clients.includes(name)) { showToast('⚠ Cliente já existe','#b45309'); return; }
+  if (archived.includes(name)) { showToast('⚠ Arquivado — use Restaurar','#b45309'); return; }
+
+  clients.push(name);
+  CLIENTS = clients;
+  saveClients(clients);
+  if (!data[name]) data[name] = [];
+  saveLocal();
+
+  const vendor = window._settingsVendorCtx;
+  if (vendor && VENDOR_CONFIG[vendor] && !VENDOR_CONFIG[vendor].clients.includes(name)) {
+    VENDOR_CONFIG[vendor].clients.push(name);
+  }
+
+  // Inject into sidebar immediately
+  if (vendor) {
+    const el = document.getElementById('sb-'+vendor+'-clients');
+    if (el && !document.getElementById('sb-'+vendor+'-client-'+slugify(name))) {
+      const btn = document.createElement('button');
+      btn.className = 'sidebar-item '+vendor;
+      btn.id = 'sb-'+vendor+'-client-'+slugify(name);
+      btn.onclick = () => showVendorClientTab(vendor, name);
+      btn.innerHTML = '<span class="item-icon">📁</span> '+name;
+      el.appendChild(btn);
+    }
+  }
+
+  input.value = '';
+  buildClientTabs();
+  renderSettingsModal(vendor);
+  showToast('✅ "'+name+'" adicionado!');
+}
+
+function archiveClient(name) {
+  if (!confirm('Arquivar "'+name+'"? A pasta some da lista, dados mantidos.')) return;
+  const clients = getClients().filter(c => c !== name);
+  const archived = getArchivedClients();
+  if (!archived.includes(name)) archived.push(name);
+  CLIENTS = clients;
+  saveClients(clients);
+  saveArchivedClients(archived);
+  const vendor = window._settingsVendorCtx;
+  // Remove from sidebar
+  const sbBtn = vendor ? document.getElementById('sb-'+vendor+'-client-'+slugify(name)) : null;
+  if (sbBtn) sbBtn.remove();
+  buildClientTabs();
+  renderSettingsModal(vendor);
+  showToast('"'+name+'" arquivado — dados mantidos.', '#b45309');
+}
+
+function restoreClient(name) {
+  const clients = getClients();
+  const archived = getArchivedClients().filter(c => c !== name);
+  if (!clients.includes(name)) clients.push(name);
+  CLIENTS = clients;
+  saveClients(clients);
+  saveArchivedClients(archived);
+  if (!data[name]) data[name] = [];
+  const vendor = window._settingsVendorCtx;
+  if (vendor && VENDOR_CONFIG[vendor] && !VENDOR_CONFIG[vendor].clients.includes(name)) {
+    VENDOR_CONFIG[vendor].clients.push(name);
+  }
+  buildClientTabs();
+  // Add to sidebar
+  if (vendor) {
+    const el = document.getElementById('sb-'+vendor+'-clients');
+    if (el && !document.getElementById('sb-'+vendor+'-client-'+slugify(name))) {
+      const btn = document.createElement('button');
+      btn.className = 'sidebar-item '+vendor;
+      btn.id = 'sb-'+vendor+'-client-'+slugify(name);
+      btn.onclick = () => showVendorClientTab(vendor, name);
+      btn.innerHTML = '<span class="item-icon">📁</span> '+name;
+      el.appendChild(btn);
+    }
+  }
+  renderSettingsModal(vendor);
+  showToast('✓ "'+name+'" restaurado!');
+}
+
 // ════════════════════════════════════════════════
 // SYNC INDICATOR
 // ════════════════════════════════════════════════
@@ -5660,9 +6016,10 @@ async function init() {
 
   loadLocal();
   loadSalesLocal();
+  CLIENTS = getClients();
   buildClientTabs();
   renderNav();
-  renderOverview();
+  sidebarNav('overview');
   // Verifica regra de perdido no carregamento local
   setTimeout(() => aplicarRegraPerdido(), 2000);
   // Restore last sync time
@@ -5901,6 +6258,40 @@ CREATE POLICY "Allow authenticated" ON mro_oportunidades
   </div>
 </div>
 
+
+<div id="module-rodrigo" style="display:none">
+  <div class="module-header"><div class="module-badge rodrigo">RO</div>
+    <div><div class="module-title">Módulo Rodrigo</div><div class="module-sub">Vale Ferrosos · Vale Metals · Suzano · Outros</div></div>
+  </div><div id="module-rodrigo-content"></div>
+</div>
+<div id="module-rodrigo-vendas" style="display:none">
+  <div class="module-header"><div class="module-badge rodrigo">RO</div>
+    <div><div class="module-title">Vendas — Rodrigo</div><div class="module-sub">Pedidos e entregas</div></div>
+  </div><div id="module-rodrigo-vendas-content"></div>
+</div>
+<div id="module-lenon" style="display:none">
+  <div class="module-header"><div class="module-badge lenon">LE</div>
+    <div><div class="module-title">Módulo Lenon</div><div class="module-sub">Petrobras · Eneva · Transpetro · Engie · TBG</div></div>
+  </div><div id="module-lenon-content"></div>
+</div>
+<div id="module-lenon-vendas" style="display:none">
+  <div class="module-header"><div class="module-badge lenon">LE</div>
+    <div><div class="module-title">Vendas — Lenon</div><div class="module-sub">Pedidos e entregas</div></div>
+  </div><div id="module-lenon-vendas-content"></div>
+</div>
+<div id="module-luiz" style="display:none">
+  <div class="module-header"><div class="module-badge luiz">LU</div>
+    <div><div class="module-title">Módulo Luiz</div><div class="module-sub">Clientes atribuídos</div></div>
+  </div><div id="module-luiz-content"></div>
+</div>
+<div id="module-luiz-vendas" style="display:none">
+  <div class="module-header"><div class="module-badge luiz">LU</div>
+    <div><div class="module-title">Vendas — Luiz</div><div class="module-sub">Pedidos e entregas</div></div>
+  </div><div id="module-luiz-vendas-content"></div>
+</div>
+
+</div><!-- /main-content -->
+</div><!-- /app-layout -->
 
 <!-- PDF REPORT (hidden, shown on print) -->
 <div id="pdfReport" style="display:none"></div>
