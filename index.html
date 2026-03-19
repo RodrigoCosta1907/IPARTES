@@ -1816,6 +1816,7 @@ td.hi { color: var(--text); font-weight: 500; }
           <th>Data Entrega</th>
           <th>Status</th>
           <th>NF</th>
+          <th>Prev. Pagamento</th>
           <th>Obs.</th>
           <th>Ações</th>
         </tr></thead>
@@ -4247,7 +4248,8 @@ function rowToVenda(row){
     numOportunidade:row.num_oportunidade||'', portal:row.portal||'', valor:row.valor||'',
     numPO:row.num_po||'', dataPedido:row.data_pedido||'', prazoEntrega:row.prazo_entrega||'',
     dataEntrega:row.data_entrega||'', statusEntrega:row.status_entrega||'Aguardando PO',
-    nfEmitida:row.nf_emitida||'NÃO', numNF:row.num_nf||'', obs:row.obs||'', createdAt:row.created_at||'' };
+    nfEmitida:row.nf_emitida||'NÃO', numNF:row.num_nf||'', obs:row.obs||'',
+    previsaoPagamento:row.previsao_pagamento||'', createdAt:row.created_at||'' };
 }
 function vendaToRow(v){
   return { cliente:v.cliente, num_oportunidade:v.numOportunidade, portal:v.portal||null,
@@ -4394,6 +4396,11 @@ function renderVendasKpis(){
   const ativos=all.filter(v=>v.statusEntrega!=='Faturado').length;
   const valorTotal=all.reduce((s,v)=>s+(parseFloat(String(v.valor||0).replace(',','.'))||0),0);
   const atrasados=all.filter(v=>getVendaSituacao(v)==='atrasado').length;
+  const pagAtrasados=all.filter(v=>v.previsaoPagamento&&isPagamentoAtrasado(v.previsaoPagamento)).length;
+  const pagProximos=all.filter(v=>{
+    if(!v.previsaoPagamento||isPagamentoAtrasado(v.previsaoPagamento))return false;
+    return Math.ceil((new Date(v.previsaoPagamento)-new Date())/86400000)<=7;
+  }).length;
   const hoje=new Date().toISOString().slice(0,7);
   const entregMes=all.filter(v=>v.dataEntrega&&v.dataEntrega.slice(0,7)===hoje).length;
   const faturados=all.length>0?Math.round(all.filter(v=>v.statusEntrega==='Faturado').length/all.length*100):0;
@@ -4517,6 +4524,9 @@ function buildVendaForm(v){
         <option value="SIM" ${v.nfEmitida==='SIM'?'selected':''}>SIM</option>
       </select></div>
     <div class="form-group"><label>Nº da NF</label><input type="text" id="vf-numNF" value="${sanitize(v.numNF||'')}" placeholder="Número da nota fiscal"></div>
+    <div class="form-group"><label>💳 Previsão de Pagamento</label>
+      <input type="date" id="vf-previsaoPagamento" value="${v.previsaoPagamento||''}">
+    </div>
     <div class="form-group" style="grid-column:1/-1"><label>Observações</label>
       <textarea id="vf-obs" placeholder="Observações de pós-venda...">${sanitize(v.obs||'')}</textarea></div>`;
 }
@@ -4526,7 +4536,7 @@ async function saveVenda(){
   const venda={ cliente:g('cliente'), numOportunidade:g('numOportunidade'), portal:g('portal'),
     valor:g('valor'), numPO:g('numPO'), dataPedido:g('dataPedido'), prazoEntrega:g('prazoEntrega'),
     dataEntrega:g('dataEntrega'), statusEntrega:g('statusEntrega'), nfEmitida:g('nfEmitida'),
-    numNF:g('numNF'), obs:g('obs') };
+    numNF:g('numNF'), previsaoPagamento:g('previsaoPagamento'), obs:g('obs') };
   if(!venda.cliente){ showToast('⚠ Selecione o cliente','#b45309'); return; }
   if(editingVendaId){
     const ex=getAllVendas().find(v=>v.id===editingVendaId);
@@ -5957,7 +5967,8 @@ function checkPrazoNotifications() {
 
   const alertas = [];
   getAllRecords().forEach(r => {
-    if (!r.finaliza || ['Pedido Recebido','Cancelado','Perdido'].includes(r.status)) return;
+    // Only notify for "Cotando" status
+    if (!r.finaliza || r.status !== 'Cotando') return;
     const prazo = new Date(r.finaliza); prazo.setHours(0,0,0,0);
     const diff = Math.ceil((prazo - hoje) / 86400000);
     if (diff < 0) return; // já perdido, tratado em outro lugar
@@ -6277,17 +6288,6 @@ function backupData() {
   localStorage.setItem('ipartes_last_backup', new Date().toISOString());
 }
 
-function checkAutoBackup() {
-  const last = localStorage.getItem('ipartes_last_backup');
-  if (!last) return;
-  const dias = Math.floor((Date.now() - new Date(last).getTime()) / 86400000);
-  if (dias >= 7) {
-    showToast('⚠ Backup automático recomendado — último há '+dias+' dias. Clique em Backup no rodapé.', '#b45309');
-  }
-}
-
-
-
 // ════════════════════════════════════════════════
 // CONTROLE DE ACESSO POR USUÁRIO
 // ════════════════════════════════════════════════
@@ -6424,6 +6424,153 @@ function applyInitialNavigation() {
 }
 
 
+
+// ════════════════════════════════════════════════
+// PREVISÃO DE PAGAMENTO
+// ════════════════════════════════════════════════
+function isPagamentoAtrasado(data) {
+  if (!data) return false;
+  return new Date(data) < new Date(new Date().toISOString().slice(0,10));
+}
+function formatPagamento(data) {
+  if (!data) return '—';
+  const d = new Date(data + 'T00:00:00');
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const diff = Math.ceil((d - hoje) / 86400000);
+  const fmt  = d.toLocaleDateString('pt-BR');
+  if (diff < 0)  return `${fmt} (${Math.abs(diff)}d atraso)`;
+  if (diff === 0) return `${fmt} (hoje)`;
+  if (diff <= 7)  return `${fmt} (${diff}d)`;
+  return fmt;
+}
+
+// ════════════════════════════════════════════════
+// BOTÃO DE ATUALIZAÇÃO INTELIGENTE (só dados do vendedor)
+// ════════════════════════════════════════════════
+async function refreshCurrentUserData() {
+  const btn = document.getElementById('btn-refresh-data');
+  if (btn) { btn.disabled = true; btn.innerHTML = '⏳ Atualizando…'; }
+
+  try {
+    if (!useSupabase || !sbClient) {
+      showToast('⚠ Sem conexão com Supabase', '#b45309');
+      return;
+    }
+
+    markSyncing();
+    const access = getUserAccess();
+
+    // Get clients for current user
+    let clientsToLoad = [];
+    if (access.canSeeAll) {
+      clientsToLoad = CLIENTS;
+    } else {
+      // Only load own vendor clients
+      const vendor = currentUserProfile;
+      clientsToLoad = getVendorClients(vendor);
+    }
+
+    // Load only relevant clients
+    for (const client of clientsToLoad) {
+      const res = await sbFetch('GET',
+        `?cliente=eq.${encodeURIComponent(client)}&select=*&order=created_at.desc&limit=5000`
+      );
+      if (res.ok) {
+        const rows = await res.json();
+        data[client] = rows.map(r => rowToRec(r));
+        data[client].forEach(r => computeRecord(r));
+      }
+    }
+
+    saveLocal();
+    markSynced();
+
+    // Re-render current view
+    if (currentSidebarNav === 'overview' || !currentSidebarNav) {
+      renderOverview();
+    } else {
+      sidebarNav(currentSidebarNav);
+    }
+
+    const n = clientsToLoad.length;
+    showToast(`✅ Dados atualizados — ${n} cliente(s)`, '#15803d');
+
+  } catch(e) {
+    markSyncError(e.message);
+    showToast('✗ Erro ao atualizar: ' + e.message, '#dc2626');
+  } finally {
+    if (btn) { btn.disabled = false; btn.innerHTML = '🔄 Atualizar'; }
+  }
+}
+
+// ════════════════════════════════════════════════
+// ATUALIZAÇÃO AUTOMÁTICA — 9h e 13h
+// ════════════════════════════════════════════════
+function scheduleAutoRefresh() {
+  function msUntil(hour) {
+    const now  = new Date();
+    const next = new Date();
+    next.setHours(hour, 0, 0, 0);
+    if (next <= now) next.setDate(next.getDate() + 1);
+    return next - now;
+  }
+
+  // Schedule 9h refresh
+  setTimeout(async () => {
+    showToast('🔄 Atualização automática das 9h…', '#1d4ed8');
+    await refreshCurrentUserData();
+    // Reschedule for next day
+    setInterval(async () => {
+      showToast('🔄 Atualização automática das 9h…', '#1d4ed8');
+      await refreshCurrentUserData();
+    }, 24 * 60 * 60 * 1000);
+  }, msUntil(9));
+
+  // Schedule 13h refresh
+  setTimeout(async () => {
+    showToast('🔄 Atualização automática das 13h…', '#1d4ed8');
+    await refreshCurrentUserData();
+    setInterval(async () => {
+      showToast('🔄 Atualização automática das 13h…', '#1d4ed8');
+      await refreshCurrentUserData();
+    }, 24 * 60 * 60 * 1000);
+  }, msUntil(13));
+}
+
+// ════════════════════════════════════════════════
+// BACKUP AUTOMÁTICO DIÁRIO ÀS 19H
+// ════════════════════════════════════════════════
+function scheduleAutoBackup() {
+  function msUntil19h() {
+    const now  = new Date();
+    const next = new Date();
+    next.setHours(19, 0, 0, 0);
+    if (next <= now) next.setDate(next.getDate() + 1);
+    return next - now;
+  }
+
+  setTimeout(() => {
+    const lastBackup = localStorage.getItem('ipartes_last_backup');
+    const hoje = new Date().toISOString().slice(0,10);
+    if (lastBackup && lastBackup.startsWith(hoje)) return; // já fez hoje
+    showToast('💾 Realizando backup automático das 19h…', '#1d4ed8');
+    backupData();
+    // Reschedule for next day
+    setInterval(() => {
+      showToast('💾 Realizando backup automático das 19h…', '#1d4ed8');
+      backupData();
+    }, 24 * 60 * 60 * 1000);
+  }, msUntil19h());
+}
+
+// Override checkAutoBackup — só avisa se não fez hoje
+function checkAutoBackup() {
+  const last = localStorage.getItem('ipartes_last_backup');
+  if (!last) return;
+  const dias = Math.floor((Date.now() - new Date(last).getTime()) / 86400000);
+  if (dias >= 2) showToast('⚠ Último backup há '+dias+' dias. Backup automático às 19h.','#b45309');
+}
+
 // ════════════════════════════════════════════════
 // SYNC INDICATOR
 // ════════════════════════════════════════════════
@@ -6507,6 +6654,9 @@ async function init() {
   setTimeout(() => { checkPrazoNotifications(); checkAutoBackup(); }, 3000);
   // Sincronização em tempo real
   setTimeout(() => startRealtimeSync(), 5000);
+  // Agendamentos automáticos
+  scheduleAutoRefresh();
+  scheduleAutoBackup();
   // Restore last sync time
   const lastSync = localStorage.getItem('ipartes_last_sync');
   if (lastSync) {
