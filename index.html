@@ -2493,6 +2493,24 @@ function buildClientTabs() {
             <option>09</option><option>10</option><option>11</option><option>12</option>
           </select>
           <div class="filter-sep"></div>
+          <label style="font-size:10px;color:var(--text3);white-space:nowrap">Lançamento:</label>
+          <input type="date" id="cf-data-de-${slug}" title="Data lançamento — de"
+            onchange="renderClientTab('${client}')"
+            style="font-size:11px;padding:3px 6px;border:1px solid var(--border);border-radius:4px;font-family:var(--font)">
+          <span style="font-size:11px;color:var(--text3)">até</span>
+          <input type="date" id="cf-data-ate-${slug}" title="Data lançamento — até"
+            onchange="renderClientTab('${client}')"
+            style="font-size:11px;padding:3px 6px;border:1px solid var(--border);border-radius:4px;font-family:var(--font)">
+          <div class="filter-sep"></div>
+          <label style="font-size:10px;color:var(--text3);white-space:nowrap">Finaliza:</label>
+          <input type="date" id="cf-fin-de-${slug}" title="Data finaliza — de"
+            onchange="renderClientTab('${client}')"
+            style="font-size:11px;padding:3px 6px;border:1px solid var(--border);border-radius:4px;font-family:var(--font)">
+          <span style="font-size:11px;color:var(--text3)">até</span>
+          <input type="date" id="cf-fin-ate-${slug}" title="Data finaliza — até"
+            onchange="renderClientTab('${client}')"
+            style="font-size:11px;padding:3px 6px;border:1px solid var(--border);border-radius:4px;font-family:var(--font)">
+          <div class="filter-sep"></div>
           <button class="btn-reset" onclick="resetClientFilters('${slug}','${client}')"
             style="font-size:11px;padding:4px 10px" title="Limpar filtros">↺</button>
         </div>
@@ -2522,6 +2540,27 @@ function buildClientTabs() {
             <tbody id="table-${slug}"></tbody>
           </table>
         </div>
+
+        <!-- Barra de exclusão em massa -->
+        <div class="bulk-delete-bar" id="bulk-bar-${slug}">
+          <div class="bulk-delete-info">
+            <span class="bulk-delete-count" id="bulk-count-${slug}">0</span>
+            selecionada(s)
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="bulk-delete-btn"
+              onclick="bulkDeleteSelected('${slug}','${client}')">
+              🗑 Excluir selecionadas
+            </button>
+            <button onclick="clearSelection('${slug}')"
+              style="background:transparent;border:1px solid rgba(255,255,255,.3);
+                     color:#fff;border-radius:6px;padding:4px 12px;
+                     font-size:12px;cursor:pointer;font-family:var(--font)">
+              ✕ Cancelar
+            </button>
+          </div>
+        </div>
+
         <!-- Paginação -->
         <div class="pagination-bar">
           <div class="pagination-info" id="cpagination-info-${slug}">—</div>
@@ -3050,7 +3089,13 @@ function rowHtml(r, client) {
     r.status==='Perdido'          ? 'row-perdido'  :
     r.status==='Cotando'          ? 'row-analise'  :
     r.status==='Orçamento Enviado'? 'row-proposta'  : '';
-  return `<tr class="${rowCls}">
+  const _slug = slugify(client);
+  return `<tr class="${rowCls}" data-id="${r.id}">
+    <td class="td-checkbox">
+      <input type="checkbox" class="row-checkbox row-select-cb"
+        data-id="${r.id}" data-client="${client}"
+        onchange="onRowSelect(this,'${_slug}')">
+    </td>
     ${client === 'Outros' ? `<td class="hi">${r.subcliente||'—'}</td>` : ''}
     <td class="hi">${r.mes||'—'}/${r.ano||'—'}${ai}</td>
     <td>${r.numero||'—'}</td>
@@ -5365,13 +5410,17 @@ const clientSortState = {}; // { slug: { col, dir } }
 function getClientFilters(slug) {
   const g = id => document.getElementById(id)?.value || '';
   return {
-    search:  g('cf-search-'+slug).toLowerCase(),
-    status:  g('cf-status-'+slug),
-    portal:  g('cf-portal-'+slug),
-    particip:g('cf-particip-'+slug),
-    venda:   g('cf-venda-'+slug),
-    ano:     g('cf-ano-'+slug),
-    mes:     g('cf-mes-'+slug),
+    search:   g('cf-search-'+slug).toLowerCase(),
+    status:   g('cf-status-'+slug),
+    portal:   g('cf-portal-'+slug),
+    particip: g('cf-particip-'+slug),
+    venda:    g('cf-venda-'+slug),
+    ano:      g('cf-ano-'+slug),
+    mes:      g('cf-mes-'+slug),
+    dataDe:   g('cf-data-de-'+slug),
+    dataAte:  g('cf-data-ate-'+slug),
+    finDe:    g('cf-fin-de-'+slug),
+    finAte:   g('cf-fin-ate-'+slug),
   };
 }
 
@@ -5395,6 +5444,12 @@ function applyClientFilters(records, slug) {
     if (f.venda   && r.venda        !== f.venda)   return false;
     if (f.ano     && r.ano          !== f.ano)     return false;
     if (f.mes     && r.mes          !== f.mes)     return false;
+    // Filtro por data de lançamento
+    if (f.dataDe  && r.data  && r.data  < f.dataDe)  return false;
+    if (f.dataAte && r.data  && r.data  > f.dataAte) return false;
+    // Filtro por data de finalização
+    if (f.finDe   && r.finaliza && r.finaliza < f.finDe)  return false;
+    if (f.finAte  && r.finaliza && r.finaliza > f.finAte) return false;
     return true;
   });
 }
@@ -6727,6 +6782,21 @@ function showCacheBanner(horas) {
   }
 }
 
+
+
+function clearClientFilters(slug, client) {
+  ['cf-search','cf-status','cf-portal','cf-particip','cf-venda',
+   'cf-ano','cf-mes','cf-data-de','cf-data-ate','cf-fin-de','cf-fin-ate'].forEach(id => {
+    const el = document.getElementById(id+'-'+slug);
+    if (el) el.value = '';
+  });
+  renderClientTab(client);
+}
+
+function clearSelection(slug) {
+  document.querySelectorAll('#table-'+slug+' .row-select-cb').forEach(cb => cb.checked = false);
+  updateBulkBar(slug);
+}
 
 // ════════════════════════════════════════════════
 // SYNC INDICATOR
