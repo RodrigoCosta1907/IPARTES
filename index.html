@@ -2809,7 +2809,12 @@ async function addRecord(client) {
       markSyncing(); showLoading('Salvando…');
       await insertToSupabase(client, rec);
       hideLoading(); markSynced();
-    } catch(e) { hideLoading(); markSyncError(e.message); showToast('✗ Erro ao salvar: '+e.message,'#dc2626'); return; }
+    } catch(e) {
+      hideLoading(); markSyncError(e.message);
+      // SALVA LOCALMENTE e enfileira para sync posterior
+      addToOfflineQueue('insert', client, rec);
+      showToast('⚠ Sem conexão — salvo localmente. Sincroniza ao reconectar.', '#b45309');
+    }
   }
 
   // Dedup: se número já existe, atualiza
@@ -2857,7 +2862,7 @@ async function deleteRecord(client, id) {
   if (!confirm('Confirmar exclusão?')) return;
   if (useSupabase) {
     try { showLoading('Removendo…'); await deleteFromSupabase(id); hideLoading(); }
-    catch(e) { hideLoading(); showToast('✗ Erro ao remover','#dc2626'); return; }
+    catch(e) { hideLoading(); addToOfflineQueue('delete', client, {id}); showToast('⚠ Removido localmente — sync pendente','#b45309'); }
   }
   data[client] = (data[client]||[]).filter(r => r.id !== id);
   saveLocal();
@@ -2884,7 +2889,7 @@ async function saveEdit() {
 
   if (useSupabase) {
     try { showLoading('Atualizando…'); await updateInSupabase(editingClient, rec); hideLoading(); }
-    catch(e) { hideLoading(); showToast('✗ Erro ao atualizar','#dc2626'); return; }
+    catch(e) { hideLoading(); addToOfflineQueue('update', editingClient, rec); showToast('⚠ Salvo localmente — sync pendente','#b45309'); }
   }
   saveLocal();
   await checkCreateVenda(editingClient, rec);
@@ -3057,7 +3062,9 @@ async function confirmImport() {
         hideLoading(); markSynced();
       } catch(e) {
         hideLoading(); markSyncError(e.message);
-        showToast('✗ Erro ao importar: '+e.message,'#dc2626'); return;
+        // Salva localmente mesmo assim e enfileira
+        novos.forEach(r => addToOfflineQueue('insert', client, r));
+        showToast('⚠ Erro no Supabase — '+novos.length+' registro(s) salvos localmente','#b45309');
       }
     }
     data[client].push(...novos);
@@ -4328,7 +4335,7 @@ async function saveGridRow(id, client) {
     computeRecord(existing);
     if (useSupabase) {
       try { await updateInSupabase(client, existing); }
-      catch(e) { tr.className='row-error'; showToast('✗ Erro ao salvar: '+e.message,'#dc2626'); return; }
+      catch(e) { tr.className='row-error'; addToOfflineQueue('update', client, existing); showToast('⚠ Salvo localmente — sync pendente','#b45309'); }
     }
     saveLocal();
   } else {
@@ -4343,7 +4350,7 @@ async function saveGridRow(id, client) {
     data[client].push(rec);
     if (useSupabase) {
       try { await insertToSupabase(client, rec); }
-      catch(e) { tr.className='row-error'; showToast('✗ Erro ao salvar: '+e.message,'#dc2626'); return; }
+      catch(e) { tr.className='row-error'; addToOfflineQueue('insert', client, rec); showToast('⚠ Salvo localmente — sync pendente','#b45309'); }
     }
     saveLocal();
   }
@@ -4368,7 +4375,7 @@ async function saveGridRow(id, client) {
 async function deleteGridRow(id, client) {
   if (!confirm('Remover esta oportunidade?')) return;
   if (useSupabase) {
-    try { await deleteFromSupabase(id); } catch(e) { showToast('✗ Erro','#dc2626'); return; }
+    try { await deleteFromSupabase(id); } catch(e) { addToOfflineQueue('delete', client, {id}); showToast('⚠ Removido localmente — sync pendente','#b45309'); }
   }
   data[client] = (data[client]||[]).filter(r => r.id !== id);
   saveLocal();
@@ -4766,7 +4773,7 @@ async function saveVenda(){
     const ex=getAllVendas().find(v=>v.id===editingVendaId);
     if(ex){
       Object.assign(ex,venda);
-      if(useSupabase){ try{ await sbFetchVendas('PATCH',`?id=eq.${ex.sb_id||ex.id}`,vendaToRow(ex)); }catch(e){ showToast('✗ Erro','#dc2626');return; } }
+      if(useSupabase){ try{ await sbFetchVendas('PATCH',`?id=eq.${ex.sb_id||ex.id}`,vendaToRow(ex)); }catch(e){ addToOfflineQueue('update-venda', ex.cliente, ex); showToast('⚠ Salvo localmente — sync pendente','#b45309'); } }
     }
   } else {
     const nv={id:genId(),...venda};
@@ -4775,7 +4782,7 @@ async function saveVenda(){
     if(useSupabase){ try{
       const res=await sbFetchVendas('POST','',vendaToRow(nv));
       if(res.ok){const ins=await res.json();if(ins&&ins[0]){nv.sb_id=ins[0].id;nv.id=ins[0].id;}}
-    }catch(e){showToast('✗ Erro','#dc2626');return;} }
+    }catch(e){ addToOfflineQueue('insert-venda', venda.cliente, nv); showToast('⚠ Salvo localmente — sync pendente','#b45309'); } }
   }
   saveSalesLocal(); closeVendaModal(); renderVendasModule(); showToast('✓ Venda salva!');
 }
@@ -4783,7 +4790,7 @@ async function saveVenda(){
 async function deleteVenda(id,client){
   if(!confirm('Remover esta venda?'))return;
   const venda=(salesData[client]||[]).find(v=>v.id===id);
-  if(venda&&useSupabase){ try{ await sbFetchVendas('DELETE',`?id=eq.${venda.sb_id||id}`); }catch(e){ showToast('✗ Erro','#dc2626');return; } }
+  if(venda&&useSupabase){ try{ await sbFetchVendas('DELETE',`?id=eq.${venda.sb_id||id}`); }catch(e){ addToOfflineQueue('delete-venda', client, {id:venda.sb_id||id}); showToast('⚠ Removido localmente — sync pendente','#b45309'); } }
   salesData[client]=(salesData[client]||[]).filter(v=>v.id!==id);
   saveSalesLocal(); renderVendasModule(); showToast('Venda removida.');
 }
@@ -6529,6 +6536,123 @@ async function init() {
   document.getElementById('settingsModal').addEventListener('click', function(e) { if (e.target===this) closeSettings(); });
   document.getElementById('vendaModal').addEventListener('click', function(e) { if (e.target===this) closeVendaModal(); });
 }
+
+// ════════════════════════════════════════════════
+// OFFLINE QUEUE — nunca perde dados
+// ════════════════════════════════════════════════
+const OFFLINE_QUEUE_KEY = 'ipartes_offline_queue';
+
+function getOfflineQueue() {
+  try { return JSON.parse(localStorage.getItem(OFFLINE_QUEUE_KEY) || '[]'); }
+  catch(e) { return []; }
+}
+
+function saveOfflineQueue(queue) {
+  localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(queue));
+  updateOfflineIndicator();
+}
+
+function addToOfflineQueue(action, client, record) {
+  const queue = getOfflineQueue();
+  queue.push({
+    id: genId(),
+    action,   // 'insert', 'update', 'delete', 'insert-venda', 'update-venda', 'delete-venda'
+    client,
+    record,
+    ts: new Date().toISOString(),
+    retries: 0
+  });
+  saveOfflineQueue(queue);
+  console.log(`[OFFLINE] Enfileirado: ${action} — ${client} — ${record?.numero || record?.id || '?'}`);
+}
+
+function updateOfflineIndicator() {
+  const queue = getOfflineQueue();
+  const count = queue.length;
+  let badge = document.getElementById('offlineQueueBadge');
+  if (count > 0) {
+    if (!badge) {
+      badge = document.createElement('button');
+      badge.id = 'offlineQueueBadge';
+      badge.style.cssText = 'background:#f59e0b;border:none;color:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:5px;animation:pulse 2s infinite';
+      badge.onclick = processOfflineQueue;
+      document.getElementById('headerRight')?.prepend(badge);
+    }
+    badge.innerHTML = `⏳ ${count} pendente${count>1?'s':''}`;
+    badge.title = 'Clique para sincronizar operações pendentes';
+  } else if (badge) {
+    badge.remove();
+  }
+}
+
+async function processOfflineQueue() {
+  if (!useSupabase || !sbClient) {
+    showToast('⚠ Conecte ao Supabase primeiro para sincronizar', '#b45309');
+    return;
+  }
+  const queue = getOfflineQueue();
+  if (!queue.length) { showToast('✓ Nenhuma operação pendente'); return; }
+
+  showLoading(`Sincronizando ${queue.length} operação(ões) pendentes…`);
+  const failed = [];
+  let synced = 0;
+
+  for (const op of queue) {
+    try {
+      if (op.action === 'insert') {
+        await insertToSupabase(op.client, op.record);
+      } else if (op.action === 'update') {
+        await updateInSupabase(op.client, op.record);
+      } else if (op.action === 'delete') {
+        await deleteFromSupabase(op.record.id);
+      } else if (op.action === 'insert-venda') {
+        const res = await sbFetchVendas('POST', '', vendaToRow(op.record));
+        if (!res.ok) throw new Error('Falha');
+      } else if (op.action === 'update-venda') {
+        await sbFetchVendas('PATCH', `?id=eq.${op.record.sb_id || op.record.id}`, vendaToRow(op.record));
+      } else if (op.action === 'delete-venda') {
+        await sbFetchVendas('DELETE', `?id=eq.${op.record.id}`);
+      }
+      synced++;
+    } catch(e) {
+      op.retries = (op.retries || 0) + 1;
+      if (op.retries < 5) {
+        failed.push(op);
+      } else {
+        console.warn('[OFFLINE] Descartado após 5 tentativas:', op);
+      }
+    }
+  }
+
+  saveOfflineQueue(failed);
+  hideLoading();
+
+  if (synced > 0 && failed.length === 0) {
+    showToast(`✅ ${synced} operação(ões) sincronizada(s) com sucesso!`, '#15803d');
+  } else if (synced > 0) {
+    showToast(`✅ ${synced} sincronizada(s), ⚠ ${failed.length} ainda pendente(s)`, '#b45309');
+  } else {
+    showToast(`⚠ Falha ao sincronizar — ${failed.length} pendente(s)`, '#dc2626');
+  }
+}
+
+// Auto-process queue when connection returns
+window.addEventListener('online', function() {
+  const queue = getOfflineQueue();
+  if (queue.length > 0 && useSupabase && sbClient) {
+    setTimeout(() => {
+      showToast(`🔄 Conexão restaurada — sincronizando ${queue.length} operação(ões)…`, '#1d4ed8');
+      processOfflineQueue();
+    }, 2000);
+  }
+});
+
+// Check queue on init
+setTimeout(updateOfflineIndicator, 3000);
+
+// ════════════════════════════════════════════════
+// ★ MELHORIAS DO SISTEMA
+// ════════════════════════════════════════════════
 
 // Safe init with error display
 try {
