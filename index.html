@@ -1380,11 +1380,11 @@ td.hi { color: var(--text); font-weight: 500; }
 
 
   /* ══ SIDEBAR LAYOUT ══ */
-  .app-layout { display:flex; flex-direction:row; width:100%; min-height:calc(100vh - 56px); align-items:stretch; box-sizing:border-box; }
-  .sidebar { width:220px; min-width:220px; max-width:220px; flex-shrink:0; flex-grow:0; background:#1e293b; display:flex; flex-direction:column; position:sticky; top:56px; height:calc(100vh - 56px); overflow-y:auto; overflow-x:hidden; scrollbar-width:thin; scrollbar-color:#334155 transparent; z-index:50; }
+  .app-layout { display:block; width:100%; min-height:calc(100vh - 56px); box-sizing:border-box; }
+  .sidebar { width:220px; min-width:220px; max-width:220px; flex-shrink:0; flex-grow:0; background:#1e293b; display:flex; flex-direction:column; position:fixed; top:56px; left:0; height:calc(100vh - 56px); overflow-y:auto; overflow-x:hidden; scrollbar-width:thin; scrollbar-color:#334155 transparent; z-index:50; }
   .sidebar::-webkit-scrollbar { width:4px; }
   .sidebar::-webkit-scrollbar-thumb { background:#334155; border-radius:2px; }
-  .main-content { flex:1 1 auto; min-width:0; max-width:calc(100vw - 220px); padding:20px 28px; background:var(--bg); overflow-x:hidden; box-sizing:border-box; }
+  .main-content { flex:1 1 auto; min-width:0; width:calc(100vw - 220px); max-width:calc(100vw - 220px); margin-left:220px; padding:20px 28px; background:var(--bg); overflow-x:hidden; box-sizing:border-box; }
   .sidebar-section { padding:6px 0; border-bottom:1px solid #334155; }
   .sidebar-section:last-child { border-bottom:none; }
   .sidebar-section-header { display:flex; align-items:center; gap:8px; padding:10px 14px 6px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:#64748b; cursor:pointer; user-select:none; }
@@ -1410,11 +1410,11 @@ td.hi { color: var(--text); font-weight: 500; }
   #module-rodrigo, #module-lenon, #module-luiz, #module-rodrigo-vendas, #module-lenon-vendas, #module-luiz-vendas { width:100%; box-sizing:border-box; }
   .nav-tabs { display:none !important; }
   @media (max-width:768px) {
-    .app-layout { position:relative; }
-    .sidebar { position:fixed; left:0; top:56px; height:calc(100vh - 56px); z-index:100; transform:translateX(-100%); transition:transform .25s ease; }
+    .app-layout { display:block; }
+    .sidebar { transform:translateX(-100%); transition:transform .25s ease; z-index:100; }
     .sidebar.open { transform:translateX(0); }
     .sidebar-toggle { display:flex; }
-    .main-content { padding:14px; max-width:100%; }
+    .main-content { margin-left:0; width:100%; max-width:100%; padding:14px; }
   }
 
 </style>
@@ -5640,6 +5640,9 @@ function applySidebarAccess() {
     if (el) el.style.display = access.sections.includes(v) ? '' : 'none';
   });
   renderUserProfileBadge();
+  // Always scroll sidebar to top on access apply
+  const sb = document.getElementById('appSidebar');
+  if (sb) sb.scrollTop = 0;
 }
 
 function renderUserProfileBadge() {
@@ -6375,6 +6378,43 @@ try {
 
 
 
+
+<div id="module-rodrigo" style="display:none">
+  <div class="module-header"><div class="module-badge rodrigo">RO</div>
+    <div><div class="module-title">Módulo Rodrigo</div><div class="module-sub">Vale Ferrosos · Vale Metals · Suzano · Outros</div></div>
+  </div><div id="module-rodrigo-content"></div>
+</div>
+<div id="module-rodrigo-vendas" style="display:none">
+  <div class="module-header"><div class="module-badge rodrigo">RO</div>
+    <div><div class="module-title">Vendas — Rodrigo</div><div class="module-sub">Pedidos e entregas</div></div>
+  </div><div id="module-rodrigo-vendas-content"></div>
+</div>
+<div id="module-lenon" style="display:none">
+  <div class="module-header"><div class="module-badge lenon">LE</div>
+    <div><div class="module-title">Módulo Lenon</div><div class="module-sub">Petrobras · Eneva · Transpetro · Engie · TBG</div></div>
+  </div><div id="module-lenon-content"></div>
+</div>
+<div id="module-lenon-vendas" style="display:none">
+  <div class="module-header"><div class="module-badge lenon">LE</div>
+    <div><div class="module-title">Vendas — Lenon</div><div class="module-sub">Pedidos e entregas</div></div>
+  </div><div id="module-lenon-vendas-content"></div>
+</div>
+<div id="module-luiz" style="display:none">
+  <div class="module-header"><div class="module-badge luiz">LU</div>
+    <div><div class="module-title">Módulo Luiz</div><div class="module-sub">Clientes atribuídos</div></div>
+  </div><div id="module-luiz-content"></div>
+</div>
+<div id="module-luiz-vendas" style="display:none">
+  <div class="module-header"><div class="module-badge luiz">LU</div>
+    <div><div class="module-title">Vendas — Luiz</div><div class="module-sub">Pedidos e entregas</div></div>
+  </div><div id="module-luiz-vendas-content"></div>
+</div>
+</div><!-- /main-content -->
+</div><!-- /app-layout -->
+
+</div><!-- /main-content -->
+</div><!-- /app-layout -->
+
 <!-- ── FOOTER ── -->
 <footer id="appFooter" style="
   background:#f8fafc;
@@ -6529,40 +6569,6 @@ CREATE POLICY "Allow authenticated" ON mro_oportunidades
     </div>
   </div>
 </div>
-
-
-<div id="module-rodrigo" style="display:none">
-  <div class="module-header"><div class="module-badge rodrigo">RO</div>
-    <div><div class="module-title">Módulo Rodrigo</div><div class="module-sub">Vale Ferrosos · Vale Metals · Suzano · Outros</div></div>
-  </div><div id="module-rodrigo-content"></div>
-</div>
-<div id="module-rodrigo-vendas" style="display:none">
-  <div class="module-header"><div class="module-badge rodrigo">RO</div>
-    <div><div class="module-title">Vendas — Rodrigo</div><div class="module-sub">Pedidos e entregas</div></div>
-  </div><div id="module-rodrigo-vendas-content"></div>
-</div>
-<div id="module-lenon" style="display:none">
-  <div class="module-header"><div class="module-badge lenon">LE</div>
-    <div><div class="module-title">Módulo Lenon</div><div class="module-sub">Petrobras · Eneva · Transpetro · Engie · TBG</div></div>
-  </div><div id="module-lenon-content"></div>
-</div>
-<div id="module-lenon-vendas" style="display:none">
-  <div class="module-header"><div class="module-badge lenon">LE</div>
-    <div><div class="module-title">Vendas — Lenon</div><div class="module-sub">Pedidos e entregas</div></div>
-  </div><div id="module-lenon-vendas-content"></div>
-</div>
-<div id="module-luiz" style="display:none">
-  <div class="module-header"><div class="module-badge luiz">LU</div>
-    <div><div class="module-title">Módulo Luiz</div><div class="module-sub">Clientes atribuídos</div></div>
-  </div><div id="module-luiz-content"></div>
-</div>
-<div id="module-luiz-vendas" style="display:none">
-  <div class="module-header"><div class="module-badge luiz">LU</div>
-    <div><div class="module-title">Vendas — Luiz</div><div class="module-sub">Pedidos e entregas</div></div>
-  </div><div id="module-luiz-vendas-content"></div>
-</div>
-</div><!-- /main-content -->
-</div><!-- /app-layout -->
 
 <!-- PDF REPORT (hidden, shown on print) -->
 <div id="pdfReport" style="display:none"></div>
