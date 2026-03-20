@@ -2143,6 +2143,12 @@ async function sbFetch(method, query, body, extraHeaders) {
     const session = JSON.parse(localStorage.getItem(AUTH_SESSION_KEY) || '{}');
     if (session.access_token && Date.now() < (session.expires_at - 10000)) {
       authToken = session.access_token;
+    } else if (session.refresh_token) {
+      // Token expirado — tentar refresh automático
+      const newSession = await refreshSession(session);
+      if (newSession && newSession.access_token) {
+        authToken = newSession.access_token;
+      }
     }
   } catch(e) { /* use anon key */ }
 
@@ -2161,8 +2167,6 @@ async function sbFetch(method, query, body, extraHeaders) {
 async function loadFromSupabase() {
   showLoading('Carregando oportunidades…');
   try {
-    // Reset para evitar acúmulo/duplicação
-    CLIENTS.forEach(c => { data[c] = []; });
     const PAGE_SIZE = 1000;
     let allRows = [];
     let page = 0;
@@ -2178,22 +2182,48 @@ async function loadFromSupabase() {
       if (!res.ok) throw new Error('Falha ao carregar dados (página ' + page + ')');
       const rows = await res.json();
       allRows = allRows.concat(rows);
-      // Se retornou menos que PAGE_SIZE, chegamos no fim
       hasMore = rows.length === PAGE_SIZE;
       page++;
-      if (page > 50) break; // safety cap: 50.000 registros máximo
+      if (page > 50) break;
       if (hasMore) showLoading(`Carregando oportunidades… ${allRows.length} registros`);
     }
 
-    // Reset local and populate
+    // ── MERGE em vez de REPLACE ──
+    // Preserva registros locais que não existem no Supabase (offline queue)
+    const localBackup = JSON.parse(JSON.stringify(data));
+    
+    // Rebuild from Supabase
     data = {};
     CLIENTS = getClients();
     CLIENTS.forEach(c => data[c] = []);
+    const sbIds = new Set();
     allRows.forEach(row => {
       const client = row.cliente;
-      if (!data[client]) data[client] = []; // handle clients not in nav
+      if (!data[client]) data[client] = [];
       data[client].push(rowToRec(row));
+      sbIds.add(row.id);
     });
+
+    // Merge back local-only records (sem sb_id = nunca chegou ao Supabase)
+    let rescued = 0;
+    Object.entries(localBackup).forEach(([client, recs]) => {
+      if (!data[client]) data[client] = [];
+      recs.forEach(rec => {
+        if (!rec.sb_id && rec.numero) {
+          // Verifica se não foi carregado do Supabase pelo numero
+          const exists = data[client].some(r => r.numero === rec.numero);
+          if (!exists) {
+            data[client].push(rec);
+            rescued++;
+          }
+        }
+      });
+    });
+    if (rescued > 0) {
+      console.log(`[SYNC] ${rescued} registro(s) locais preservados (não estavam no Supabase)`);
+      showToast(`⚠ ${rescued} registro(s) encontrados apenas no local — verifique a fila offline`, '#b45309');
+    }
+
     saveLocal();
     await loadVendasFromSupabase();
     markSynced();
@@ -2201,7 +2231,6 @@ async function loadFromSupabase() {
     if (currentTab === 'overview') renderOverview();
     else if (currentTab === 'vendas') renderVendasModule();
     else renderClientTab(currentTab);
-    // Aplica regra automática de Perdido após carregar dados
     setTimeout(() => aplicarRegraPerdido(), 1000);
   } catch (err) {
     showToast('Erro ao carregar: ' + err.message, '#dc2626');
@@ -2242,9 +2271,18 @@ async function insertToSupabase(client, rec) {
   try {
     const row = recToRow(rec, client);
     const res = await sbFetch('POST', '', row);
-    if (!res.ok) throw new Error('Falha ao inserir: ' + await res.text());
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error('Falha ao inserir (HTTP ' + res.status + '): ' + errText);
+    }
     const inserted = await res.json();
-    if (inserted && inserted[0]) rec.sb_id = inserted[0].id, rec.id = inserted[0].id;
+    if (inserted && inserted[0]) {
+      rec.sb_id = inserted[0].id;
+      rec.id = inserted[0].id;
+    } else {
+      // Supabase retornou sucesso mas sem dados — suspeito
+      console.warn('[SUPABASE] Insert retornou sem dados de confirmação:', inserted);
+    }
   } catch(e) {
     throw new Error('insertToSupabase: ' + e.message);
   }
@@ -2818,31 +2856,21 @@ async function addRecord(client) {
     }
   }
 
-  // Dedup: se número já existe, atualiza
+  // Dedup: se número já existe, atualiza em vez de duplicar
   const _dup = (data[client]||[]).find(r => r.numero && r.numero === rec.numero);
   if (_dup) {
     Object.assign(_dup, rec, { id:_dup.id, sb_id:_dup.sb_id });
     computeRecord(_dup);
+    if (useSupabase && _dup.sb_id) {
+      try { await updateInSupabase(client, _dup); } catch(e) { addToOfflineQueue('update', client, _dup); }
+    }
+    saveLocal();
     showToast('ℹ Nº '+rec.numero+' já existe — atualizado', '#1d4ed8');
   } else {
     data[client].push(rec);
-  }
-  // Verifica se já existe registro com mesmo número
-  const existing = (data[client]||[]).find(r => r.numero && r.numero === rec.numero);
-  if (existing) {
-    // Atualiza o registro existente em vez de criar duplicata
-    Object.assign(existing, rec, { id: existing.id, sb_id: existing.sb_id });
-    computeRecord(existing);
-    if (useSupabase && existing.sb_id) {
-      try { await updateInSupabase(client, existing); } catch(e) {}
-    }
     saveLocal();
-    showToast(`ℹ Oportunidade ${rec.numero} já existia — registro atualizado`, '#1d4ed8');
-    renderClientTab(client);
-    if (currentTab === 'overview') renderOverview();
-    return; // Não continua para inserir novo
+    showToast('✓ Oportunidade registrada' + (useSupabase ? ' no Supabase!' : '!'));
   }
-  saveLocal();
   checkCreateVenda(client, rec);
   renderClientTab(client);
   if (currentTab === 'overview') renderOverview();
@@ -2853,7 +2881,6 @@ async function addRecord(client) {
   const dpg = document.getElementById(id+'-dpg'); if (dpg) dpg.style.display = 'none';
   const st = document.getElementById('form-status-'+id);
   if (st) { st.textContent = '✓ Registrado'; setTimeout(()=>st.textContent='',2500); }
-  showToast('✓ Oportunidade registrada' + (useSupabase ? ' no Supabase!' : '!'));
 }
 
 // ══════════════════════════════════════════════════
