@@ -7032,7 +7032,12 @@ window.onLoginSuccess = function(user) {
       <button class="user-dropdown-item" onclick="showShortcutsHelp();toggleUserMenu()">
         ⌨ Atalhos do Teclado
       </button>`;
-    dd.insertBefore(items, dd.querySelector('.danger')?.parentElement || dd.lastElementChild);
+    const dangerBtn = dd.querySelector('.user-dropdown-item.danger');
+    if (dangerBtn) {
+      dd.insertBefore(items, dangerBtn);
+    } else {
+      dd.appendChild(items);
+    }
   }
   // Run notification engine after login
   setTimeout(runNotificationEngine, 2000);
