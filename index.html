@@ -2266,10 +2266,11 @@ async function insertBatchToSupabase(client, recs) {
   if (!recs || recs.length === 0) return;
   const rows = recs.map(r => recToRow(r, client));
   try {
+    const authToken = getAuthToken();
     const res = await fetch(sbClient.url+'/rest/v1/'+TABLE, {
       method:'POST',
       headers:{'Content-Type':'application/json','apikey':sbClient.key,
-        'Authorization':'Bearer '+sbClient.key,
+        'Authorization':'Bearer '+authToken,
         'Prefer':'resolution=merge-duplicates,return=minimal'},
       body:JSON.stringify(rows)
     });
@@ -3034,6 +3035,9 @@ async function confirmImport() {
   if (!pendingImportClient || !pendingImport.length) return;
   const client = pendingImportClient;
   const recs   = [...pendingImport];
+  const totalRecs = recs.length;
+
+  showLoading(`Processando ${totalRecs} registros…`);
 
   // ── Separar novos de existentes (por número de oportunidade) ──
   const existingNums = new Set((data[client]||[]).map(r => r.numero).filter(Boolean));
@@ -3042,7 +3046,7 @@ async function confirmImport() {
 
   let importados = 0, atualizados = 0;
 
-  // ── Atualiza existentes (substitui pelo mais novo) ──
+  // ── Atualiza existentes localmente (rápido, sem HTTP) ──
   existentes.forEach(rec => {
     const idx = (data[client]||[]).findIndex(r => r.numero === rec.numero);
     if (idx !== -1) {
@@ -3052,36 +3056,78 @@ async function confirmImport() {
     atualizados++;
   });
 
-  // ── Insere novos ──
+  // ── Insere novos localmente ──
   if (novos.length) {
-    if (useSupabase) {
-      try {
-        markSyncing();
-        showLoading(`Salvando ${novos.length} novos registros…`);
-        await insertBatchToSupabase(client, novos);
-        hideLoading(); markSynced();
-      } catch(e) {
-        hideLoading(); markSyncError(e.message);
-        // Salva localmente mesmo assim e enfileira
-        novos.forEach(r => addToOfflineQueue('insert', client, r));
-        showToast('⚠ Erro no Supabase — '+novos.length+' registro(s) salvos localmente','#b45309');
-      }
-    }
     data[client].push(...novos);
     importados = novos.length;
   }
 
-  // ── Atualiza existentes no Supabase ──
-  if (existentes.length && useSupabase) {
-    try {
-      for (const rec of existentes) {
-        const local = (data[client]||[]).find(r => r.numero === rec.numero);
-        if (local?.sb_id) await updateInSupabase(client, local);
+  // Salva localStorage IMEDIATAMENTE (dados seguros)
+  saveLocal();
+
+  // ── Sync com Supabase em background (lotes de 200) ──
+  if (useSupabase) {
+    const BATCH_SIZE = 200;
+
+    // Batch INSERT novos
+    if (novos.length) {
+      showLoading(`Enviando ${novos.length} novos registros ao Supabase…`);
+      for (let i = 0; i < novos.length; i += BATCH_SIZE) {
+        const batch = novos.slice(i, i + BATCH_SIZE);
+        try {
+          await insertBatchToSupabase(client, batch);
+          showLoading(`Enviando novos… ${Math.min(i + BATCH_SIZE, novos.length)}/${novos.length}`);
+        } catch(e) {
+          batch.forEach(r => addToOfflineQueue('insert', client, r));
+          showToast(`⚠ Lote ${Math.floor(i/BATCH_SIZE)+1} falhou — enfileirado para sync`, '#b45309');
+        }
+        // Yield para não travar a UI
+        await new Promise(r => setTimeout(r, 50));
       }
-    } catch(e) { /* silencioso — dados já salvos localmente */ }
+    }
+
+    // Batch UPDATE existentes via UPSERT (muito mais rápido que update individual)
+    if (existentes.length) {
+      showLoading(`Atualizando ${existentes.length} registros existentes…`);
+      const toUpdate = existentes.map(rec => {
+        const local = (data[client]||[]).find(r => r.numero === rec.numero);
+        return local;
+      }).filter(Boolean);
+
+      for (let i = 0; i < toUpdate.length; i += BATCH_SIZE) {
+        const batch = toUpdate.slice(i, i + BATCH_SIZE);
+        try {
+          // Usa batch upsert em vez de update individual
+          const rows = batch.map(r => {
+            const row = recToRow(r, client);
+            if (r.sb_id) row.id = r.sb_id;
+            return row;
+          });
+          const authToken = getAuthToken();
+          const res = await fetch(sbClient.url + '/rest/v1/' + TABLE, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': sbClient.key,
+              'Authorization': 'Bearer ' + authToken,
+              'Prefer': 'resolution=merge-duplicates,return=minimal'
+            },
+            body: JSON.stringify(rows)
+          });
+          if (!res.ok) throw new Error('Batch update falhou');
+          showLoading(`Atualizando… ${Math.min(i + BATCH_SIZE, toUpdate.length)}/${toUpdate.length}`);
+        } catch(e) {
+          // Enfileira individualmente em caso de falha
+          batch.forEach(r => addToOfflineQueue('update', client, r));
+        }
+        await new Promise(r => setTimeout(r, 50));
+      }
+    }
+
+    markSynced();
   }
 
-  saveLocal();
+  hideLoading();
   pendingImport = []; pendingImportClient = null;
   closeImportModal();
   cancelImport(slugify(client));
@@ -3094,6 +3140,15 @@ async function confirmImport() {
     ? `✓ ${importados} oportunidade(s) importada(s)`
     : `✓ ${atualizados} oportunidade(s) atualizada(s)`;
   showToast(msg);
+}
+
+// Helper para pegar token de auth
+function getAuthToken() {
+  try {
+    const session = JSON.parse(localStorage.getItem(AUTH_SESSION_KEY) || '{}');
+    if (session.access_token && Date.now() < (session.expires_at - 10000)) return session.access_token;
+  } catch(e) {}
+  return sbClient?.key || '';
 }
 
 function cancelImport(slug) {
