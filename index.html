@@ -6533,6 +6533,7 @@ try {
 // ════════════════════════════════════════════════
 // ★ MELHORIA 1: DARK MODE
 // ════════════════════════════════════════════════
+try {
 function toggleDarkMode() {
   const isDark = document.body.classList.toggle('dark-mode');
   localStorage.setItem('ipartes_dark_mode', isDark ? '1' : '0');
@@ -6725,8 +6726,8 @@ function showFieldErrors(prefix, errors) {
 }
 
 // Override addRecord with validation
-const _originalAddRecord = addRecord;
-addRecord = async function(client) {
+const _originalAddRecord = window.addRecord || addRecord;
+window.addRecord = async function(client) {
   const id = slugify(client);
   const rec = {
     mes: document.getElementById(id+'-mes')?.value||'',
@@ -6928,35 +6929,10 @@ document.addEventListener('keydown', function(e) {
 });
 
 // ════════════════════════════════════════════════
-// ★ MELHORIA 8: SEGURANÇA - SANITIZAÇÃO REFORÇADA
+// ★ MELHORIA 8: SEGURANÇA - SESSÃO E INATIVIDADE
 // ════════════════════════════════════════════════
-// Override sbFetch to use session JWT with priority
-const _originalSbFetch = sbFetch;
-window.sbFetch = async function(method, query, body, extraHeaders) {
-  // Enhanced: always try session token first
-  let authToken = sbClient?.key || '';
-  try {
-    const session = JSON.parse(localStorage.getItem(AUTH_SESSION_KEY) || '{}');
-    if (session.access_token && Date.now() < (session.expires_at - 30000)) {
-      authToken = session.access_token;
-    } else if (session.refresh_token) {
-      // Auto-refresh expired token
-      const newSession = await refreshSession(session);
-      if (newSession) authToken = newSession.access_token;
-    }
-  } catch(e) { /* fallback to anon key */ }
-
-  const headers = {
-    'apikey': sbClient?.key || '',
-    'Authorization': 'Bearer ' + authToken,
-    'Content-Type': 'application/json',
-    'Prefer': method === 'POST' ? 'return=representation' : 'return=minimal',
-    ...( extraHeaders || {} )
-  };
-  const opts = { method, headers };
-  if (body) opts.body = JSON.stringify(body);
-  return fetch(`${sbClient.url}/rest/v1/${TABLE}${query}`, opts);
-};
+// A função sbFetch original já usa JWT da sessão.
+// Melhorias de segurança: timeout por inatividade.
 
 // Session activity timeout (30min inactivity = auto-logout)
 let _lastActivity = Date.now();
@@ -6972,18 +6948,10 @@ setInterval(() => {
 }, 60000);
 
 // ════════════════════════════════════════════════
-// ★ MELHORIA 9: PERFORMANCE - VIRTUAL RENDERING LITE
+// ★ MELHORIA 9: PERFORMANCE - DEBOUNCED RENDERING
 // ════════════════════════════════════════════════
-// Already have debounced search; add requestAnimationFrame for heavy renders
-const _originalRenderOverview = renderOverview;
-let _renderOverviewRAF = null;
-window.renderOverview = function() {
-  if (_renderOverviewRAF) cancelAnimationFrame(_renderOverviewRAF);
-  _renderOverviewRAF = requestAnimationFrame(() => {
-    _originalRenderOverview();
-    _renderOverviewRAF = null;
-  });
-};
+// Performance improvements are handled by debounce on search and filter inputs above.
+// No need to override renderOverview as it can cause navigation conflicts.
 
 // ════════════════════════════════════════════════
 // ★ MELHORIA 10: RELATÓRIOS - EXPORT PDF MELHORADO
@@ -7094,6 +7062,9 @@ function showShortcutsHelp() {
   </div>`;
   document.body.appendChild(modal);
   modal.onclick = e => { if (e.target === modal) modal.remove(); };
+}
+} catch(_enhancementError) {
+  console.warn('IPARTES: Erro ao carregar melhorias (sistema base OK):', _enhancementError);
 }
 </script>
 
