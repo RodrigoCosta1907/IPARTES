@@ -6819,6 +6819,180 @@ window.addEventListener('online', function() {
 setTimeout(updateOfflineIndicator, 3000);
 
 // ════════════════════════════════════════════════
+// LIMPEZA DE DUPLICATAS
+// ════════════════════════════════════════════════
+async function cleanDuplicates() {
+  const allRecs = getAllRecords();
+  const totalBefore = allRecs.length;
+  
+  // Identificar duplicatas locais por cliente+numero
+  let totalDups = 0;
+  const dupDetails = [];
+  
+  CLIENTS.forEach(client => {
+    const recs = data[client] || [];
+    const seen = {};
+    const toKeep = [];
+    
+    // Ordenar por created_at desc para manter o mais recente
+    const sorted = [...recs].sort((a, b) => {
+      // Prioriza quem tem sb_id (já está no Supabase)
+      if (a.sb_id && !b.sb_id) return -1;
+      if (!a.sb_id && b.sb_id) return 1;
+      return 0;
+    });
+    
+    sorted.forEach(rec => {
+      if (!rec.numero) { toKeep.push(rec); return; }
+      if (!seen[rec.numero]) {
+        seen[rec.numero] = rec;
+        toKeep.push(rec);
+      } else {
+        totalDups++;
+        dupDetails.push({ client, numero: rec.numero, id: rec.id, sb_id: rec.sb_id });
+      }
+    });
+    
+    data[client] = toKeep;
+  });
+  
+  if (totalDups === 0) {
+    showToast('✅ Nenhuma duplicata encontrada localmente', '#15803d');
+    return { localDups: 0, sbDups: 0 };
+  }
+  
+  // Salvar local limpo
+  saveLocal();
+  
+  // Deletar duplicatas no Supabase
+  let sbDeleted = 0;
+  if (useSupabase && sbClient) {
+    showLoading(`Removendo ${totalDups} duplicatas do Supabase…`);
+    const sbIdsToDelete = dupDetails.filter(d => d.sb_id).map(d => d.sb_id);
+    
+    for (let i = 0; i < sbIdsToDelete.length; i += 50) {
+      const batch = sbIdsToDelete.slice(i, i + 50);
+      try {
+        const inFilter = batch.map(id => `id.eq.${id}`).join(',');
+        const res = await sbFetch('DELETE', `?or=(${inFilter})`);
+        if (res.ok) sbDeleted += batch.length;
+        showLoading(`Removendo duplicatas… ${Math.min(i + 50, sbIdsToDelete.length)}/${sbIdsToDelete.length}`);
+      } catch(e) {
+        console.warn('[DEDUP] Erro ao deletar lote do Supabase:', e.message);
+      }
+      await new Promise(r => setTimeout(r, 30));
+    }
+    hideLoading();
+  }
+  
+  // Atualizar UI
+  renderNav();
+  if (currentTab === 'overview') renderOverview();
+  else if (currentTab !== 'vendas') renderClientTab(currentTab);
+  
+  const totalAfter = getAllRecords().length;
+  showToast(`🧹 ${totalDups} duplicata(s) removidas (${totalBefore} → ${totalAfter})`, '#15803d');
+  
+  return { localDups: totalDups, sbDups: sbDeleted };
+}
+
+// Limpeza profunda: recarrega do Supabase e remove duplicatas lá também
+async function deepCleanDuplicates() {
+  if (!useSupabase || !sbClient) {
+    showToast('⚠ Conecte ao Supabase primeiro', '#b45309');
+    return;
+  }
+  
+  const confirmed = confirm(
+    '🧹 Limpeza Profunda de Duplicatas\n\n' +
+    'Isso vai:\n' +
+    '1. Buscar TODOS os registros no Supabase\n' +
+    '2. Identificar registros com mesmo Nº e Cliente\n' +
+    '3. Manter apenas o mais recente de cada\n' +
+    '4. Deletar duplicatas do banco\n\n' +
+    'Continuar?'
+  );
+  if (!confirmed) return;
+  
+  showLoading('Carregando todos os registros do Supabase…');
+  
+  try {
+    // Buscar tudo do Supabase
+    const PAGE_SIZE = 1000;
+    let allRows = [];
+    let page = 0;
+    let hasMore = true;
+    
+    while (hasMore) {
+      const res = await sbFetch('GET',
+        `?select=id,cliente,numero,created_at&order=created_at.desc&offset=${page * PAGE_SIZE}&limit=${PAGE_SIZE}`);
+      if (!res.ok) throw new Error('Falha ao carregar');
+      const rows = await res.json();
+      allRows = allRows.concat(rows);
+      hasMore = rows.length === PAGE_SIZE;
+      page++;
+      if (page > 50) break;
+      showLoading(`Carregando… ${allRows.length} registros`);
+    }
+    
+    showLoading(`Analisando ${allRows.length} registros…`);
+    
+    // Agrupar por cliente+numero e identificar duplicatas
+    const groups = {};
+    allRows.forEach(row => {
+      if (!row.numero) return;
+      const key = row.cliente + '||' + row.numero;
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(row);
+    });
+    
+    // Pegar IDs a deletar (manter o primeiro = mais recente por ORDER BY created_at.desc)
+    const idsToDelete = [];
+    Object.values(groups).forEach(group => {
+      if (group.length > 1) {
+        // Manter o primeiro (mais recente), deletar o resto
+        for (let i = 1; i < group.length; i++) {
+          idsToDelete.push(group[i].id);
+        }
+      }
+    });
+    
+    if (!idsToDelete.length) {
+      hideLoading();
+      showToast('✅ Nenhuma duplicata encontrada no Supabase!', '#15803d');
+      return;
+    }
+    
+    showLoading(`Removendo ${idsToDelete.length} duplicatas do Supabase…`);
+    
+    let deleted = 0;
+    for (let i = 0; i < idsToDelete.length; i += 50) {
+      const batch = idsToDelete.slice(i, i + 50);
+      try {
+        const inFilter = batch.map(id => `id.eq.${id}`).join(',');
+        await sbFetch('DELETE', `?or=(${inFilter})`);
+        deleted += batch.length;
+        showLoading(`Removendo… ${deleted}/${idsToDelete.length}`);
+      } catch(e) {
+        console.warn('[DEDUP] Erro no lote:', e.message);
+      }
+      await new Promise(r => setTimeout(r, 30));
+    }
+    
+    // Recarregar dados limpos
+    showLoading('Recarregando dados limpos…');
+    await loadFromSupabase();
+    
+    hideLoading();
+    showToast(`🧹 ${deleted} duplicata(s) removidas do Supabase! (${allRows.length} → ${allRows.length - deleted})`, '#15803d');
+    
+  } catch(e) {
+    hideLoading();
+    showToast('✗ Erro: ' + e.message, '#dc2626');
+  }
+}
+
+// ════════════════════════════════════════════════
 // ★ MELHORIAS DO SISTEMA
 // ════════════════════════════════════════════════
 
@@ -7334,6 +7508,9 @@ window.onLoginSuccess = function(user) {
       </button>
       <button class="user-dropdown-item" onclick="backupData();toggleUserMenu()">
         💾 Exportar Backup
+      </button>
+      <button class="user-dropdown-item" onclick="deepCleanDuplicates();toggleUserMenu()">
+        🧹 Limpar Duplicatas
       </button>
       <button class="user-dropdown-item" onclick="showShortcutsHelp();toggleUserMenu()">
         ⌨ Atalhos do Teclado
