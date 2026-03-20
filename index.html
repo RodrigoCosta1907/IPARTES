@@ -1961,6 +1961,7 @@ td.hi { color: var(--text); font-weight: 500; }
           <th>Data Entrega</th>
           <th>Status</th>
           <th>NF</th>
+          <th>Prev. Pagamento</th>
           <th>Obs.</th>
           <th>Ações</th>
         </tr></thead>
@@ -4471,7 +4472,7 @@ function vendaToRow(v){
     valor:v.valor?parseFloat(String(v.valor).replace(',','.')):null, num_po:v.numPO||null,
     data_pedido:v.dataPedido||null, prazo_entrega:v.prazoEntrega||null, data_entrega:v.dataEntrega||null,
     status_entrega:v.statusEntrega||'Aguardando PO', nf_emitida:v.nfEmitida||'NÃO',
-    num_nf:v.numNF||null, obs:v.obs||null };
+    num_nf:v.numNF||null, previsao_pagamento:v.previsaoPagamento||null, obs:v.obs||null };
 }
 
 async function checkCreateVenda(client, rec) {
@@ -4649,7 +4650,7 @@ function renderVendasTable(){
   if(!tbody)return;
   const vendas=getFilteredVendas();
   countEl.textContent=vendas.length+' registro(s)';
-  if(!vendas.length){ tbody.innerHTML=`<tr><td colspan="13"><div class="empty-state"><div class="icon">🛒</div><p>Nenhuma venda encontrada</p></div></td></tr>`; return; }
+  if(!vendas.length){ tbody.innerHTML=`<tr><td colspan="14"><div class="empty-state"><div class="icon">🛒</div><p>Nenhuma venda encontrada</p></div></td></tr>`; return; }
   tbody.innerHTML=vendas.map(v=>{
     const sit=getVendaSituacao(v);
     const rowCls=sit==='atrasado'?'row-atrasado':sit==='alerta'?'row-alerta':'';
@@ -4678,6 +4679,7 @@ function renderVendasTable(){
       <td>${v.dataEntrega||'—'}</td>
       <td><span class="badge ${stCls}">${v.statusEntrega||'—'}</span></td>
       <td><span class="badge ${v.nfEmitida==='SIM'?'b-green':'b-slate'}">${v.nfEmitida||'NÃO'}${v.numNF?' #'+v.numNF:''}</span></td>
+      <td style="font-size:12px;${isPagamentoAtrasado(v.previsaoPagamento)?'color:#dc2626;font-weight:600':'color:var(--text2)'}">${v.previsaoPagamento?formatPagamento(v.previsaoPagamento):'—'}</td>
       <td style="max-width:140px;white-space:normal;font-size:11px;color:var(--text3)">${sanitize(v.obs)||''}</td>
       <td>
         <button class="btn-icon-edit" onclick="openEditVenda('${v.id}')">✏</button>
@@ -4748,6 +4750,7 @@ function buildVendaForm(v){
         <option value="SIM" ${v.nfEmitida==='SIM'?'selected':''}>SIM</option>
       </select></div>
     <div class="form-group"><label>Nº da NF</label><input type="text" id="vf-numNF" value="${sanitize(v.numNF||'')}" placeholder="Número da nota fiscal"></div>
+    <div class="form-group"><label>Previsão de Pagamento</label><input type="date" id="vf-previsaoPagamento" value="${v.previsaoPagamento||''}"></div>
     <div class="form-group" style="grid-column:1/-1"><label>Observações</label>
       <textarea id="vf-obs" placeholder="Observações de pós-venda...">${sanitize(v.obs||'')}</textarea></div>`;
 }
@@ -4757,7 +4760,7 @@ async function saveVenda(){
   const venda={ cliente:g('cliente'), numOportunidade:g('numOportunidade'), portal:g('portal'),
     valor:g('valor'), numPO:g('numPO'), dataPedido:g('dataPedido'), prazoEntrega:g('prazoEntrega'),
     dataEntrega:g('dataEntrega'), statusEntrega:g('statusEntrega'), nfEmitida:g('nfEmitida'),
-    numNF:g('numNF'), obs:g('obs') };
+    numNF:g('numNF'), previsaoPagamento:g('previsaoPagamento'), obs:g('obs') };
   if(!venda.cliente){ showToast('⚠ Selecione o cliente','#b45309'); return; }
   if(editingVendaId){
     const ex=getAllVendas().find(v=>v.id===editingVendaId);
@@ -5994,8 +5997,19 @@ function showVendorVendas(vendor) {
   function buildRow(v) {
     const sit=getVendaSituacao(v);
     const badge=sit==='atrasado'?'<span class="atraso-badge">⚠ ATRASADO</span>':sit==='alerta'?'<span class="alerta-badge">⏰</span>':'<span style="font-size:10px;color:var(--green)">✓ OK</span>';
+    const stCls=VENDA_STATUS_CSS[v.statusEntrega]||'';
     const tr=document.createElement('tr');
-    tr.innerHTML='<td class="hi">'+sanitize(v.cliente)+'</td><td>'+sanitize(v.numOportunidade||'—')+'</td><td class="hi">'+(v.valor?fmtCurrency(v.valor):'—')+'</td><td>'+(v.dataPedido||'—')+'</td><td>'+(v.prazoEntrega||'—')+'</td><td>'+badge+'</td><td><span class="badge '+(VENDA_STATUS_CSS[v.statusEntrega]||'')+'">'+v.statusEntrega+'</span></td><td></td>';
+    tr.innerHTML=`<td class="hi">${sanitize(v.cliente)}</td>
+      <td class="hi">${sanitize(v.numPO)||'—'}</td>
+      <td>${sanitize(v.numOportunidade||'—')}</td>
+      <td class="hi">${v.valor?fmtCurrency(v.valor):'—'}</td>
+      <td>${v.dataPedido||'—'}</td>
+      <td>${v.prazoEntrega||'—'}</td>
+      <td>${badge}</td>
+      <td><span class="badge ${stCls}">${v.statusEntrega}</span></td>
+      <td style="font-size:12px;${isPagamentoAtrasado(v.previsaoPagamento)?'color:#dc2626;font-weight:600':'color:var(--text2)'}">${v.previsaoPagamento?formatPagamento(v.previsaoPagamento):'—'}</td>
+      <td style="max-width:120px;white-space:normal;font-size:11px;color:var(--text3)">${sanitize(v.obs)||''}</td>
+      <td></td>`;
     const td=tr.lastElementChild;
     const eb=document.createElement('button'); eb.className='btn-icon-edit'; eb.textContent='✏';
     eb.addEventListener('click',()=>openEditVenda(v.id)); td.appendChild(eb);
@@ -6020,14 +6034,14 @@ function showVendorVendas(vendor) {
       <span style="font-size:12px;color:var(--text3)">${vendorVendas.length} registro(s)</span>
     </div>
     <div class="table-wrap"><table>
-      <thead><tr><th>Cliente</th><th>Nº Oportunidade</th><th>Valor</th><th>Data Pedido</th><th>Prazo</th><th>Situação</th><th>Status</th><th>Ações</th></tr></thead>
+      <thead><tr><th>Cliente</th><th>Nº PO</th><th>Nº Oportunidade</th><th>Valor</th><th>Data Pedido</th><th>Prazo</th><th>Situação</th><th>Status</th><th>Prev. Pagamento</th><th>Obs.</th><th>Ações</th></tr></thead>
       <tbody id="vendor-vendas-tbody-${vendor}"></tbody>
     </table></div></div>`;
 
   const tbody=document.getElementById('vendor-vendas-tbody-'+vendor);
   if(tbody){
     if(vendorVendas.length) vendorVendas.forEach(v=>tbody.appendChild(buildRow(v)));
-    else tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><div class="icon">🛒</div><p>Nenhuma venda</p></div></td></tr>';
+    else tbody.innerHTML='<tr><td colspan="11"><div class="empty-state"><div class="icon">🛒</div><p>Nenhuma venda</p></div></td></tr>';
   }
 }
 
