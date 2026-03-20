@@ -6630,7 +6630,13 @@ function updateOfflineIndicator() {
       badge = document.createElement('button');
       badge.id = 'offlineQueueBadge';
       badge.style.cssText = 'background:#f59e0b;border:none;color:#fff;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:5px;animation:pulse 2s infinite';
-      badge.onclick = processOfflineQueue;
+      badge.onclick = function(e) {
+        e.stopPropagation();
+        const n = getOfflineQueue().length;
+        const action = prompt(`${n} operação(ões) pendente(s).\n\nDigite:\n  1 = Sincronizar com Supabase\n  2 = Descartar fila (dados já estão no banco)\n  3 = Cancelar`, '2');
+        if (action === '1') processOfflineQueue();
+        else if (action === '2') clearOfflineQueue();
+      };
       document.getElementById('headerRight')?.prepend(badge);
     }
     badge.innerHTML = `⏳ ${count} pendente${count>1?'s':''}`;
@@ -6638,6 +6644,13 @@ function updateOfflineIndicator() {
   } else if (badge) {
     badge.remove();
   }
+}
+
+// Limpar fila offline manualmente (quando dados já estão no banco)
+function clearOfflineQueue() {
+  if (!confirm(`Descartar ${getOfflineQueue().length} operação(ões) pendentes?\n\nUse isto apenas se os dados já estão no Supabase (ex: após importação direta).`)) return;
+  saveOfflineQueue([]);
+  showToast('✓ Fila de sincronização limpa', '#15803d');
 }
 
 async function processOfflineQueue() {
@@ -6648,19 +6661,96 @@ async function processOfflineQueue() {
   const queue = getOfflineQueue();
   if (!queue.length) { showToast('✓ Nenhuma operação pendente'); return; }
 
-  showLoading(`Sincronizando ${queue.length} operação(ões) pendentes…`);
+  showLoading(`Preparando sincronização de ${queue.length} operação(ões)…`);
   const failed = [];
   let synced = 0;
+  const BATCH = 200;
 
-  for (const op of queue) {
+  // ── Agrupar operações por tipo ──
+  const inserts = queue.filter(o => o.action === 'insert');
+  const updates = queue.filter(o => o.action === 'update');
+  const deletes = queue.filter(o => o.action === 'delete');
+  const vendaInserts = queue.filter(o => o.action === 'insert-venda');
+  const vendaUpdates = queue.filter(o => o.action === 'update-venda');
+  const vendaDeletes = queue.filter(o => o.action === 'delete-venda');
+
+  // ── Batch INSERTS (oportunidades) ──
+  if (inserts.length) {
+    showLoading(`Enviando ${inserts.length} novos registros…`);
+    // Agrupar por cliente
+    const byClient = {};
+    inserts.forEach(o => { (byClient[o.client] = byClient[o.client] || []).push(o); });
+    for (const [client, ops] of Object.entries(byClient)) {
+      for (let i = 0; i < ops.length; i += BATCH) {
+        const batch = ops.slice(i, i + BATCH);
+        try {
+          await insertBatchToSupabase(client, batch.map(o => o.record));
+          synced += batch.length;
+          showLoading(`Novos registros… ${synced}/${queue.length}`);
+        } catch(e) {
+          batch.forEach(o => { o.retries = (o.retries||0)+1; if (o.retries < 5) failed.push(o); });
+        }
+        await new Promise(r => setTimeout(r, 30));
+      }
+    }
+  }
+
+  // ── Batch UPDATES (oportunidades) — via upsert ──
+  if (updates.length) {
+    showLoading(`Atualizando ${updates.length} registros…`);
+    const byClient = {};
+    updates.forEach(o => { (byClient[o.client] = byClient[o.client] || []).push(o); });
+    for (const [client, ops] of Object.entries(byClient)) {
+      for (let i = 0; i < ops.length; i += BATCH) {
+        const batch = ops.slice(i, i + BATCH);
+        try {
+          const rows = batch.map(o => {
+            const row = recToRow(o.record, client);
+            if (o.record.sb_id) row.id = o.record.sb_id;
+            return row;
+          });
+          const res = await fetch(sbClient.url + '/rest/v1/' + TABLE, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'apikey': sbClient.key,
+              'Authorization': 'Bearer ' + getAuthToken(),
+              'Prefer': 'resolution=merge-duplicates,return=minimal' },
+            body: JSON.stringify(rows)
+          });
+          if (!res.ok) throw new Error('Batch update falhou');
+          synced += batch.length;
+          showLoading(`Atualizando… ${synced}/${queue.length}`);
+        } catch(e) {
+          batch.forEach(o => { o.retries = (o.retries||0)+1; if (o.retries < 5) failed.push(o); });
+        }
+        await new Promise(r => setTimeout(r, 30));
+      }
+    }
+  }
+
+  // ── Batch DELETES (oportunidades) ──
+  if (deletes.length) {
+    showLoading(`Excluindo ${deletes.length} registros…`);
+    for (let i = 0; i < deletes.length; i += 50) {
+      const batch = deletes.slice(i, i + 50);
+      try {
+        const ids = batch.map(o => o.record.id).filter(Boolean);
+        if (ids.length) {
+          const inFilter = ids.map(id => `id.eq.${id}`).join(',');
+          await sbFetch('DELETE', `?or=(${inFilter})`);
+        }
+        synced += batch.length;
+      } catch(e) {
+        batch.forEach(o => { o.retries = (o.retries||0)+1; if (o.retries < 5) failed.push(o); });
+      }
+      await new Promise(r => setTimeout(r, 30));
+    }
+  }
+
+  // ── Vendas (menor volume, processa individualmente) ──
+  const vendaOps = [...vendaInserts, ...vendaUpdates, ...vendaDeletes];
+  for (const op of vendaOps) {
     try {
-      if (op.action === 'insert') {
-        await insertToSupabase(op.client, op.record);
-      } else if (op.action === 'update') {
-        await updateInSupabase(op.client, op.record);
-      } else if (op.action === 'delete') {
-        await deleteFromSupabase(op.record.id);
-      } else if (op.action === 'insert-venda') {
+      if (op.action === 'insert-venda') {
         const res = await sbFetchVendas('POST', '', vendaToRow(op.record));
         if (!res.ok) throw new Error('Falha');
       } else if (op.action === 'update-venda') {
@@ -6671,11 +6761,7 @@ async function processOfflineQueue() {
       synced++;
     } catch(e) {
       op.retries = (op.retries || 0) + 1;
-      if (op.retries < 5) {
-        failed.push(op);
-      } else {
-        console.warn('[OFFLINE] Descartado após 5 tentativas:', op);
-      }
+      if (op.retries < 5) failed.push(op);
     }
   }
 
