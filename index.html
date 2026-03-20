@@ -1390,10 +1390,7 @@ td.hi { color: var(--text); font-weight: 500; }
   .sidebar-section-header { display:flex; align-items:center; gap:8px; padding:10px 14px 6px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.8px; color:#64748b; cursor:pointer; user-select:none; }
   .sidebar-section-header:hover { color:#94a3b8; }
   .sidebar-section-header .vendor-badge { width:20px; height:20px; border-radius:50%; font-size:9px; font-weight:800; display:flex; align-items:center; justify-content:center; color:#fff; flex-shrink:0; }
-  .badge-rodrigo { background:#ea580c; }
-  .badge-lenon   { background:#15803d; }
-  .badge-luiz    { background:#1d4ed8; }
-  .badge-geral   { background:#475569; }
+  .badge-rodrigo { background:#ea580c; } .badge-lenon { background:#15803d; } .badge-luiz { background:#1d4ed8; } .badge-geral { background:#475569; }
   .sidebar-section-header .collapse-icon { margin-left:auto; font-size:10px; color:#475569; transition:transform .2s; }
   .sidebar-section.collapsed .collapse-icon { transform:rotate(-90deg); }
   .sidebar-section.collapsed .sidebar-items { display:none; }
@@ -1401,24 +1398,16 @@ td.hi { color: var(--text); font-weight: 500; }
   .sidebar-item { display:flex; align-items:center; gap:8px; padding:7px 14px 7px 20px; font-size:12px; font-weight:500; color:#94a3b8; cursor:pointer; transition:all .15s; border:none; background:transparent; width:100%; text-align:left; font-family:var(--font); border-left:2px solid transparent; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .sidebar-item:hover { color:#e2e8f0; background:rgba(255,255,255,.04); }
   .sidebar-item.active { color:#fff; background:rgba(255,255,255,.07); font-weight:600; }
-  .sidebar-item.active.rodrigo { border-left-color:#ea580c; }
-  .sidebar-item.active.lenon   { border-left-color:#15803d; }
-  .sidebar-item.active.luiz    { border-left-color:#1d4ed8; }
-  .sidebar-item.active.geral   { border-left-color:#94a3b8; }
-  .sidebar-item.active.vendas  { border-left-color:#7c3aed; }
+  .sidebar-item.active.rodrigo { border-left-color:#ea580c; } .sidebar-item.active.lenon { border-left-color:#15803d; } .sidebar-item.active.luiz { border-left-color:#1d4ed8; } .sidebar-item.active.geral { border-left-color:#94a3b8; }
   .sidebar-item .item-icon { font-size:12px; flex-shrink:0; }
   .sidebar-add-btn { display:flex; align-items:center; gap:6px; padding:5px 14px 5px 20px; font-size:11px; color:#475569; cursor:pointer; transition:color .15s; border:none; background:transparent; font-family:var(--font); width:100%; text-align:left; }
   .sidebar-add-btn:hover { color:#94a3b8; }
   .sidebar-toggle { display:none; position:fixed; bottom:20px; left:20px; width:44px; height:44px; background:var(--blue); border:none; border-radius:50%; color:#fff; font-size:18px; cursor:pointer; z-index:200; box-shadow:0 4px 12px rgba(29,78,216,.4); align-items:center; justify-content:center; }
   .module-header { display:flex; align-items:center; gap:12px; margin-bottom:20px; padding-bottom:16px; border-bottom:2px solid var(--border); width:100%; }
   .module-badge { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:800; color:#fff; flex-shrink:0; }
-  .module-badge.rodrigo { background:linear-gradient(135deg,#c2410c,#ea580c); }
-  .module-badge.lenon   { background:linear-gradient(135deg,#15803d,#16a34a); }
-  .module-badge.luiz    { background:linear-gradient(135deg,#1d4ed8,#3b82f6); }
-  .module-title { font-size:20px; font-weight:700; color:var(--text); }
-  .module-sub   { font-size:12px; color:var(--text3); margin-top:2px; }
-  #module-rodrigo, #module-lenon, #module-luiz,
-  #module-rodrigo-vendas, #module-lenon-vendas, #module-luiz-vendas { width:100%; box-sizing:border-box; }
+  .module-badge.rodrigo { background:linear-gradient(135deg,#c2410c,#ea580c); } .module-badge.lenon { background:linear-gradient(135deg,#15803d,#16a34a); } .module-badge.luiz { background:linear-gradient(135deg,#1d4ed8,#3b82f6); }
+  .module-title { font-size:20px; font-weight:700; color:var(--text); } .module-sub { font-size:12px; color:var(--text3); margin-top:2px; }
+  #module-rodrigo, #module-lenon, #module-luiz, #module-rodrigo-vendas, #module-lenon-vendas, #module-luiz-vendas { width:100%; box-sizing:border-box; }
   .nav-tabs { display:none !important; }
   @media (max-width:768px) {
     .app-layout { position:relative; }
@@ -1427,12 +1416,6 @@ td.hi { color: var(--text); font-weight: 500; }
     .sidebar-toggle { display:flex; }
     .main-content { padding:14px; max-width:100%; }
   }
-
-
-  /* ── CONTROLE DE ACESSO ── */
-  .access-adm-only { /* visible only to ADM */ }
-  .sidebar-section.access-denied { display: none !important; }
-  #user-profile-badge { cursor: default; }
 
 </style>
 </head>
@@ -1490,16 +1473,8 @@ td.hi { color: var(--text); font-weight: 500; }
       <img src="data:image/webp;base64,UklGRlQSAABXRUJQVlA4WAoAAAAQAAAAuQAAQwAAQUxQSMIHAAABoEZt2yFHer6q7h4l2e5kPGvbtm3btm3btm0jw7PW2LYnmE06SdX33T+qGtXnZH7uiYgJ0P9/NSY540VMnPFKMQW8Al6MMaUYySuHV5qRjDEFjEnI+NKqx5x9xunlP/uMrSXfSCZVl8vV1hiTrssVrq2RPC9iTKZnLpfrlTIFampzhWt9yZfpUpcrsbbKq8mVaIw8I2/js26//bZzNpR8k0hKfX6yJD3nUHmetL1rz4cjpCNoz8e3dTT/eqCMH9Eg8vk8r8pElJli8wXb22Y910e+zidfoh2imWG+2PbGnkrJu2I28VMOkOcl4GvdPM4lZOFOedJ2AMOlwyjxIxkjqW/gABq6KW4qxYcHSudS8iDNpvjlPaWeU8HGWHhMCRh1byAkcWc5VSltG/lLOhRwRVhelCfpAuIPKjCxOAtb67w4By5usGaU0NJTVQsJHfHOcrFM2aS7sVSgw/ZXCda25vN5i7NYNpeMfi3wvrwiXFs+n++AAMt4nU1bPt8aWLBhaz6fZ1iMa8vHB4299D6Bs7RNHj8bOqC1SuU3EymzLQHLW6XwbTq7Uu2A23BYXpDUP3A4LK6xm4oINuyezfbcfi4OywamLpfNZk4F+CiVzWbruqfnAB3rVWVja3MakAd4q9rzUquNxlpOSaB7Q2khTQsXtLpSYFGmlC8kI+kJgHGedDFYmnFwSDEdqys6IAQ4TrFHR95RbCbS3ldF7oeDWTJGnnIO+DSBHk2lMTjd3bsYW9LybClfSZLRrpE5GekPYMFpbTg+kCkUrBMx3tjISXEnRN6LS8esUszJAM1ZyUjmjLtvuO/oJBqLsDGWeyT1bsPiHLhCjTVl8XRYZHZaq4QO/tA8oKlKJflzwbJl+XoWMjoQh2XWgVWSjKKpSggJx4ODtSVPJ4BzzMPasr0bUfXkyM/SxTjHbXoD5zhEpkDHShFdg7PMlClXx/4bbhnddmOjfu1AAA1fXbJpRvI8JVhESLCtbm4O5u4kI3m6uJW263UZrmyTr7nnrnufayDAcoX0B8CmOgTg4yLsszffffdDv2BDx87yymUpOD9l9AzWEb/wta2kVCWQ31gpVa3sKZOt7S4pu0mVfJ1KuQLiLSGLumr1AJggdVsGLK9WnLPEOsuyPZVSuYqcnpLR9+BiHPBLTqlKOFIZk5I2f31yQ+P8wad4koyny8pWpMVtLF2Ghacyvbp8AZYjZGKK/nWVBFyheSn50tlzARzgLItzMhXwc8qk5H9EwZkbyJe2xZYrKMSkNeXrT8A1NzYtawH4uICzBYIAzpIpFzMmT4nOHepLvqf0fs+OCwALIYMrIeQqKT0d7LRfxjoC2EEpPVQ+pt3xxBNPPPHs3btIKa1pAUvUAv/VxGFfe+CJxx97Zg6hJeylcrWvbNLxxkgyktT/5A+bsA5n11Jy8L30BwFBP6nfR3TAGtI1hGV7RwWNZ3Q1lsIOy3GKa69WtHoxWI4uX38V9k1Mykjq9jwOOKYCQh7XSTgsc3tJeoGAOb5qmrDl+qpQ9C9wtC1vaWlpDpyDzwoE68ToC4ATyrdKETpt+l8jxvSUJ2OkCQAnJhUCC2o1Fgd5ZvUw6t1KyC3StoBNbg0Lrn2Dur59+1bvFPmvppQfIseUL1fMcQDPK7bHQnDsmJTr+Ou1nFYP+GqdFtp4SkpPBeZ2Ndpq2GKSMroeB78o1psKjhMqKrjw0BNiTz4uXdUMlvrDNt9kk6MmYx1LupqEuECS9obbtVoL3C5VzQHc1kpJ21XAcICrYoyeBPi6klxIkX11J6GzgHUQOMv5Smw7yegQeFRa/afHekub4YDDJaNNE9Oa1uFYK0baDQctVSUMixxerqKX95T+wkai1vG2vMQ2kHxtY5koX5LS8oYROI6UJ21WaOfIJOnYyC/FPA0wQyauRxPABZoLsH7cB5Eb4s6M/BCXaSihvbfkfUaR7TfIeErqq+Mz8no0wX2KzSgzEcte0lan/lJo/eGD6v95Rtph5KD64fcU8+Lf9fXjz1O80S0j6utH3qo3/qgfOmxA3JbDB9aPuTluz+GD6kffHJf66Lf6Yn/+YSWlpB2/mB+Aaxn3YD8ZX0kFML2H9CYBv+y/yhrn9lcXmVEs66mHgSDOU2wqo9hMAZNWbMbEKK3YLor1I2nFZiIZxWYinqdSjS/jSd1W23Cj9Xt6km+UGIT8Y9QncCF0tNPUR12kGT/oCJwltrFGnadRvFGyhQg5SzoF64CQlgHqom499RaOInzTWZTomeQcr8jTE1gLBLSupoykewmKMZlzrrqks71xG/nJhVwjz9PtxAa01UlSz6UUozfpjDdScozqLuNJGw/uAPjvk76SMtqjKDO5E3LcXwm7qIdi+x54wTm7V0tSRvqqKI3shOCdSli6tvq9M/Kz1eRJUvrmQW+uK/MjQVEjOqVXKyCg5eYGoG11+TLmd6Djsl8IWAEiBEIsc7sZo1OwWAcBKzJNhQqGHCvpMUpfAemyoCQYd8W1jzWVoTm7wqHvsKW0Ew1Lcg3VKxpGe5VWZscvWtGQp48JK8Gyv6QxKxr+FKxLyjlekSf93Sm9XT75ygylAh+RMdKDndLzCSgl7f7OyFHDExz91xMbyniSqr6ZOLyznfRDLgkZTwkbSb6RlJKMOlsjpZL4H5VWUDggbAoAABAqAJ0BKroARAA+kTiXSCWjIqEu9tx4sBIJbADNBPxJl9R5zVnblATvsTzif5X1AeYBzjPMR+vv7Ve7P/tf3A9zPoAf4b0ovUG9ADy6/ZJ/un/pwj7/D7b/lS+ASoiZvPh2WyzXTvMCgGpPrLq+0/732AP49/fP+Z6n+dd6r9hL9ferd+5fsY/tEoUlxKRqmP234Sp1fOIYp4DzVJXzvJbUAM7YY1YkrqxYKsI9XqpnsqXSV8uKBQrxZ1RheI76qedcCvgO7aWb0lQU1IY6jmq25038DqjEPXc8FlZByv2Xt73wJi090Hl4PVadqZko+eQByxuIw99CmOiZflDRVAQ72lceRj1BpVcTRZ4muhrt6Jvgjf8PM2q73iExDnV3Kq9wtwDgYvJgLdN7656r7H9m7Cbj88Lu3KyPFwMXlZ9hEGh0V+nWB9f2z39OfGuv0esNYaw1hrDRwAD+/Hr6Oxv8Fl8xIfXxeimEP+zUpTdSYCr+P00DQi/DDbsU6eeKoCGib27VFvTipHmxZhjRCf0ntTjQKitvhReaX3lU4W0kpjoAq8ntcPFIoyWizE6g5YxWaqhFepNYQI68IUytGWsiFy5u5H1mqiTwbRGRM7meGlSgO1d1YuOcIh13tafjdiRe6O2SL2aAenLnX2gMMq8SR0gCV0pa6OCczJgLvkkTkKsvAsi7qP6PCmBSEFZHw6IJCs5ay1QEWAq5pROVottaA63FbAQOutMlEaInCe7QxIajxgSOtcJVgl+vTgsZx2lYCl182dOcKMl1HeMT458a4hDpOm26ep3D25ZKC8R2YSodfxWW/2ON2/J46Vv1+7P4iycVW+7dVRRwTXA6tg0nlfsNtGDj/qZzOPwyyfvksLF59xLq2vURZ6ACYtvdLuyIH0NGvH9ce/cdxAA8Tw0lPU6xi4LkjtoJ9lyAIqbninF3cZ71tybL2ikwG8Vq/gwWcneL+VPA7I+NWe77uLuWJpBksn54ri8tAI7dA65Mbtg8EroXtSp3CZWaeHgQv19hvkdqpfL2F7xJ5ugrhdrthwk5v01IeuPmgY61WDx7x/cfQEGwZiFQR9xa3abjjOJ2Tx45TZadYsse7j4SzdSRnSxNFJJK2pZ9tCHDlHYpAcEOHKusMp9A1eCCHFTilvDjM92+PQ1uSivGaXaS3XS/jbSmPULrzSfENGQ/2CUrzX5ykyWG+xq1mrqCacVAntnbjk1Yy3PzFwPOmJGMFlLWwfwoWbtxdmqYmykGRtNelUxF0wsCCmjedP00kHACk+jOfnxKh2BJUAgU72cyetPjMOkZdE2pr+KGx/aAlILwgQMDU286zMS0iWaXmQdtn7e9hV+Fmhq3FRxp5wBcUarKfiK/f49wHRFpQlJQr+LqeA7VrMY3aIwhIP01RiT9vZXxFjwoLfgVgLHeorhnmtVHGl14oDWXltslvx4FsGAjH9bUu86Fz4BpF3ZjRo5DRLq9RUknLxmDp5yt1k0vudOlk15wEEH4aKar3SI4s0iDbUqBg6/L4vN1f1pUBCTMprIYa9Eu4pj9/zfDDhxWtcCxyZyrBYam9IxFWbRCKm3B4lPg0Z/Ep9dhbZGJRkTo+MzQ/VS7XTHXoq6EzjBe9KzuVLLnkCGigeurpOXQyC2cKYGMa4RCtaOIMkLXfDCUgDaxbt83IXhO5P0ogdNircqW8chCnnEOGX/chLQP8CLKeIAYyJBryR25J0jPfxxU3pLWFghoQERKarcK9Sxciqc30J7fNYFvxJs2AfBTgtT4FjH1H19qtzH+8TNbuvqLjfLxWEyYw8GHmMWB4Xf93jmZHVOav0c6b/LymDMzte4oznF4q8pXhaTwOfUtsrTZg6jLjB9aJFZR9GQYcsisDrdvU2Hty4Tg1ALWnRayHSN9FGKub2mi9hcFai3TF1I0bPHhgAJk9fv/PJDMr/rsoJRXLsRPW9KtSSkKd7VAzE2yS6XOBSTT0ae1Qsjj4uGRGJMoMUcKlgkbPvWqPME5c0XwpjGNOkpMJsHSM+l3UkGmH4E/3GDJAWCo+9Cx2oxFAjxU/8M5DViTu4srFF1VhCMeqQW18egeVpXlksk9TGnoTpB0hZg1CIgCgJwU+NzXH2Fz+u7jdS5WS2yOuSCjb7wMfzc+qogwdpx/N21Df5DdO9/H1wvNLZ1j1/TmzlYvsKpvMPKONOn9b1CdJ75z2v3Yz72btQXU9VCY/fUinj2RxpKB8trWrcmAD8I4GCZnPxo4Tm//uHR8OlwlfTPWAGFZVGHjxoVj41YqKaHt9zrVFjoeiLvoLc5TGjgfiOdGYC9CUMiHjl2k4zkjuWln//JA9fLz3dDscindKwqt8t3FQAilQKoI/uoKx1e4gz5BGzD3eKcFvzxvJEOS8xC89DPTHCtmpJrIFAVaFtlEEZ9ZkMxMpEoL/s8/JvNpVXkI3el/HyORu05pFhIicA3rNO9bMtmuGs2nYVbzkVlgnJz1yBOF5hPzXil5j6paUmstAcXBbBFijo+5g26UFOT/deqO5CF8ef60KcKrXZStn5V2CIoUT/6zTb4Vk2VVUWshv4Wvc8XG70ZM0LyUKboH4HRT9iusnrsyvNTndFzm0hgeWU8H+x1VzSUTNeqv1G1aISYd10mQb3JkmwLTfiQmduEBlCgpoajnGgjsCCxVcO2vEAVMdAKbX/n4SJELK1/6j5x2wPaI7cBwLM6gomVpuv/D1D/TOeqm2DADG9VaevN9S/4+uyKtZDoi4Z81mHplME6aoAXBBMRP/DXjdAhsNdFmY4yJsZV2xIRLMcBv9J7aQwh1xRLjOtCG6ilbTQ2eleTW/WeHD+AgaRmTloPIllcFKjqIlwWfDUv69t9bcKdbECUE30at06KK42l8gWphR0v7IPtVGA7iwpzQbpYB1Z09KioPINUSO7Hk57LU3Laly4ineef0Kd9kP5WbT+bhbQxwFg84RTtTZ29wMIkpMnB7uXwysKztotD/xD9FIITIdnpbvyvX5FT3KEhSBezwF8A3W0ME+4WVOe6JcsgnDxXFrp7w5c8areabN8ExbxoD3m00OnwuPL++0bvWejrbXP4OH/BWY+Js5eL/D8v3+GE+f3u0mZy9hgJyCH9NKSaLg+/H0o2QNsHt8pfeW8QfiACQXjb8yjsTvmB6JoA5S0OloTLn65m8mFIxdNy5bcgh141UuLeE41JIx3RZzzgHDu+CqBCpkmU+C5HwURyFymj4rQYfYfE6ZfvAfW1qMGTvizh7H5y1touqcNud8g8BvquQMihuPj/KdYfldaz+9KDRxwo9NGM6IqB+kqMeW0bwY7tsatKtQlSk7GKqUnlDq+Zx1NApn8wTDtTaNp46F81vkFwGt+dxQIyKRpF01iBhWiBNbZfgcDu8GyW47mWMBo/+qm0+SNpKbvjlTXdejRsxz/J2lftBtUl2o1v4qboqxQZzvL+FSEWk8g7VuZe6yZEsJpwmkS7BJUPShdVXecqiR70Ut90bM+0OvPPWjcwU9XgmjZbkhl+/hhPigXci7UeR6UH3aEZjp0ngNlkbYYL/EgAAAAAAAAAAAAA=" alt="IPARTES" style="height:32px;display:block;">
     </div>
   </div>
-  <div class="header-right">
-    <button id="btn-refresh-data" onclick="refreshCurrentUserData()"
-      style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);
-             color:#fff;font-family:var(--font);font-size:12px;font-weight:600;
-             padding:6px 14px;border-radius:8px;cursor:pointer;
-             display:flex;align-items:center;gap:6px;transition:all .2s;white-space:nowrap"
-      onmouseover="this.style.background='rgba(255,255,255,.25)'"
-      onmouseout="this.style.background='rgba(255,255,255,.15)'">
-      🔄 Atualizar
-    </button>
+  <div class="header-right" id="headerRight">
+    <button id="btn-refresh-data" onclick="refreshCurrentUserData()" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);color:#fff;font-family:var(--font);font-size:12px;font-weight:600;padding:6px 14px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:6px" onmouseover="this.style.background='rgba(255,255,255,.25)'" onmouseout="this.style.background='rgba(255,255,255,.15)'">🔄 Atualizar</button>
     <div class="db-indicator">
       <div class="db-dot" id="dbDot"></div>
       <span id="dbLabel">localStorage</span>
@@ -1558,22 +1533,18 @@ td.hi { color: var(--text); font-weight: 500; }
 
 <div class="app-layout">
 <aside class="sidebar" id="appSidebar">
-
   <div class="sidebar-section" id="section-geral">
     <div class="sidebar-section-header" onclick="toggleSidebarSection('geral')">
-      <div class="vendor-badge badge-geral">◈</div><span>Visão Geral</span>
-      <span class="collapse-icon">▾</span>
+      <div class="vendor-badge badge-geral">◈</div><span>Visão Geral</span><span class="collapse-icon">▾</span>
     </div>
     <div class="sidebar-items">
       <button class="sidebar-item geral active" id="sb-overview" onclick="sidebarNav('overview')"><span class="item-icon">📊</span> Dashboard Geral</button>
       <button class="sidebar-item vendas" id="sb-vendas-geral" onclick="sidebarNav('vendas-geral')"><span class="item-icon">🛒</span> Vendas Geral</button>
     </div>
   </div>
-
   <div class="sidebar-section" id="section-rodrigo">
     <div class="sidebar-section-header" onclick="toggleSidebarSection('rodrigo')">
-      <div class="vendor-badge badge-rodrigo">RO</div><span>Rodrigo</span>
-      <span class="collapse-icon">▾</span>
+      <div class="vendor-badge badge-rodrigo">RO</div><span>Rodrigo</span><span class="collapse-icon">▾</span>
     </div>
     <div class="sidebar-items">
       <button class="sidebar-item rodrigo" id="sb-rodrigo-overview" onclick="sidebarNav('rodrigo-overview')"><span class="item-icon">📊</span> Visão Geral</button>
@@ -1587,11 +1558,9 @@ td.hi { color: var(--text); font-weight: 500; }
       <button class="sidebar-add-btn" onclick="openSettings('rodrigo')" style="color:#ea580c">＋ Adicionar cliente</button>
     </div>
   </div>
-
   <div class="sidebar-section" id="section-lenon">
     <div class="sidebar-section-header" onclick="toggleSidebarSection('lenon')">
-      <div class="vendor-badge badge-lenon">LE</div><span>Lenon</span>
-      <span class="collapse-icon">▾</span>
+      <div class="vendor-badge badge-lenon">LE</div><span>Lenon</span><span class="collapse-icon">▾</span>
     </div>
     <div class="sidebar-items">
       <button class="sidebar-item lenon" id="sb-lenon-overview" onclick="sidebarNav('lenon-overview')"><span class="item-icon">📊</span> Visão Geral</button>
@@ -1606,11 +1575,9 @@ td.hi { color: var(--text); font-weight: 500; }
       <button class="sidebar-add-btn" onclick="openSettings('lenon')" style="color:#15803d">＋ Adicionar cliente</button>
     </div>
   </div>
-
   <div class="sidebar-section" id="section-luiz">
     <div class="sidebar-section-header" onclick="toggleSidebarSection('luiz')">
-      <div class="vendor-badge badge-luiz">LU</div><span>Luiz</span>
-      <span class="collapse-icon">▾</span>
+      <div class="vendor-badge badge-luiz">LU</div><span>Luiz</span><span class="collapse-icon">▾</span>
     </div>
     <div class="sidebar-items">
       <button class="sidebar-item luiz" id="sb-luiz-overview" onclick="sidebarNav('luiz-overview')"><span class="item-icon">📊</span> Visão Geral</button>
@@ -1619,13 +1586,12 @@ td.hi { color: var(--text); font-weight: 500; }
       <button class="sidebar-add-btn" onclick="openSettings('luiz')" style="color:#1d4ed8">＋ Adicionar cliente</button>
     </div>
   </div>
-
 </aside>
 <button class="sidebar-toggle" onclick="toggleMobileSidebar()">☰</button>
 <div class="main-content" id="appMainContent">
 
 <!-- OVERVIEW -->
-<div class="overview-section" id="tab-overview" id="tab-overview">
+<div class="overview-section active" id="tab-overview">
   <div class="page-header">
     <div class="page-title">Visão Geral</div>
     <div class="page-sub">Consolidado de todos os clientes · filtros globais</div>
@@ -1673,9 +1639,6 @@ td.hi { color: var(--text); font-weight: 500; }
   <div class="kpi-grid" id="kpiGrid"></div>
   <div class="insights-grid" id="insightsGrid"></div>
 
-  <!-- Meta Mensal por Vendedor -->
-  <div id="meta-vendedor-section" style="margin-bottom:20px"></div>
-
   <!-- Comparativo Mês a Mês -->
   <div class="comparativo-grid" id="comparativoGrid"></div>
 
@@ -1710,12 +1673,6 @@ td.hi { color: var(--text); font-weight: 500; }
       <div class="chart-wrap" style="height:220px"><canvas id="chartFN"></canvas></div>
     </div>
   </div>
-
-  <!-- Ranking de Clientes -->
-  <div id="ranking-clientes-section" style="margin-bottom:20px"></div>
-
-  <!-- Win/Loss por Portal -->
-  <div id="winloss-section" style="margin-bottom:20px"></div>
 
   <!-- SUMMARY TABLE -->
   <div class="table-card">
@@ -1825,7 +1782,6 @@ td.hi { color: var(--text); font-weight: 500; }
           <th>Data Entrega</th>
           <th>Status</th>
           <th>NF</th>
-          <th>Prev. Pagamento</th>
           <th>Obs.</th>
           <th>Ações</th>
         </tr></thead>
@@ -2025,9 +1981,8 @@ async function sbFetch(method, query, body, extraHeaders) {
 async function loadFromSupabase() {
   showLoading('Carregando oportunidades…');
   try {
-    // RESET data antes de carregar para evitar acúmulo/duplicação
+    // Reset para evitar acúmulo/duplicação
     CLIENTS.forEach(c => { data[c] = []; });
-
     const PAGE_SIZE = 1000;
     let allRows = [];
     let page = 0;
@@ -2106,28 +2061,12 @@ function recToRow(rec, client) {
 async function insertToSupabase(client, rec) {
   try {
     const row = recToRow(rec, client);
-    // Use upsert to prevent duplicates on (cliente, numero)
-    const url = sbClient.url + '/rest/v1/' + TABLE;
-    let token = sbClient.key;
-    try {
-      const s = JSON.parse(localStorage.getItem('ipartes_session_v1')||'{}');
-      if (s.access_token && Date.now() < s.expires_at-10000) token = s.access_token;
-    } catch(e2) {}
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type':  'application/json',
-        'apikey':        sbClient.key,
-        'Authorization': 'Bearer ' + token,
-        'Prefer':        'resolution=merge-duplicates,return=representation',
-      },
-      body: JSON.stringify([row])
-    });
+    const res = await sbFetch('POST', '', row);
     if (!res.ok) throw new Error('Falha ao inserir: ' + await res.text());
     const inserted = await res.json();
-    if (inserted && inserted[0]) rec.sb_id = inserted[0].id;
+    if (inserted && inserted[0]) rec.sb_id = inserted[0].id, rec.id = inserted[0].id;
   } catch(e) {
-    throw new Error('Erro ao salvar no Supabase: ' + e.message);
+    throw new Error('insertToSupabase: ' + e.message);
   }
 }
 
@@ -2147,29 +2086,16 @@ async function insertBatchToSupabase(client, recs) {
   if (!recs || recs.length === 0) return;
   const rows = recs.map(r => recToRow(r, client));
   try {
-    // Use upsert with ON CONFLICT to prevent duplicates
-    const res = await fetch(
-      sbClient.url + '/rest/v1/' + TABLE,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': sbClient.key,
-          'Authorization': 'Bearer ' + ((() => {
-            try {
-              const s = JSON.parse(localStorage.getItem('ipartes_session_v1')||'{}');
-              return (s.access_token && Date.now() < s.expires_at-10000) ? s.access_token : sbClient.key;
-            } catch(e) { return sbClient.key; }
-          })()),
-          // Upsert: if same (cliente, numero) exists → update instead of duplicate
-          'Prefer': 'resolution=merge-duplicates,return=minimal',
-        },
-        body: JSON.stringify(rows)
-      }
-    );
+    const res = await fetch(sbClient.url+'/rest/v1/'+TABLE, {
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':sbClient.key,
+        'Authorization':'Bearer '+sbClient.key,
+        'Prefer':'resolution=merge-duplicates,return=minimal'},
+      body:JSON.stringify(rows)
+    });
     if (!res.ok) {
-      let errMsg = 'Erro desconhecido';
-      try { const j = await res.json(); errMsg = j.message || j.error || errMsg; } catch(e2) {}
+      let errMsg='Erro desconhecido';
+      try { const j=await res.json(); errMsg=j.message||j.error||errMsg; } catch(e2) {}
       throw new Error(`Batch insert falhou (${res.status}): ${errMsg}`);
     }
   } catch(e) {
@@ -2234,11 +2160,9 @@ function computeRecord(rec) {
   rec.mesPedido = getM(rec.dataPedido);
   rec.anoPedido = getY(rec.dataPedido);
   if (rec.dataPedido) {
-    const start = rec.dataLancamento || (rec.ano && rec.mes ? rec.ano+'-'+rec.mes+'-01' : null);
-    if (start) {
-      const raw = daysBetween(start, rec.dataPedido);
-      rec.ciclo = raw !== null ? Math.max(0, raw) : null;
-    } else { rec.ciclo = null; }
+    const start = rec.dataLancamento || (rec.ano&&rec.mes ? rec.ano+'-'+rec.mes+'-01' : null);
+    const raw = start ? daysBetween(start, rec.dataPedido) : null;
+    rec.ciclo = raw !== null ? Math.max(0, raw) : null;
   } else { rec.ciclo = null; }
   rec.alertaMes = (rec.venda === 'SIM' && rec.mes && rec.mesPedido && rec.mes !== rec.mesPedido);
   return rec;
@@ -2494,25 +2418,44 @@ function buildClientTabs() {
           </select>
           <div class="filter-sep"></div>
           <label style="font-size:10px;color:var(--text3);white-space:nowrap">Lançamento:</label>
-          <input type="date" id="cf-data-de-${slug}" title="Data lançamento — de"
+          <input type="date" id="cf-data-de-${slug}"
             onchange="renderClientTab('${client}')"
-            style="font-size:11px;padding:3px 6px;border:1px solid var(--border);border-radius:4px;font-family:var(--font)">
+            style="font-size:11px;padding:3px 6px;border:1px solid var(--border);border-radius:4px">
           <span style="font-size:11px;color:var(--text3)">até</span>
-          <input type="date" id="cf-data-ate-${slug}" title="Data lançamento — até"
+          <input type="date" id="cf-data-ate-${slug}"
             onchange="renderClientTab('${client}')"
-            style="font-size:11px;padding:3px 6px;border:1px solid var(--border);border-radius:4px;font-family:var(--font)">
+            style="font-size:11px;padding:3px 6px;border:1px solid var(--border);border-radius:4px">
           <div class="filter-sep"></div>
           <label style="font-size:10px;color:var(--text3);white-space:nowrap">Finaliza:</label>
-          <input type="date" id="cf-fin-de-${slug}" title="Data finaliza — de"
+          <input type="date" id="cf-fin-de-${slug}"
             onchange="renderClientTab('${client}')"
-            style="font-size:11px;padding:3px 6px;border:1px solid var(--border);border-radius:4px;font-family:var(--font)">
+            style="font-size:11px;padding:3px 6px;border:1px solid var(--border);border-radius:4px">
           <span style="font-size:11px;color:var(--text3)">até</span>
-          <input type="date" id="cf-fin-ate-${slug}" title="Data finaliza — até"
+          <input type="date" id="cf-fin-ate-${slug}"
             onchange="renderClientTab('${client}')"
-            style="font-size:11px;padding:3px 6px;border:1px solid var(--border);border-radius:4px;font-family:var(--font)">
+            style="font-size:11px;padding:3px 6px;border:1px solid var(--border);border-radius:4px">
           <div class="filter-sep"></div>
-          <button class="btn-reset" onclick="resetClientFilters('${slug}','${client}')"
-            style="font-size:11px;padding:4px 10px" title="Limpar filtros">↺</button>
+          <button onclick="renderClientTab(\'${client}\')"
+            style="font-size:11px;padding:4px 12px;border:none;border-radius:4px;
+                   background:var(--blue);color:#fff;font-family:var(--font);
+                   font-weight:600;cursor:pointer">🔍 Filtrar</button>
+          <button onclick="clearClientFilters(\'${slug}\',\'${client}\')"
+            style="font-size:11px;padding:4px 10px;border:1px solid var(--border);
+                   border-radius:4px;background:transparent;cursor:pointer;
+                   color:var(--text3);font-family:var(--font)">↺ Limpar</button>
+        </div>
+        <div id="excluir-bar-${slug}"
+          style="display:none;padding:6px 4px;gap:8px;align-items:center;flex-wrap:wrap">
+          <span id="excluir-count-${slug}"
+            style="font-size:12px;color:var(--text3);font-family:var(--font)">0 selecionada(s)</span>
+          <button onclick="bulkDeleteSelected(\'${slug}\',\'${client}\')"
+            style="font-size:12px;font-weight:600;padding:5px 14px;border:none;
+                   border-radius:6px;background:#dc2626;color:#fff;cursor:pointer;font-family:var(--font)">
+            🗑 Excluir Selecionadas</button>
+          <button onclick="clearSelection(\'${slug}\')"
+            style="font-size:12px;padding:5px 10px;border:1px solid var(--border);
+                   border-radius:6px;background:transparent;color:var(--text3);
+                   cursor:pointer;font-family:var(--font)">✕ Cancelar</button>
         </div>
         <div class="table-wrap">
           <table>
@@ -2540,27 +2483,19 @@ function buildClientTabs() {
             <tbody id="table-${slug}"></tbody>
           </table>
         </div>
-
-        <!-- Barra de exclusão em massa -->
         <div class="bulk-delete-bar" id="bulk-bar-${slug}">
           <div class="bulk-delete-info">
-            <span class="bulk-delete-count" id="bulk-count-${slug}">0</span>
-            selecionada(s)
+            <span class="bulk-delete-count" id="bulk-count-${slug}">0</span> selecionada(s)
           </div>
-          <div style="display:flex;gap:8px;align-items:center">
-            <button class="bulk-delete-btn"
-              onclick="bulkDeleteSelected('${slug}','${client}')">
-              🗑 Excluir selecionadas
-            </button>
-            <button onclick="clearSelection('${slug}')"
-              style="background:transparent;border:1px solid rgba(255,255,255,.3);
-                     color:#fff;border-radius:6px;padding:4px 12px;
-                     font-size:12px;cursor:pointer;font-family:var(--font)">
-              ✕ Cancelar
-            </button>
+          <div style="display:flex;gap:8px">
+            <button class="bulk-delete-btn" onclick="bulkDeleteSelected(\'${slug}\',\'${client}\')">
+              🗑 Excluir selecionadas</button>
+            <button onclick="clearSelection(\'${slug}\')"
+              style="background:transparent;border:1px solid rgba(255,255,255,.3);color:#fff;
+                     border-radius:6px;padding:4px 12px;font-size:12px;cursor:pointer;font-family:var(--font)">
+              ✕ Cancelar</button>
           </div>
         </div>
-
         <!-- Paginação -->
         <div class="pagination-bar">
           <div class="pagination-info" id="cpagination-info-${slug}">—</div>
@@ -2697,12 +2632,12 @@ async function addRecord(client) {
     } catch(e) { hideLoading(); markSyncError(e.message); showToast('✗ Erro ao salvar: '+e.message,'#dc2626'); return; }
   }
 
-  // Dedup: se número já existe, atualiza em vez de inserir
+  // Dedup: se número já existe, atualiza
   const _dup = (data[client]||[]).find(r => r.numero && r.numero === rec.numero);
   if (_dup) {
-    Object.assign(_dup, rec, { id: _dup.id, sb_id: _dup.sb_id });
+    Object.assign(_dup, rec, { id:_dup.id, sb_id:_dup.sb_id });
     computeRecord(_dup);
-    showToast('ℹ Nº ' + rec.numero + ' já existe — registro atualizado', '#1d4ed8');
+    showToast('ℹ Nº '+rec.numero+' já existe — atualizado', '#1d4ed8');
   } else {
     data[client].push(rec);
   }
@@ -3714,12 +3649,12 @@ function renderOverview() {
   const filtered = applySearch(applyFilter(getAllRecords()));
   updateSearchCount(getAllRecords().length, filtered.length);
   renderKPIs(filtered);
-  renderInsights(filtered);
   renderMetaVendedor();
-  renderComparativo(filtered);
-  renderCharts(filtered);
   renderRankingClientes();
   renderWinLoss();
+  renderInsights(filtered);
+  renderComparativo(filtered);
+  renderCharts(filtered);
   renderOverviewTable(filtered);
   // Refresh client filter dropdown (no renderNav here — only on client list changes)
   const fCliente = document.getElementById('fCliente');
@@ -3979,7 +3914,7 @@ function onLoginSuccess(user) {
   document.getElementById('loginScreen').style.display = 'none';
   document.getElementById('appContent').classList.add('visible');
 
-  // Detect user profile from email
+  // Detect access profile from email
   currentUserEmail   = user.email || '';
   currentUserProfile = detectUserProfile(currentUserEmail);
 
@@ -4004,13 +3939,11 @@ function onLoginSuccess(user) {
   if (_url && _key) {
     const elUrl = document.getElementById('sbUrl'); if (elUrl) elUrl.value = _url;
     const elKey = document.getElementById('sbKey'); if (elKey) elKey.value = _key;
-    // Connect to Supabase but DON'T auto-load — user clicks Atualizar
     useSupabase = true;
     sbClient = { url: _url.replace(/\/$/,''), key: _key };
     document.getElementById('dbDot').className = 'db-dot online';
     document.getElementById('dbLabel').textContent = 'Supabase';
     updateFooterDot(true);
-    // Show cache data immediately — fast load
     showCacheNotice();
   }
 }
@@ -4348,8 +4281,7 @@ function rowToVenda(row){
     numOportunidade:row.num_oportunidade||'', portal:row.portal||'', valor:row.valor||'',
     numPO:row.num_po||'', dataPedido:row.data_pedido||'', prazoEntrega:row.prazo_entrega||'',
     dataEntrega:row.data_entrega||'', statusEntrega:row.status_entrega||'Aguardando PO',
-    nfEmitida:row.nf_emitida||'NÃO', numNF:row.num_nf||'', obs:row.obs||'',
-    previsaoPagamento:row.previsao_pagamento||'', createdAt:row.created_at||'' };
+    nfEmitida:row.nf_emitida||'NÃO', numNF:row.num_nf||'', previsaoPagamento:row.previsao_pagamento||'', obs:row.obs||'', createdAt:row.created_at||'' };
 }
 function vendaToRow(v){
   return { cliente:v.cliente, num_oportunidade:v.numOportunidade, portal:v.portal||null,
@@ -4496,11 +4428,6 @@ function renderVendasKpis(){
   const ativos=all.filter(v=>v.statusEntrega!=='Faturado').length;
   const valorTotal=all.reduce((s,v)=>s+(parseFloat(String(v.valor||0).replace(',','.'))||0),0);
   const atrasados=all.filter(v=>getVendaSituacao(v)==='atrasado').length;
-  const pagAtrasados=all.filter(v=>v.previsaoPagamento&&isPagamentoAtrasado(v.previsaoPagamento)).length;
-  const pagProximos=all.filter(v=>{
-    if(!v.previsaoPagamento||isPagamentoAtrasado(v.previsaoPagamento))return false;
-    return Math.ceil((new Date(v.previsaoPagamento)-new Date())/86400000)<=7;
-  }).length;
   const hoje=new Date().toISOString().slice(0,7);
   const entregMes=all.filter(v=>v.dataEntrega&&v.dataEntrega.slice(0,7)===hoje).length;
   const faturados=all.length>0?Math.round(all.filter(v=>v.statusEntrega==='Faturado').length/all.length*100):0;
@@ -4624,9 +4551,6 @@ function buildVendaForm(v){
         <option value="SIM" ${v.nfEmitida==='SIM'?'selected':''}>SIM</option>
       </select></div>
     <div class="form-group"><label>Nº da NF</label><input type="text" id="vf-numNF" value="${sanitize(v.numNF||'')}" placeholder="Número da nota fiscal"></div>
-    <div class="form-group"><label>💳 Previsão de Pagamento</label>
-      <input type="date" id="vf-previsaoPagamento" value="${v.previsaoPagamento||''}">
-    </div>
     <div class="form-group" style="grid-column:1/-1"><label>Observações</label>
       <textarea id="vf-obs" placeholder="Observações de pós-venda...">${sanitize(v.obs||'')}</textarea></div>`;
 }
@@ -4636,7 +4560,7 @@ async function saveVenda(){
   const venda={ cliente:g('cliente'), numOportunidade:g('numOportunidade'), portal:g('portal'),
     valor:g('valor'), numPO:g('numPO'), dataPedido:g('dataPedido'), prazoEntrega:g('prazoEntrega'),
     dataEntrega:g('dataEntrega'), statusEntrega:g('statusEntrega'), nfEmitida:g('nfEmitida'),
-    numNF:g('numNF'), previsaoPagamento:g('previsaoPagamento'), obs:g('obs') };
+    numNF:g('numNF'), obs:g('obs') };
   if(!venda.cliente){ showToast('⚠ Selecione o cliente','#b45309'); return; }
   if(editingVendaId){
     const ex=getAllVendas().find(v=>v.id===editingVendaId);
@@ -5410,19 +5334,16 @@ const clientSortState = {}; // { slug: { col, dir } }
 function getClientFilters(slug) {
   const g = id => document.getElementById(id)?.value || '';
   return {
-    search:   g('cf-search-'+slug).toLowerCase(),
-    status:   g('cf-status-'+slug),
-    portal:   g('cf-portal-'+slug),
-    particip: g('cf-particip-'+slug),
-    venda:    g('cf-venda-'+slug),
-    ano:      g('cf-ano-'+slug),
-    mes:      g('cf-mes-'+slug),
-    dataDe:   g('cf-data-de-'+slug),
-    dataAte:  g('cf-data-ate-'+slug),
-    finDe:    g('cf-fin-de-'+slug),
-    finAte:   g('cf-fin-ate-'+slug),
+    search:  g('cf-search-'+slug).toLowerCase(),
+    status:  g('cf-status-'+slug),
+    portal:  g('cf-portal-'+slug),
+    particip:g('cf-particip-'+slug),
+    venda:   g('cf-venda-'+slug),
+    ano:     g('cf-ano-'+slug),
+    mes:     g('cf-mes-'+slug),
   };
 }
+
 
 function resetClientFilters(slug, client) {
   ['cf-search-','cf-status-','cf-portal-','cf-particip-','cf-venda-','cf-ano-','cf-mes-'].forEach(p => {
@@ -5444,10 +5365,8 @@ function applyClientFilters(records, slug) {
     if (f.venda   && r.venda        !== f.venda)   return false;
     if (f.ano     && r.ano          !== f.ano)     return false;
     if (f.mes     && r.mes          !== f.mes)     return false;
-    // Filtro por data de lançamento
-    if (f.dataDe  && r.data  && r.data  < f.dataDe)  return false;
-    if (f.dataAte && r.data  && r.data  > f.dataAte) return false;
-    // Filtro por data de finalização
+    if (f.dataDe  && r.data && r.data < f.dataDe)  return false;
+    if (f.dataAte && r.data && r.data > f.dataAte) return false;
     if (f.finDe   && r.finaliza && r.finaliza < f.finDe)  return false;
     if (f.finAte  && r.finaliza && r.finaliza > f.finAte) return false;
     return true;
@@ -5572,6 +5491,10 @@ function updateBulkDeleteBar(slug) {
 
   if (bar) bar.classList.toggle('visible', n > 0);
   if (countEl) countEl.textContent = n;
+  const exBar   = document.getElementById('excluir-bar-'+slug);
+  const exCount = document.getElementById('excluir-count-'+slug);
+  if (exBar)   exBar.style.display = n > 0 ? 'flex' : 'none';
+  if (exCount) exCount.textContent = n + ' selecionada(s)';
 
   // Update select-all checkbox state
   const allCbs = document.querySelectorAll(`#table-${slug} .row-select-cb`);
@@ -5677,30 +5600,93 @@ function dedupByNumero(records) {
 }
 
 
-// ════════════════════════════════════════════════
-// SIDEBAR & VENDOR MODULES
-// ════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════
+// VENDOR CONFIG + SIDEBAR + ACCESS CONTROL + ALL FEATURES
+// ══════════════════════════════════════════════════════
+
 const VENDOR_CONFIG = {
   rodrigo: { name:'Rodrigo', badge:'RO', color:'#ea580c', clients:['Vale Ferrosos','Vale Metals','Suzano','Outros'] },
   lenon:   { name:'Lenon',   badge:'LE', color:'#15803d', clients:['Petrobras','Eneva','Transpetro','Engie','TBG'] },
   luiz:    { name:'Luiz',    badge:'LU', color:'#1d4ed8', clients:[] },
 };
+const META_VENDEDOR = 250000;
+const PORTALS_LIST  = ['COUPA','MERCADO ELETRONICO','FAIRMARKIT','PETRONECT','CAPTURAME','E-MAIL','ENGIE'];
 
-let currentSidebarNav = 'overview';
+let currentUserProfile = 'adm';
+let currentUserEmail   = '';
+let currentSidebarNav  = 'overview';
 
+// ── Access Control ──
+function detectUserProfile(email) {
+  const e = (email||'').toLowerCase();
+  if (e.includes('lenon'))   return 'lenon';
+  if (e.includes('luiz'))    return 'luiz';
+  if (e.includes('rodrigo')) return 'rodrigo';
+  return 'adm';
+}
+const ACCESS_RULES = {
+  adm:     { sections:['geral','rodrigo','lenon','luiz'], canSeeAll:true },
+  rodrigo: { sections:['geral','rodrigo','lenon','luiz'], canSeeAll:true },
+  lenon:   { sections:['geral','lenon'],                  canSeeAll:false },
+  luiz:    { sections:['geral','luiz'],                   canSeeAll:false },
+};
+function getUserAccess() { return ACCESS_RULES[currentUserProfile] || ACCESS_RULES.adm; }
+function canAccessSection(s) { return getUserAccess().sections.includes(s); }
+
+function applySidebarAccess() {
+  const access = getUserAccess();
+  ['rodrigo','lenon','luiz'].forEach(v => {
+    const el = document.getElementById('section-'+v);
+    if (el) el.style.display = access.sections.includes(v) ? '' : 'none';
+  });
+  renderUserProfileBadge();
+}
+
+function renderUserProfileBadge() {
+  document.getElementById('user-profile-badge')?.remove();
+  const cfg   = VENDOR_CONFIG[currentUserProfile];
+  const color = cfg ? cfg.color : '#64748b';
+  const label = cfg ? cfg.name  : 'Administrador';
+  const badge = cfg ? cfg.badge : 'ADM';
+  const el = document.createElement('div');
+  el.id = 'user-profile-badge';
+  el.style.cssText = 'padding:12px 14px;background:rgba(255,255,255,.05);border-bottom:1px solid #334155;display:flex;align-items:center;gap:8px;';
+  el.innerHTML = `<div style="width:28px;height:28px;border-radius:50%;background:${color};color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center">${badge}</div>
+    <div><div style="font-size:12px;font-weight:700;color:#e2e8f0">${label}</div>
+    <div style="font-size:10px;color:#64748b;overflow:hidden;text-overflow:ellipsis;max-width:140px;white-space:nowrap">${currentUserEmail}</div></div>`;
+  document.getElementById('appSidebar')?.prepend(el);
+}
+
+function applyInitialNavigation() {
+  if (currentUserProfile === 'lenon') { sidebarNav('lenon-overview'); }
+  else if (currentUserProfile === 'luiz') { sidebarNav('luiz-overview'); }
+  else {
+    const el = document.getElementById('tab-overview');
+    if (el) el.style.display = 'block';
+    document.getElementById('sb-overview')?.classList.add('active');
+    renderOverview();
+  }
+}
+
+function checkSectionAccess(target) {
+  const m = target.match(/^(rodrigo|lenon|luiz)/);
+  if (m && !canAccessSection(m[1])) {
+    showToast('⛔ Você não tem acesso a este módulo','#dc2626');
+    return false;
+  }
+  return true;
+}
+
+// ── Sidebar Navigation ──
 function sidebarNav(target) {
-  // Access control check
   if (!checkSectionAccess(target)) return;
   currentSidebarNav = target;
-  // Hide all sections
-  ['#tab-overview','#tab-vendas','#module-rodrigo','#module-rodrigo-vendas',
-   '#module-lenon','#module-lenon-vendas','#module-luiz','#module-luiz-vendas',
-   '#clientTabsContainer'].forEach(id => {
-    const el = document.getElementById(id.slice(1));
+  ['tab-overview','tab-vendas','module-rodrigo','module-rodrigo-vendas',
+   'module-lenon','module-lenon-vendas','module-luiz','module-luiz-vendas',
+   'clientTabsContainer'].forEach(id => {
+    const el = document.getElementById(id);
     if (el) el.style.display = 'none';
   });
-  // Also hide overview-section class
-  document.querySelectorAll('.overview-section').forEach(el => el.style.display = 'none');
   document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
 
   if (target === 'overview') {
@@ -5712,81 +5698,64 @@ function sidebarNav(target) {
     const el = document.getElementById('tab-vendas');
     if (el) el.style.display = 'block';
     document.getElementById('sb-vendas-geral')?.classList.add('active');
-    salesCurrentClient = null;
-    salesFilters = {status:'',cliente:'',atrasado:'',de:'',ate:''};
+    salesCurrentClient = null; salesFilters = {status:'',cliente:'',atrasado:'',de:'',ate:''};
     renderVendasModule();
   } else if (target.endsWith('-overview')) {
     const vendor = target.replace('-overview','');
-    const modEl = document.getElementById('module-'+vendor);
-    if (modEl) modEl.style.display = 'block';
+    const el = document.getElementById('module-'+vendor);
+    if (el) el.style.display = 'block';
     document.getElementById('sb-'+vendor+'-overview')?.classList.add('active');
     showVendorModule(vendor);
   } else if (target.endsWith('-vendas')) {
     const vendor = target.replace('-vendas','');
-    document.getElementById('module-'+vendor+'-vendas')?.style && (document.getElementById('module-'+vendor+'-vendas').style.display = 'block');
+    const el = document.getElementById('module-'+vendor+'-vendas');
+    if (el) el.style.display = 'block';
     document.getElementById('sb-'+vendor+'-vendas')?.classList.add('active');
     showVendorVendas(vendor);
   }
 }
 
 function showVendorClientTab(vendor, client) {
+  currentSidebarNav = 'vendor-'+vendor+'-'+client;
   ['tab-overview','tab-vendas','module-rodrigo','module-rodrigo-vendas',
    'module-lenon','module-lenon-vendas','module-luiz','module-luiz-vendas'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = 'none';
+    const el = document.getElementById(id); if (el) el.style.display='none';
   });
   const ct = document.getElementById('clientTabsContainer');
   if (ct) ct.style.display = 'block';
-  document.querySelectorAll('.client-section').forEach(s => s.style.display = 'none');
-  const section = document.getElementById('client-'+slugify(client));
-  if (section) { section.style.display = 'block'; renderClientTab(client); }
+  document.querySelectorAll('.client-section').forEach(s => s.style.display='none');
+  const sec = document.getElementById('client-'+slugify(client));
+  if (sec) { sec.style.display='block'; renderClientTab(client); }
   document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
   document.getElementById('sb-'+vendor+'-client-'+slugify(client))?.classList.add('active');
-  currentSidebarNav = 'vendor-'+vendor+'-'+client;
 }
 
 function getVendorClients(vendor) {
-  const cfg = VENDOR_CONFIG[vendor];
-  if (!cfg) return [];
+  const cfg = VENDOR_CONFIG[vendor]; if (!cfg) return [];
   return cfg.clients.filter(c => CLIENTS.includes(c));
 }
 
 function showVendorModule(vendor) {
-  const cfg = VENDOR_CONFIG[vendor];
-  if (!cfg) return;
-  const contentEl = document.getElementById('module-'+vendor+'-content');
-  if (!contentEl) return;
-
+  const cfg = VENDOR_CONFIG[vendor]; if (!cfg) return;
+  const contentEl = document.getElementById('module-'+vendor+'-content'); if (!contentEl) return;
   const vendorClients = getVendorClients(vendor);
   const filtered = getAllRecords().filter(r => vendorClients.includes(r.cliente));
-  const _dd      = dedupByNumero(filtered);
-  const total    = _dd.length;
-  const particip = _dd.filter(r=>r.participamos==='SIM').length;
-  const vendas   = _dd.filter(r=>r.venda==='SIM').length;
-  const receita  = _dd.filter(r=>r.venda==='SIM').reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0);
-  const conv     = particip>0?(vendas/particip*100).toFixed(1):'0.0';
-  const ciclos   = _dd.filter(r=>r.ciclo!=null).map(r=>r.ciclo);
-  const cicloMed = ciclos.length?Math.round(ciclos.reduce((a,b)=>a+b,0)/ciclos.length):0;
-
+  const _dd = dedupByNumero(filtered);
+  const total=_dd.length, particip=_dd.filter(r=>r.participamos==='SIM').length;
+  const vendas=_dd.filter(r=>r.venda==='SIM').length;
+  const receita=_dd.filter(r=>r.venda==='SIM').reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0);
+  const conv=particip>0?(vendas/particip*100).toFixed(1):'0.0';
   const clientCards = vendorClients.map(c => {
-    const recs = dedupByNumero(filtered.filter(r=>r.cliente===c));
-    const v = recs.filter(r=>r.venda==='SIM').length;
-    const p = recs.filter(r=>r.participamos==='SIM').length;
-    const cv = p>0?(v/p*100).toFixed(0):0;
-    return `<div class="table-card" style="padding:14px;cursor:pointer;transition:box-shadow .15s"
-      onmouseover="this.style.boxShadow='0 4px 16px rgba(0,0,0,.1)'" onmouseout="this.style.boxShadow=''"
-      onclick="showVendorClientTab('${vendor}','${c}')">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-        <span>📁</span><span style="font-size:13px;font-weight:700;color:var(--text)">${c}</span>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;text-align:center">
+    const recs=dedupByNumero(filtered.filter(r=>r.cliente===c));
+    const v=recs.filter(r=>r.venda==='SIM').length, p=recs.filter(r=>r.participamos==='SIM').length;
+    return `<div class="table-card" style="padding:14px;cursor:pointer" onclick="showVendorClientTab('${vendor}','${c}')">
+      <div style="font-weight:700;font-size:13px;margin-bottom:8px">📁 ${c}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;text-align:center">
         <div><div style="font-size:16px;font-weight:700;color:var(--blue)">${fmtNum(recs.length)}</div><div style="font-size:10px;color:var(--text3)">oport.</div></div>
         <div><div style="font-size:16px;font-weight:700;color:var(--green)">${fmtNum(v)}</div><div style="font-size:10px;color:var(--text3)">vendas</div></div>
-        <div><div style="font-size:16px;font-weight:700;color:var(--amber)">${cv}%</div><div style="font-size:10px;color:var(--text3)">conv.</div></div>
-      </div>
-    </div>`;
+        <div><div style="font-size:16px;font-weight:700;color:var(--amber)">${p>0?(v/p*100).toFixed(0):0}%</div><div style="font-size:10px;color:var(--text3)">conv.</div></div>
+      </div></div>`;
   }).join('');
-
   contentEl.innerHTML = `
     <div class="kpi-grid" style="margin-bottom:20px">
       <div class="kpi-card c-blue"><div class="kpi-icon">📋</div><div class="kpi-label">Oportunidades</div><div class="kpi-value">${fmtNum(total)}</div><div class="kpi-sub">total registradas</div></div>
@@ -5794,1009 +5763,454 @@ function showVendorModule(vendor) {
       <div class="kpi-card c-green"><div class="kpi-icon">✅</div><div class="kpi-label">Vendas</div><div class="kpi-value">${fmtNum(vendas)}</div><div class="kpi-sub">convertidas</div></div>
       <div class="kpi-card c-orange"><div class="kpi-icon">💰</div><div class="kpi-label">Receita Total</div><div class="kpi-value kpi-currency">${fmtCurrency(receita)}</div><div class="kpi-sub">em pedidos fechados</div></div>
       <div class="kpi-card c-amber"><div class="kpi-icon">🎯</div><div class="kpi-label">Conversão</div><div class="kpi-value">${conv}%</div><div class="kpi-sub">vendas / participações</div></div>
-      <div class="kpi-card c-teal"><div class="kpi-icon">⏱</div><div class="kpi-label">Ciclo Médio</div><div class="kpi-value">${cicloMed>0?cicloMed+'d':'—'}</div><div class="kpi-sub">oport. → pedido</div></div>
     </div>
     <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px">Clientes</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:16px">${clientCards}</div>
     <button onclick="openSettings('${vendor}')"
-      style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 18px;width:100%;
+      style="display:flex;align-items:center;justify-content:center;gap:8px;padding:10px;width:100%;
              background:transparent;border:2px dashed ${cfg.color}66;border-radius:var(--radius);
-             color:${cfg.color};font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer"
-      onmouseover="this.style.background='${cfg.color}11'" onmouseout="this.style.background='transparent'">
-      ＋ Adicionar / Gerenciar Clientes
-    </button>`;
+             color:${cfg.color};font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer">
+      ＋ Adicionar / Gerenciar Clientes</button>`;
 }
 
 function showVendorVendas(vendor) {
-  const cfg = VENDOR_CONFIG[vendor];
-  if (!cfg) return;
-  const contentEl = document.getElementById('module-'+vendor+'-vendas-content');
-  if (!contentEl) return;
-
+  const cfg = VENDOR_CONFIG[vendor]; if (!cfg) return;
+  const contentEl = document.getElementById('module-'+vendor+'-vendas-content'); if (!contentEl) return;
   const vendorClients = getVendorClients(vendor);
   const vendorVendas  = getAllVendas().filter(v => vendorClients.includes(v.cliente));
-  const hoje     = new Date();
-  const mesAtual = hoje.getMonth()+1;
-  const anoAtual = hoje.getFullYear();
-  const nomeMes  = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
-    'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][mesAtual-1];
-
-  const vendasMes = vendorVendas.filter(v => {
-    if (!v.dataPedido) return false;
-    const [y,m] = v.dataPedido.split('-');
-    return parseInt(m)===mesAtual && parseInt(y)===anoAtual;
+  const hoje=new Date(), mes=hoje.getMonth()+1, ano=hoje.getFullYear();
+  const nomeMes=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'][mes-1];
+  const vendasMes = vendorVendas.filter(v=>{
+    if(!v.dataPedido) return false;
+    const [y,m]=v.dataPedido.split('-');
+    return parseInt(m)===mes&&parseInt(y)===ano;
   });
-  const totalMes = vendasMes.reduce((s,v)=>s+(parseFloat(String(v.valor||0).replace(',','.'))||0),0);
-  const totalAno = vendorVendas
-    .filter(v=>v.dataPedido&&v.dataPedido.startsWith(String(anoAtual)))
-    .reduce((s,v)=>s+(parseFloat(String(v.valor||0).replace(',','.'))||0),0);
+  const totalMes=vendasMes.reduce((s,v)=>s+(parseFloat(String(v.valor||0).replace(',','.'))||0),0);
+  const totalAno=vendorVendas.filter(v=>v.dataPedido&&v.dataPedido.startsWith(String(ano))).reduce((s,v)=>s+(parseFloat(String(v.valor||0).replace(',','.'))||0),0);
 
-  // Build table rows without nested quotes in onclick
-  function buildVendaRow(v) {
-    const sit   = getVendaSituacao(v);
-    const badge = sit==='atrasado'
-      ? '<span class="atraso-badge">⚠ ATRASADO</span>'
-      : sit==='alerta'
-      ? '<span class="alerta-badge">⏰</span>'
-      : '<span style="font-size:10px;color:var(--green)">✓ OK</span>';
-    const stCls = VENDA_STATUS_CSS[v.statusEntrega] || '';
-    const tr = document.createElement('tr');
-    tr.innerHTML = [
-      '<td class="hi">' + sanitize(v.cliente) + '</td>',
-      '<td>' + sanitize(v.numOportunidade||'—') + '</td>',
-      '<td class="hi">' + (v.valor ? fmtCurrency(v.valor) : '—') + '</td>',
-      '<td>' + (v.dataPedido||'—') + '</td>',
-      '<td>' + (v.prazoEntrega||'—') + '</td>',
-      '<td>' + badge + '</td>',
-      '<td><span class="badge ' + stCls + '">' + (v.statusEntrega||'—') + '</span></td>',
-      '<td></td>',
-    ].join('');
-    // Add action buttons safely via JS (no inline onclick with quotes)
-    const actionTd = tr.lastElementChild;
-    const editBtn = document.createElement('button');
-    editBtn.className = 'btn-icon-edit';
-    editBtn.textContent = '✏';
-    editBtn.addEventListener('click', () => openEditVenda(v.id));
-    const delBtn = document.createElement('button');
-    delBtn.className = 'btn-icon-del';
-    delBtn.textContent = '✕';
-    delBtn.addEventListener('click', () => deleteVenda(v.id, v.cliente));
-    actionTd.appendChild(editBtn);
-    actionTd.appendChild(delBtn);
+  function buildRow(v) {
+    const sit=getVendaSituacao(v);
+    const badge=sit==='atrasado'?'<span class="atraso-badge">⚠ ATRASADO</span>':sit==='alerta'?'<span class="alerta-badge">⏰</span>':'<span style="font-size:10px;color:var(--green)">✓ OK</span>';
+    const tr=document.createElement('tr');
+    tr.innerHTML='<td class="hi">'+sanitize(v.cliente)+'</td><td>'+sanitize(v.numOportunidade||'—')+'</td><td class="hi">'+(v.valor?fmtCurrency(v.valor):'—')+'</td><td>'+(v.dataPedido||'—')+'</td><td>'+(v.prazoEntrega||'—')+'</td><td>'+badge+'</td><td><span class="badge '+(VENDA_STATUS_CSS[v.statusEntrega]||'')+'">'+v.statusEntrega+'</span></td><td></td>';
+    const td=tr.lastElementChild;
+    const eb=document.createElement('button'); eb.className='btn-icon-edit'; eb.textContent='✏';
+    eb.addEventListener('click',()=>openEditVenda(v.id)); td.appendChild(eb);
     return tr;
   }
 
-  // Set highlights HTML
-  contentEl.innerHTML = `
+  contentEl.innerHTML=`
     <div class="vendas-highlights" style="margin-bottom:16px">
-      <div class="vendas-highlight-card">
-        <div class="vendas-highlight-icon">📅</div>
-        <div class="vendas-highlight-body">
-          <div class="vendas-highlight-label">Vendas — ${nomeMes} ${anoAtual}</div>
-          <div class="vendas-highlight-val">${fmtCurrency(totalMes)}</div>
-          <div class="vendas-highlight-sub">${vendasMes.length} pedido(s) no mês</div>
-        </div>
+      <div class="vendas-highlight-card"><div class="vendas-highlight-icon">📅</div>
+        <div class="vendas-highlight-body"><div class="vendas-highlight-label">Vendas — ${nomeMes} ${ano}</div>
+        <div class="vendas-highlight-val">${fmtCurrency(totalMes)}</div>
+        <div class="vendas-highlight-sub">${vendasMes.length} pedido(s) no mês</div></div>
       </div>
-      <div class="vendas-highlight-card orange">
-        <div class="vendas-highlight-icon">📊</div>
-        <div class="vendas-highlight-body">
-          <div class="vendas-highlight-label">Total — ${anoAtual}</div>
-          <div class="vendas-highlight-val">${fmtCurrency(totalAno)}</div>
-          <div class="vendas-highlight-sub">${vendorVendas.filter(v=>v.dataPedido&&v.dataPedido.startsWith(String(anoAtual))).length} pedido(s) no ano</div>
-        </div>
+      <div class="vendas-highlight-card orange"><div class="vendas-highlight-icon">📊</div>
+        <div class="vendas-highlight-body"><div class="vendas-highlight-label">Total — ${ano}</div>
+        <div class="vendas-highlight-val">${fmtCurrency(totalAno)}</div>
+        <div class="vendas-highlight-sub">${vendorVendas.filter(v=>v.dataPedido&&v.dataPedido.startsWith(String(ano))).length} pedido(s) no ano</div></div>
       </div>
     </div>
-    <div class="table-card">
-      <div class="table-header">
-        <div class="table-title">Pedidos — ${cfg.name}</div>
-        <span style="font-size:12px;color:var(--text3)">${vendorVendas.length} registro(s)</span>
-      </div>
-      <div class="table-wrap">
-        <table>
-          <thead><tr>
-            <th>Cliente</th><th>Nº Oportunidade</th><th>Valor</th>
-            <th>Data Pedido</th><th>Prazo</th><th>Situação</th><th>Status</th><th>Ações</th>
-          </tr></thead>
-          <tbody id="vendor-vendas-tbody-${vendor}"></tbody>
-        </table>
-      </div>
-    </div>`;
+    <div class="table-card"><div class="table-header">
+      <div class="table-title">Pedidos — ${cfg.name}</div>
+      <span style="font-size:12px;color:var(--text3)">${vendorVendas.length} registro(s)</span>
+    </div>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Cliente</th><th>Nº Oportunidade</th><th>Valor</th><th>Data Pedido</th><th>Prazo</th><th>Situação</th><th>Status</th><th>Ações</th></tr></thead>
+      <tbody id="vendor-vendas-tbody-${vendor}"></tbody>
+    </table></div></div>`;
 
-  // Populate tbody safely
-  const tbody = document.getElementById('vendor-vendas-tbody-'+vendor);
-  if (tbody) {
-    if (vendorVendas.length) {
-      vendorVendas.forEach(v => tbody.appendChild(buildVendaRow(v)));
-    } else {
-      tbody.innerHTML = '<tr><td colspan="8"><div class="empty-state"><div class="icon">🛒</div><p>Nenhuma venda registrada</p></div></td></tr>';
-    }
+  const tbody=document.getElementById('vendor-vendas-tbody-'+vendor);
+  if(tbody){
+    if(vendorVendas.length) vendorVendas.forEach(v=>tbody.appendChild(buildRow(v)));
+    else tbody.innerHTML='<tr><td colspan="8"><div class="empty-state"><div class="icon">🛒</div><p>Nenhuma venda</p></div></td></tr>';
   }
 }
 
-function toggleSidebarSection(section) {
-  document.getElementById('section-'+section)?.classList.toggle('collapsed');
-}
-function toggleMobileSidebar() {
-  document.getElementById('appSidebar')?.classList.toggle('open');
-}
+function toggleSidebarSection(s) { document.getElementById('section-'+s)?.classList.toggle('collapsed'); }
+function toggleMobileSidebar()    { document.getElementById('appSidebar')?.classList.toggle('open'); }
 
-// ════════════════════════════════════════════════
-// VENDOR SETTINGS MODAL (per-vendor client management)
-// ════════════════════════════════════════════════
+// ── Settings Modal ──
 function openSettings(vendor) {
-  window._settingsVendorCtx = vendor || null;
+  window._settingsVendorCtx = vendor||null;
   renderSettingsModal(vendor);
   document.getElementById('settingsModal').classList.remove('hidden');
 }
 
 function renderSettingsModal(vendorCtx) {
-  window._settingsVendorCtx = vendorCtx || null;
+  window._settingsVendorCtx = vendorCtx||null;
   const cfg = vendorCtx ? VENDOR_CONFIG[vendorCtx] : null;
-  const allClients = getClients();
-  const archived   = getArchivedClients();
-
-  const vendorClients  = vendorCtx ? allClients.filter(c => cfg.clients.includes(c)) : allClients;
-  const vendorArchived = vendorCtx ? archived.filter(c => cfg.clients.includes(c)) : archived;
-
+  const allClients = getClients(), archived = getArchivedClients();
+  const vendorClients  = vendorCtx ? allClients.filter(c=>cfg.clients.includes(c)) : allClients;
+  const vendorArchived = vendorCtx ? archived.filter(c=>cfg.clients.includes(c)) : archived;
   const titleEl = document.querySelector('#settingsModal .modal-title');
   if (titleEl) titleEl.innerHTML = cfg ? `<span style="color:${cfg.color}">●</span> Clientes — ${cfg.name}` : '👥 Gerenciar Clientes';
-
   const hintEl = document.getElementById('addClientVendorHint');
-  if (hintEl) {
-    hintEl.style.display = cfg ? 'block' : 'none';
-    if (cfg) hintEl.innerHTML = `📌 Será adicionado ao módulo <strong style="color:${cfg.color}">${cfg.name}</strong>`;
-  }
-
-  const listEl  = document.getElementById('clientsList');
-  const archEl  = document.getElementById('archivedList');
-  const archSec = document.getElementById('archivedSection');
+  if (hintEl) { hintEl.style.display=cfg?'block':'none'; if(cfg) hintEl.innerHTML=`📌 Será adicionado ao módulo <strong style="color:${cfg.color}">${cfg.name}</strong>`; }
+  const listEl=document.getElementById('clientsList'), archEl=document.getElementById('archivedList'), archSec=document.getElementById('archivedSection');
   if (!listEl) return;
-
   listEl.innerHTML = vendorClients.length
-    ? vendorClients.map(c => `
-      <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;
-        background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:4px">
-        <span style="font-size:13px;font-weight:500;color:var(--text);flex:1">📁 ${c}</span>
+    ? vendorClients.map(c=>`<div style="display:flex;align-items:center;gap:8px;padding:9px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:4px">
+        <span style="font-size:13px;font-weight:500;flex:1">📁 ${c}</span>
         <span style="font-size:11px;color:var(--text3)">${(data[c]||[]).length} reg.</span>
-        <button onclick="archiveClient('${c}')"
-          style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:4px;
-                 border:1px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer">
-          Arquivar
-        </button>
+        <button onclick="archiveClient('${c}')" style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:4px;border:1px solid #fca5a5;background:#fef2f2;color:#dc2626;cursor:pointer">Arquivar</button>
       </div>`).join('')
     : '<p style="font-size:12px;color:var(--text3)">Nenhum cliente ativo.</p>';
-
-  if (archEl && archSec) {
-    archSec.style.display = vendorArchived.length ? 'block' : 'none';
-    archEl.innerHTML = vendorArchived.map(c => `
-      <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;
-        background:#fafafa;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:4px;opacity:.75">
-        <span style="font-size:13px;color:var(--text3);flex:1">📁 ${c} <span style="font-size:10px">(arquivado)</span></span>
-        <button onclick="restoreClient('${c}')"
-          style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:4px;
-                 border:1px solid #86efac;background:#f0fdf4;color:#15803d;cursor:pointer">
-          ↩ Restaurar
-        </button>
-      </div>`).join('');
+  if (archEl&&archSec) {
+    archSec.style.display = vendorArchived.length?'block':'none';
+    archEl.innerHTML = vendorArchived.map(c=>`<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:#fafafa;border:1px solid var(--border);border-radius:var(--radius);margin-bottom:4px;opacity:.75">
+      <span style="font-size:13px;color:var(--text3);flex:1">📁 ${c} <span style="font-size:10px">(arquivado)</span></span>
+      <button onclick="restoreClient('${c}')" style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:4px;border:1px solid #86efac;background:#f0fdf4;color:#15803d;cursor:pointer">↩ Restaurar</button>
+    </div>`).join('');
   }
 }
 
 function addClient() {
-  const input = document.getElementById('newClientName');
-  const name  = input.value.trim();
-  if (!name) { showToast('⚠ Digite o nome do cliente','#b45309'); return; }
-  const clients  = getClients();
-  const archived = getArchivedClients();
-  if (clients.includes(name)) { showToast('⚠ Cliente já existe','#b45309'); return; }
+  const input=document.getElementById('newClientName');
+  const name=input.value.trim();
+  if (!name) { showToast('⚠ Digite o nome','#b45309'); return; }
+  const clients=getClients(), archived=getArchivedClients();
+  if (clients.includes(name)) { showToast('⚠ Já existe','#b45309'); return; }
   if (archived.includes(name)) { showToast('⚠ Arquivado — use Restaurar','#b45309'); return; }
-
-  clients.push(name);
-  CLIENTS = clients;
-  saveClients(clients);
-  if (!data[name]) data[name] = [];
+  clients.push(name); CLIENTS=clients; saveClients(clients);
+  if (!data[name]) data[name]=[];
   saveLocal();
-
-  const vendor = window._settingsVendorCtx;
-  if (vendor && VENDOR_CONFIG[vendor] && !VENDOR_CONFIG[vendor].clients.includes(name)) {
-    VENDOR_CONFIG[vendor].clients.push(name);
-  }
-
-  // Inject into sidebar immediately
+  const vendor=window._settingsVendorCtx;
+  if (vendor&&VENDOR_CONFIG[vendor]&&!VENDOR_CONFIG[vendor].clients.includes(name)) VENDOR_CONFIG[vendor].clients.push(name);
   if (vendor) {
-    const el = document.getElementById('sb-'+vendor+'-clients');
-    if (el && !document.getElementById('sb-'+vendor+'-client-'+slugify(name))) {
-      const btn = document.createElement('button');
-      btn.className = 'sidebar-item '+vendor;
-      btn.id = 'sb-'+vendor+'-client-'+slugify(name);
-      btn.onclick = () => showVendorClientTab(vendor, name);
-      btn.innerHTML = '<span class="item-icon">📁</span> '+name;
+    const el=document.getElementById('sb-'+vendor+'-clients');
+    if (el&&!document.getElementById('sb-'+vendor+'-client-'+slugify(name))) {
+      const btn=document.createElement('button'); btn.className='sidebar-item '+vendor;
+      btn.id='sb-'+vendor+'-client-'+slugify(name);
+      btn.onclick=()=>showVendorClientTab(vendor,name);
+      btn.innerHTML='<span class="item-icon">📁</span> '+name;
       el.appendChild(btn);
     }
   }
-
-  input.value = '';
-  buildClientTabs();
-  renderSettingsModal(vendor);
+  input.value=''; buildClientTabs(); renderSettingsModal(vendor);
   showToast('✅ "'+name+'" adicionado!');
 }
 
 function archiveClient(name) {
-  if (!confirm('Arquivar "'+name+'"? A pasta some da lista, dados mantidos.')) return;
-  const clients = getClients().filter(c => c !== name);
-  const archived = getArchivedClients();
+  if (!confirm('Arquivar "'+name+'"? Dados mantidos.')) return;
+  const clients=getClients().filter(c=>c!==name), archived=getArchivedClients();
   if (!archived.includes(name)) archived.push(name);
-  CLIENTS = clients;
-  saveClients(clients);
-  saveArchivedClients(archived);
-  const vendor = window._settingsVendorCtx;
-  // Remove from sidebar
-  const sbBtn = vendor ? document.getElementById('sb-'+vendor+'-client-'+slugify(name)) : null;
-  if (sbBtn) sbBtn.remove();
-  buildClientTabs();
-  renderSettingsModal(vendor);
-  showToast('"'+name+'" arquivado — dados mantidos.', '#b45309');
+  CLIENTS=clients; saveClients(clients); saveArchivedClients(archived);
+  const vendor=window._settingsVendorCtx;
+  document.getElementById('sb-'+(vendor||'')+'-client-'+slugify(name))?.remove();
+  buildClientTabs(); renderSettingsModal(vendor);
+  showToast('"'+name+'" arquivado','#b45309');
 }
 
 function restoreClient(name) {
-  const clients = getClients();
-  const archived = getArchivedClients().filter(c => c !== name);
+  const clients=getClients(), archived=getArchivedClients().filter(c=>c!==name);
   if (!clients.includes(name)) clients.push(name);
-  CLIENTS = clients;
-  saveClients(clients);
-  saveArchivedClients(archived);
-  if (!data[name]) data[name] = [];
-  const vendor = window._settingsVendorCtx;
-  if (vendor && VENDOR_CONFIG[vendor] && !VENDOR_CONFIG[vendor].clients.includes(name)) {
-    VENDOR_CONFIG[vendor].clients.push(name);
-  }
+  CLIENTS=clients; saveClients(clients); saveArchivedClients(archived);
+  if (!data[name]) data[name]=[];
+  const vendor=window._settingsVendorCtx;
+  if (vendor&&VENDOR_CONFIG[vendor]&&!VENDOR_CONFIG[vendor].clients.includes(name)) VENDOR_CONFIG[vendor].clients.push(name);
   buildClientTabs();
-  // Add to sidebar
   if (vendor) {
-    const el = document.getElementById('sb-'+vendor+'-clients');
-    if (el && !document.getElementById('sb-'+vendor+'-client-'+slugify(name))) {
-      const btn = document.createElement('button');
-      btn.className = 'sidebar-item '+vendor;
-      btn.id = 'sb-'+vendor+'-client-'+slugify(name);
-      btn.onclick = () => showVendorClientTab(vendor, name);
-      btn.innerHTML = '<span class="item-icon">📁</span> '+name;
+    const el=document.getElementById('sb-'+vendor+'-clients');
+    if (el&&!document.getElementById('sb-'+vendor+'-client-'+slugify(name))) {
+      const btn=document.createElement('button'); btn.className='sidebar-item '+vendor;
+      btn.id='sb-'+vendor+'-client-'+slugify(name);
+      btn.onclick=()=>showVendorClientTab(vendor,name);
+      btn.innerHTML='<span class="item-icon">📁</span> '+name;
       el.appendChild(btn);
     }
   }
-  renderSettingsModal(vendor);
-  showToast('✓ "'+name+'" restaurado!');
+  renderSettingsModal(vendor); showToast('✓ "'+name+'" restaurado!');
 }
 
+// ── Features: Meta, Ranking, Win/Loss, Notifications, History, Backup, Sync ──
+function renderMetaVendedor() {
+  const el=document.getElementById('meta-vendedor-section'); if(!el) return;
+  const hoje=new Date(), mes=hoje.getMonth()+1, ano=hoje.getFullYear();
+  const todos=getAllRecords();
+  const nomeMes=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][mes-1];
+  const metaData=Object.entries(VENDOR_CONFIG).map(([vendor,cfg])=>{
+    const clientes=getVendorClients(vendor);
+    const receita=dedupByNumero(todos.filter(r=>clientes.includes(r.cliente)&&r.venda==='SIM'&&parseInt(r.mes)===mes&&parseInt(r.ano)===ano)).reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0);
+    const pct=Math.min(100,receita/META_VENDEDOR*100);
+    return {vendor,cfg,receita,pct,clientes};
+  }).filter(d=>d.clientes.length>0);
+  el.innerHTML=`<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">🎯 Meta Mensal por Vendedor — ${nomeMes}/${ano}</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">
+  ${metaData.map(({cfg,receita,pct})=>`<div class="table-card" style="padding:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:28px;height:28px;border-radius:50%;background:${cfg.color};color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center">${cfg.badge}</div>
+        <span style="font-weight:700;font-size:14px">${cfg.name}</span>
+      </div>
+      <span style="font-size:13px;font-weight:700;color:${pct>=100?'#15803d':pct>=70?'#b45309':'#dc2626'}">${pct.toFixed(0)}%</span>
+    </div>
+    <div style="background:#f1f5f9;border-radius:8px;height:10px;overflow:hidden;margin-bottom:8px">
+      <div style="height:100%;width:${pct}%;background:${pct>=100?'#15803d':pct>=70?'#f59e0b':cfg.color};border-radius:8px;transition:width .6s"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3)">
+      <span>${fmtCurrency(receita)} realizados</span><span>Meta: ${fmtCurrency(META_VENDEDOR)}</span>
+    </div>${pct>=100?'<div style="font-size:11px;color:#15803d;font-weight:600;margin-top:4px">🏆 Meta atingida!</div>':''}
+  </div>`).join('')}</div>`;
+}
 
-// ════════════════════════════════════════════════
-// 1. NOTIFICAÇÕES DE PRAZO
-// ════════════════════════════════════════════════
+function renderRankingClientes() {
+  const el=document.getElementById('ranking-clientes-section'); if(!el) return;
+  const todos=dedupByNumero(getAllRecords());
+  const ranking=CLIENTS.map(c=>{
+    const recs=todos.filter(r=>r.cliente===c);
+    const vendas=recs.filter(r=>r.venda==='SIM');
+    const receita=vendas.reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0);
+    const p=recs.filter(r=>r.participamos==='SIM').length;
+    return {c,total:recs.length,receita,vendas:vendas.length,conv:p>0?(vendas.length/p*100):0};
+  }).filter(d=>d.total>0).sort((a,b)=>b.receita-a.receita);
+  el.innerHTML=`<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">🏅 Ranking de Clientes por Receita</div>
+  <div class="table-card"><div class="table-wrap"><table>
+  <thead><tr><th>#</th><th>Cliente</th><th style="text-align:right">Oport.</th><th style="text-align:right">Vendas</th><th style="text-align:right">Receita</th><th style="text-align:right">Conv.</th></tr></thead>
+  <tbody>${ranking.map((d,i)=>`<tr>
+    <td>${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}</td>
+    <td style="font-weight:600">${d.c}</td>
+    <td style="text-align:right;color:var(--text3)">${fmtNum(d.total)}</td>
+    <td style="text-align:right;color:var(--green)">${fmtNum(d.vendas)}</td>
+    <td style="text-align:right;font-weight:700;color:var(--blue)">${fmtCurrency(d.receita)}</td>
+    <td style="text-align:right;color:${d.conv>=15?'var(--green)':d.conv>=8?'var(--amber)':'var(--text3)'}">${d.conv.toFixed(1)}%</td>
+  </tr>`).join('')}</tbody></table></div></div>`;
+}
+
+function renderWinLoss() {
+  const el=document.getElementById('winloss-section'); if(!el) return;
+  const todos=dedupByNumero(getAllRecords());
+  const portalData=PORTALS_LIST.map(p=>{
+    const recs=todos.filter(r=>r.portal===p&&r.participamos==='SIM');
+    const wins=recs.filter(r=>r.venda==='SIM').length;
+    const losses=recs.filter(r=>r.status==='Perdido').length;
+    const winRate=recs.length>0?(wins/recs.length*100):0;
+    return {p,total:recs.length,wins,losses,winRate};
+  }).filter(d=>d.total>0).sort((a,b)=>b.winRate-a.winRate);
+  el.innerHTML=`<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">⚖ Taxa Win/Loss por Portal</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
+  ${portalData.map(d=>`<div class="table-card" style="padding:14px">
+    <div style="font-size:12px;font-weight:700;margin-bottom:8px">${d.p}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;text-align:center">
+      <div style="background:#f0fdf4;border-radius:6px;padding:6px"><div style="font-size:16px;font-weight:800;color:#15803d">${d.wins}</div><div style="font-size:10px;color:#15803d">Wins</div></div>
+      <div style="background:#fef2f2;border-radius:6px;padding:6px"><div style="font-size:16px;font-weight:800;color:#dc2626">${d.losses}</div><div style="font-size:10px;color:#dc2626">Losses</div></div>
+    </div>
+    <div style="background:#f1f5f9;border-radius:6px;height:6px;overflow:hidden;margin-bottom:6px">
+      <div style="height:100%;width:${d.winRate}%;background:#15803d;border-radius:6px"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3)">
+      <span>Win rate: <strong style="color:${d.winRate>=20?'#15803d':d.winRate>=10?'#b45309':'#dc2626'}">${d.winRate.toFixed(1)}%</strong></span>
+      <span>${d.total} particip.</span>
+    </div>
+  </div>`).join('')}</div>`;
+}
+
 function checkPrazoNotifications() {
-  const hoje = new Date(); hoje.setHours(0,0,0,0);
-  const amanha = new Date(hoje); amanha.setDate(amanha.getDate()+1);
-  const em3dias = new Date(hoje); em3dias.setDate(em3dias.getDate()+3);
-
-  const alertas = [];
-  getAllRecords().forEach(r => {
-    // Only notify for "Cotando" status
+  const hoje=new Date(); hoje.setHours(0,0,0,0);
+  const alertas=[];
+  getAllRecords().forEach(r=>{
     if (!r.finaliza || r.status !== 'Cotando') return;
-    const prazo = new Date(r.finaliza); prazo.setHours(0,0,0,0);
-    const diff = Math.ceil((prazo - hoje) / 86400000);
-    if (diff < 0) return; // já perdido, tratado em outro lugar
-    if (diff === 0) alertas.push({r, tipo:'hoje', label:'Vence HOJE', cor:'#dc2626'});
-    else if (diff === 1) alertas.push({r, tipo:'amanha', label:'Vence amanhã', cor:'#ea580c'});
-    else if (diff <= 3) alertas.push({r, tipo:'em3', label:`Vence em ${diff}d`, cor:'#b45309'});
+    const prazo=new Date(r.finaliza); prazo.setHours(0,0,0,0);
+    const diff=Math.ceil((prazo-hoje)/86400000);
+    if (diff<0) return;
+    if (diff===0) alertas.push({r,label:'Vence HOJE',cor:'#dc2626'});
+    else if (diff===1) alertas.push({r,label:'Vence amanhã',cor:'#ea580c'});
+    else if (diff<=3) alertas.push({r,label:`Vence em ${diff}d`,cor:'#b45309'});
   });
-
-  if (alertas.length === 0) return;
-
-  // Show notification badge on header
-  let badge = document.getElementById('notif-badge');
+  if (!alertas.length) return;
+  window._notifAlertas=alertas;
+  let badge=document.getElementById('notif-badge');
   if (!badge) {
-    const header = document.querySelector('.header');
-    if (header) {
-      badge = document.createElement('button');
-      badge.id = 'notif-badge';
-      badge.style.cssText = 'background:#dc2626;border:none;color:#fff;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:6px;';
-      badge.onclick = () => showNotifPanel();
-      header.querySelector('.header-right')?.prepend(badge);
-    }
+    badge=document.createElement('button');
+    badge.id='notif-badge';
+    badge.style.cssText='background:#dc2626;border:none;color:#fff;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:6px;';
+    badge.onclick=()=>showNotifPanel();
+    document.getElementById('headerRight')?.prepend(badge);
   }
-  if (badge) badge.innerHTML = `🔔 ${alertas.length} prazo${alertas.length>1?'s':''}`;
-
-  // Store for panel
-  window._notifAlertas = alertas;
+  badge.innerHTML=`🔔 ${alertas.length} prazo${alertas.length>1?'s':''}`;
 }
 
 function showNotifPanel() {
-  const alertas = window._notifAlertas || [];
-  const existing = document.getElementById('notifPanel');
+  const alertas=window._notifAlertas||[];
+  const existing=document.getElementById('notifPanel');
   if (existing) { existing.remove(); return; }
-
-  const panel = document.createElement('div');
-  panel.id = 'notifPanel';
-  panel.style.cssText = 'position:fixed;top:60px;right:16px;width:380px;max-height:480px;overflow-y:auto;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.15);z-index:9999;font-family:var(--font)';
-  panel.innerHTML = `
-    <div style="padding:14px 16px;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center">
-      <span style="font-weight:700;font-size:14px">🔔 Alertas de Prazo</span>
-      <button onclick="document.getElementById('notifPanel').remove()" style="border:none;background:none;cursor:pointer;font-size:18px;color:#94a3b8">×</button>
-    </div>
-    ${alertas.map(({r,label,cor}) => `
-      <div style="padding:12px 16px;border-bottom:1px solid #f8fafc;display:flex;gap:10px;align-items:flex-start">
-        <span style="background:${cor}22;color:${cor};font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;white-space:nowrap;margin-top:2px">${label}</span>
-        <div>
-          <div style="font-size:12px;font-weight:600;color:#0f172a">${r.cliente} — Nº ${r.numero}</div>
-          <div style="font-size:11px;color:#64748b">${r.portal} · ${r.status} · Finaliza: ${r.finaliza}</div>
-        </div>
-      </div>`).join('')}`;
+  const panel=document.createElement('div');
+  panel.id='notifPanel';
+  panel.style.cssText='position:fixed;top:60px;right:16px;width:380px;max-height:480px;overflow-y:auto;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.15);z-index:9999;font-family:var(--font)';
+  panel.innerHTML=`<div style="padding:14px 16px;border-bottom:1px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center">
+    <span style="font-weight:700;font-size:14px">🔔 Alertas de Prazo</span>
+    <button onclick="document.getElementById('notifPanel').remove()" style="border:none;background:none;cursor:pointer;font-size:18px;color:#94a3b8">×</button>
+  </div>
+  ${alertas.map(({r,label,cor})=>`<div style="padding:12px 16px;border-bottom:1px solid #f8fafc;display:flex;gap:10px;align-items:flex-start">
+    <span style="background:${cor}22;color:${cor};font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;white-space:nowrap;margin-top:2px">${label}</span>
+    <div><div style="font-size:12px;font-weight:600">${r.cliente} — Nº ${r.numero}</div>
+    <div style="font-size:11px;color:#64748b">${r.portal} · ${r.status} · Finaliza: ${r.finaliza}</div></div>
+  </div>`).join('')}`;
   document.body.appendChild(panel);
-  document.addEventListener('click', function handler(e) {
-    if (!panel.contains(e.target) && e.target.id !== 'notif-badge') {
-      panel.remove(); document.removeEventListener('click', handler);
-    }
-  }, true);
+  document.addEventListener('click',function handler(e){ if(!panel.contains(e.target)&&e.target.id!=='notif-badge'){ panel.remove(); document.removeEventListener('click',handler); } },true);
 }
 
-// ════════════════════════════════════════════════
-// 2. HISTÓRICO DE ALTERAÇÕES
-// ════════════════════════════════════════════════
-const HISTORY_KEY = 'ipartes_history_v1';
-
-function addHistory(action, record, oldVal, newVal) {
-  const hist = getHistory();
-  hist.unshift({
-    ts: new Date().toISOString(),
-    action,
-    cliente: record.cliente || '',
-    numero:  record.numero  || '',
-    field:   oldVal?.field  || '',
-    oldVal:  oldVal?.value  || '',
-    newVal:  newVal?.value  || '',
-    user:    document.getElementById('userNameShort')?.textContent || 'sistema'
-  });
-  // Keep last 500 entries
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(hist.slice(0,500)));
+const HISTORY_KEY='ipartes_history_v1';
+function addHistory(action,record,oldVal,newVal) {
+  const hist=getHistory();
+  hist.unshift({ts:new Date().toISOString(),action,cliente:record.cliente||'',numero:record.numero||'',
+    field:oldVal?.field||'',oldVal:oldVal?.value||'',newVal:newVal?.value||'',
+    user:document.getElementById('userNameShort')?.textContent||'sistema'});
+  localStorage.setItem(HISTORY_KEY,JSON.stringify(hist.slice(0,500)));
 }
-
-function getHistory() {
-  try { return JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]'); } catch(e) { return []; }
-}
-
+function getHistory() { try{return JSON.parse(localStorage.getItem(HISTORY_KEY)||'[]');}catch(e){return[];} }
 function showHistoryModal() {
-  const hist = getHistory();
-  let modal = document.getElementById('historyModal');
-  if (!modal) {
-    modal = document.createElement('div');
-    modal.id = 'historyModal';
-    modal.className = 'modal-overlay';
-    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;display:flex;align-items:center;justify-content:center';
-    document.body.appendChild(modal);
-  }
-  modal.innerHTML = `
-    <div style="background:#fff;border-radius:16px;width:640px;max-height:80vh;overflow:hidden;display:flex;flex-direction:column">
-      <div style="padding:20px 24px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center">
-        <span style="font-size:16px;font-weight:700;font-family:var(--font)">📋 Histórico de Alterações</span>
-        <button onclick="document.getElementById('historyModal').remove()" style="border:none;background:none;cursor:pointer;font-size:22px;color:#94a3b8">×</button>
-      </div>
-      <div style="overflow-y:auto;flex:1;padding:8px 0">
-        ${hist.length ? hist.map(h => `
-          <div style="padding:10px 24px;border-bottom:1px solid #f8fafc;font-family:var(--font)">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px">
-              <span style="font-size:12px;font-weight:600;color:#0f172a">${h.action}</span>
-              <span style="font-size:10px;color:#94a3b8">${new Date(h.ts).toLocaleString('pt-BR')}</span>
-            </div>
-            <div style="font-size:11px;color:#475569">
-              ${h.cliente} · Nº ${h.numero}
-              ${h.field ? ` · <em>${h.field}</em>: <span style="color:#dc2626">${h.oldVal}</span> → <span style="color:#15803d">${h.newVal}</span>` : ''}
-            </div>
-          </div>`).join('')
-        : '<div style="padding:40px;text-align:center;color:#94a3b8;font-family:var(--font)">Nenhum histórico ainda</div>'}
-      </div>
-    </div>`;
-  modal.onclick = e => { if (e.target === modal) modal.remove(); };
-}
-
-// ════════════════════════════════════════════════
-// 3. META MENSAL POR VENDEDOR (R$ 250.000)
-// ════════════════════════════════════════════════
-const META_VENDEDOR = 250000;
-
-function renderMetaVendedor() {
-  const hoje    = new Date();
-  const mesAtual= hoje.getMonth()+1;
-  const anoAtual= hoje.getFullYear();
-  const todos   = getAllRecords();
-
-  const metaData = Object.entries(VENDOR_CONFIG).map(([vendor, cfg]) => {
-    const clientes = getVendorClients(vendor);
-    const recsMes  = dedupByNumero(todos.filter(r =>
-      clientes.includes(r.cliente) &&
-      r.venda==='SIM' &&
-      parseInt(r.mes)===mesAtual &&
-      parseInt(r.ano)===anoAtual
-    ));
-    const receita = recsMes.reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0);
-    const pct     = Math.min(100, (receita/META_VENDEDOR*100));
-    return { vendor, cfg, receita, pct, clientes };
-  }).filter(d => d.clientes.length > 0);
-
-  const el = document.getElementById('meta-vendedor-section');
-  if (!el) return;
-
-  el.innerHTML = `
-    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">
-      🎯 Meta Mensal por Vendedor — ${['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'][mesAtual-1]}/${anoAtual}
+  const hist=getHistory();
+  let modal=document.getElementById('historyModal');
+  if(!modal){modal=document.createElement('div');modal.id='historyModal';modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:10000;display:flex;align-items:center;justify-content:center';document.body.appendChild(modal);}
+  modal.innerHTML=`<div style="background:#fff;border-radius:16px;width:640px;max-height:80vh;overflow:hidden;display:flex;flex-direction:column">
+    <div style="padding:20px 24px;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:16px;font-weight:700;font-family:var(--font)">📋 Histórico de Alterações</span>
+      <button onclick="document.getElementById('historyModal').remove()" style="border:none;background:none;cursor:pointer;font-size:22px;color:#94a3b8">×</button>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">
-      ${metaData.map(({cfg, receita, pct}) => `
-        <div class="table-card" style="padding:16px">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-            <div style="display:flex;align-items:center;gap:8px">
-              <div style="width:28px;height:28px;border-radius:50%;background:${cfg.color};color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center">${cfg.badge}</div>
-              <span style="font-weight:700;font-size:14px;color:var(--text)">${cfg.name}</span>
-            </div>
-            <span style="font-size:13px;font-weight:700;color:${pct>=100?'#15803d':pct>=70?'#b45309':'#dc2626'}">${pct.toFixed(0)}%</span>
-          </div>
-          <div style="background:#f1f5f9;border-radius:8px;height:10px;overflow:hidden;margin-bottom:8px">
-            <div style="height:100%;width:${pct}%;background:${pct>=100?'#15803d':pct>=70?'#f59e0b':cfg.color};border-radius:8px;transition:width .6s ease"></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3)">
-            <span>${fmtCurrency(receita)} realizados</span>
-            <span>Meta: ${fmtCurrency(META_VENDEDOR)}</span>
-          </div>
-          ${pct>=100?'<div style="font-size:11px;color:#15803d;font-weight:600;margin-top:4px">🏆 Meta atingida!</div>':''}
-        </div>`).join('')}
-    </div>`;
-}
-
-// ════════════════════════════════════════════════
-// 4. RANKING DE CLIENTES
-// ════════════════════════════════════════════════
-function renderRankingClientes() {
-  const el = document.getElementById('ranking-clientes-section');
-  if (!el) return;
-  const todos = dedupByNumero(getAllRecords());
-
-  const ranking = CLIENTS.map(c => {
-    const recs   = todos.filter(r=>r.cliente===c);
-    const vendas = recs.filter(r=>r.venda==='SIM');
-    const receita= vendas.reduce((s,r)=>s+(parseFloat(String(r.valor||0).replace(',','.'))||0),0);
-    const particip = recs.filter(r=>r.participamos==='SIM').length;
-    const conv   = particip>0?(vendas.length/particip*100):0;
-    return { c, total:recs.length, receita, vendas:vendas.length, conv };
-  }).filter(d=>d.total>0).sort((a,b)=>b.receita-a.receita);
-
-  el.innerHTML = `
-    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">
-      🏅 Ranking de Clientes por Receita
+    <div style="overflow-y:auto;flex:1;padding:8px 0">
+      ${hist.length?hist.map(h=>`<div style="padding:10px 24px;border-bottom:1px solid #f8fafc;font-family:var(--font)">
+        <div style="display:flex;justify-content:space-between;margin-bottom:2px">
+          <span style="font-size:12px;font-weight:600">${h.action}</span>
+          <span style="font-size:10px;color:#94a3b8">${new Date(h.ts).toLocaleString('pt-BR')}</span>
+        </div>
+        <div style="font-size:11px;color:#475569">${h.cliente} · Nº ${h.numero}${h.field?` · <em>${h.field}</em>: <span style="color:#dc2626">${h.oldVal}</span> → <span style="color:#15803d">${h.newVal}</span>`:''}</div>
+      </div>`).join(''):'<div style="padding:40px;text-align:center;color:#94a3b8;font-family:var(--font)">Nenhum histórico ainda</div>'}
     </div>
-    <div class="table-card">
-      <div class="table-wrap">
-        <table>
-          <thead><tr>
-            <th style="width:32px">#</th>
-            <th>Cliente</th>
-            <th style="text-align:right">Oport.</th>
-            <th style="text-align:right">Vendas</th>
-            <th style="text-align:right">Receita</th>
-            <th style="text-align:right">Conversão</th>
-          </tr></thead>
-          <tbody>
-            ${ranking.map((d,i) => `
-              <tr>
-                <td><span style="font-size:13px">${i===0?'🥇':i===1?'🥈':i===2?'🥉':'#'+(i+1)}</span></td>
-                <td style="font-weight:600">${d.c}</td>
-                <td style="text-align:right;color:var(--text3)">${fmtNum(d.total)}</td>
-                <td style="text-align:right;color:var(--green)">${fmtNum(d.vendas)}</td>
-                <td style="text-align:right;font-weight:700;color:var(--blue)">${fmtCurrency(d.receita)}</td>
-                <td style="text-align:right;color:${d.conv>=15?'var(--green)':d.conv>=8?'var(--amber)':'var(--text3)'}">${d.conv.toFixed(1)}%</td>
-              </tr>`).join('')}
-          </tbody>
-        </table>
-      </div>
-    </div>`;
+  </div>`;
+  modal.onclick=e=>{if(e.target===modal)modal.remove();};
 }
 
-// ════════════════════════════════════════════════
-// 5. TAXA WIN/LOSS POR PORTAL
-// ════════════════════════════════════════════════
-function renderWinLoss() {
-  const el = document.getElementById('winloss-section');
-  if (!el) return;
-  const todos = dedupByNumero(getAllRecords());
-
-  const portalData = PORTALS.map(p => {
-    const recs   = todos.filter(r=>r.portal===p && r.participamos==='SIM');
-    const wins   = recs.filter(r=>r.venda==='SIM').length;
-    const losses = recs.filter(r=>r.status==='Perdido').length;
-    const total  = recs.length;
-    const winRate= total>0?(wins/total*100):0;
-    return { p, total, wins, losses, winRate };
-  }).filter(d=>d.total>0).sort((a,b)=>b.winRate-a.winRate);
-
-  el.innerHTML = `
-    <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">
-      ⚖ Taxa Win/Loss por Portal
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
-      ${portalData.map(d => `
-        <div class="table-card" style="padding:14px">
-          <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:8px">${d.p}</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;text-align:center">
-            <div style="background:#f0fdf4;border-radius:6px;padding:6px">
-              <div style="font-size:16px;font-weight:800;color:#15803d">${d.wins}</div>
-              <div style="font-size:10px;color:#15803d">Wins</div>
-            </div>
-            <div style="background:#fef2f2;border-radius:6px;padding:6px">
-              <div style="font-size:16px;font-weight:800;color:#dc2626">${d.losses}</div>
-              <div style="font-size:10px;color:#dc2626">Losses</div>
-            </div>
-          </div>
-          <div style="background:#f1f5f9;border-radius:6px;height:6px;overflow:hidden;margin-bottom:6px">
-            <div style="height:100%;width:${d.winRate}%;background:#15803d;border-radius:6px"></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3)">
-            <span>Win rate: <strong style="color:${d.winRate>=20?'#15803d':d.winRate>=10?'#b45309':'#dc2626'}">${d.winRate.toFixed(1)}%</strong></span>
-            <span>${d.total} particip.</span>
-          </div>
-        </div>`).join('')}
-    </div>`;
-}
-
-// ════════════════════════════════════════════════
-// 6. SINCRONIZAÇÃO EM TEMPO REAL (polling 60s)
-// ════════════════════════════════════════════════
-let _realtimeInterval = null;
-let _lastSyncHash = '';
-
-function startRealtimeSync() {
-  if (_realtimeInterval) return;
-  _realtimeInterval = setInterval(async () => {
-    if (!useSupabase || !sbClient) return;
-    try {
-      // Get count from Supabase to detect changes
-      const res = await sbFetch('GET', `?select=id&limit=1&order=created_at.desc`);
-      if (!res.ok) return;
-      const data = await res.json();
-      const hash = JSON.stringify(data);
-      if (_lastSyncHash && hash !== _lastSyncHash) {
-        // Data changed — reload silently
-        await loadFromSupabase();
-        showToast('🔄 Dados atualizados por outro usuário', '#1d4ed8');
-      }
-      _lastSyncHash = hash;
-    } catch(e) { /* silent */ }
-  }, 60000); // 60 seconds
-  console.log('Real-time sync started (60s interval)');
-}
-
-function stopRealtimeSync() {
-  if (_realtimeInterval) {
-    clearInterval(_realtimeInterval);
-    _realtimeInterval = null;
-  }
-}
-
-// ════════════════════════════════════════════════
-// 7. BACKUP AUTOMÁTICO
-// ════════════════════════════════════════════════
 function backupData() {
-  const backup = {
-    ts:      new Date().toISOString(),
-    version: '2.0',
-    clients: getClients(),
-    data:    data,
-    sales:   getAllVendas(),
-  };
-  const blob = new Blob([JSON.stringify(backup, null, 2)], {type:'application/json'});
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href     = url;
-  a.download = `ipartes_backup_${new Date().toISOString().slice(0,10)}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
+  const backup={ts:new Date().toISOString(),version:'2.0',clients:getClients(),data:data,sales:getAllVendas()};
+  const blob=new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url;
+  a.download=`ipartes_backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click(); URL.revokeObjectURL(url);
   showToast('✅ Backup exportado!');
-  localStorage.setItem('ipartes_last_backup', new Date().toISOString());
+  localStorage.setItem('ipartes_last_backup',new Date().toISOString());
+}
+function checkAutoBackup() {
+  const last=localStorage.getItem('ipartes_last_backup'); if(!last) return;
+  const dias=Math.floor((Date.now()-new Date(last).getTime())/86400000);
+  if(dias>=2) showToast('⚠ Último backup há '+dias+' dias.','#b45309');
 }
 
-// ════════════════════════════════════════════════
-// CONTROLE DE ACESSO POR USUÁRIO
-// ════════════════════════════════════════════════
-
-// Perfil do usuário logado
-let currentUserProfile = 'adm'; // 'adm' | 'rodrigo' | 'lenon' | 'luiz'
-let currentUserEmail   = '';
-
-// Define perfil baseado no e-mail
-function detectUserProfile(email) {
-  const e = (email || '').toLowerCase();
-  if (e.includes('lenon'))   return 'lenon';
-  if (e.includes('luiz'))    return 'luiz';
-  if (e.includes('rodrigo')) return 'rodrigo';
-  return 'adm';
-}
-
-// Permissões por perfil
-const ACCESS_RULES = {
-  adm: {
-    sections: ['geral','rodrigo','lenon','luiz'],
-    canSeeAll: true,
-  },
-  rodrigo: {
-    sections: ['geral','rodrigo','lenon','luiz'],
-    canSeeAll: true, // Rodrigo vê tudo
-  },
-  lenon: {
-    sections: ['geral','lenon'],
-    canSeeAll: false,
-  },
-  luiz: {
-    sections: ['geral','luiz'],
-    canSeeAll: false,
-  },
-};
-
-function getUserAccess() {
-  return ACCESS_RULES[currentUserProfile] || ACCESS_RULES.adm;
-}
-
-function canAccessSection(section) {
-  return getUserAccess().sections.includes(section);
-}
-
-// Apply access control to sidebar — hide forbidden sections
-function applySidebarAccess() {
-  const access = getUserAccess();
-
-  // Section visibility
-  ['rodrigo','lenon','luiz'].forEach(vendor => {
-    const el = document.getElementById('section-'+vendor);
-    if (el) el.style.display = access.sections.includes(vendor) ? '' : 'none';
+function scheduleAutoRefresh() {
+  function msUntil(hour) { const n=new Date(),t=new Date(); t.setHours(hour,0,0,0); if(t<=n)t.setDate(t.getDate()+1); return t-n; }
+  [9,13].forEach(hour=>{
+    setTimeout(async()=>{
+      showToast(`🔄 Atualização automática das ${hour}h…`,'#1d4ed8');
+      await refreshCurrentUserData();
+      setInterval(async()=>{ showToast(`🔄 Atualização automática das ${hour}h…`,'#1d4ed8'); await refreshCurrentUserData(); },86400000);
+    },msUntil(hour));
   });
-
-  // If user has no access to a section, redirect to overview when clicking
-  document.querySelectorAll('.sidebar-item').forEach(btn => {
-    const onclick = btn.getAttribute('onclick') || '';
-    // Detect which vendor this button belongs to
-    const match = onclick.match(/(rodrigo|lenon|luiz)/);
-    if (match) {
-      const vendor = match[1];
-      if (!access.sections.includes(vendor)) {
-        btn.style.display = 'none';
-      }
-    }
-  });
-
-  // Show profile badge in sidebar top
-  renderUserProfileBadge();
 }
 
-function renderUserProfileBadge() {
-  const access = getUserAccess();
-  const existing = document.getElementById('user-profile-badge');
-  if (existing) existing.remove();
-
-  const badge = document.createElement('div');
-  badge.id = 'user-profile-badge';
-  badge.style.cssText = `
-    padding:12px 14px;
-    background:rgba(255,255,255,.05);
-    border-bottom:1px solid #334155;
-    display:flex;align-items:center;gap:8px;
-  `;
-
-  const profile = currentUserProfile;
-  const cfg = VENDOR_CONFIG[profile];
-  const color = cfg ? cfg.color : '#64748b';
-  const label = cfg ? cfg.name : 'Administrador';
-  const badge2 = cfg ? cfg.badge : 'ADM';
-
-  badge.innerHTML = `
-    <div style="width:28px;height:28px;border-radius:50%;background:${color};
-      color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;
-      justify-content:center;flex-shrink:0">${badge2}</div>
-    <div>
-      <div style="font-size:12px;font-weight:700;color:#e2e8f0">${label}</div>
-      <div style="font-size:10px;color:#64748b;white-space:nowrap;overflow:hidden;
-        text-overflow:ellipsis;max-width:140px">${currentUserEmail}</div>
-    </div>
-    ${!access.canSeeAll ? `<span style="font-size:9px;background:#1d4ed833;color:#60a5fa;
-      padding:1px 6px;border-radius:8px;margin-left:auto">Vendedor</span>` : ''}
-  `;
-
-  const sidebar = document.getElementById('appSidebar');
-  if (sidebar) sidebar.prepend(badge);
+function scheduleAutoBackup() {
+  function msUntil19h() { const n=new Date(),t=new Date(); t.setHours(19,0,0,0); if(t<=n)t.setDate(t.getDate()+1); return t-n; }
+  setTimeout(()=>{
+    const last=localStorage.getItem('ipartes_last_backup');
+    const hoje=new Date().toISOString().slice(0,10);
+    if(last&&last.startsWith(hoje)) return;
+    showToast('💾 Backup automático das 19h…','#1d4ed8'); backupData();
+    setInterval(()=>{ showToast('💾 Backup automático das 19h…','#1d4ed8'); backupData(); },86400000);
+  },msUntil19h());
 }
 
-// Access check helper — used inside sidebarNav directly
-function checkSectionAccess(target) {
-  const vendorMatch = target.match(/^(rodrigo|lenon|luiz)/);
-  if (vendorMatch && !canAccessSection(vendorMatch[1])) {
-    showToast('⛔ Você não tem acesso a este módulo', '#dc2626');
-    return false;
-  }
-  return true;
-}
-
-// On first load — redirect vendor to their own module
-function applyInitialNavigation() {
-  const access = getUserAccess();
-  if (currentUserProfile === 'lenon') {
-    sidebarNav('lenon-overview');
-  } else if (currentUserProfile === 'luiz') {
-    sidebarNav('luiz-overview');
-  } else {
-    // ADM and Rodrigo start on dashboard geral
-    const el = document.getElementById('tab-overview');
-    if (el) el.style.display = 'block';
-    document.getElementById('sb-overview')?.classList.add('active');
-    renderOverview();
-  }
-}
-
-
-
-// ════════════════════════════════════════════════
-// PREVISÃO DE PAGAMENTO
-// ════════════════════════════════════════════════
-function isPagamentoAtrasado(data) {
-  if (!data) return false;
-  return new Date(data) < new Date(new Date().toISOString().slice(0,10));
-}
+function isPagamentoAtrasado(data) { if(!data)return false; return new Date(data+'T00:00:00')<new Date(new Date().toISOString().slice(0,10)+'T00:00:00'); }
 function formatPagamento(data) {
-  if (!data) return '—';
-  const d = new Date(data + 'T00:00:00');
-  const hoje = new Date(); hoje.setHours(0,0,0,0);
-  const diff = Math.ceil((d - hoje) / 86400000);
-  const fmt  = d.toLocaleDateString('pt-BR');
-  if (diff < 0)  return `${fmt} (${Math.abs(diff)}d atraso)`;
-  if (diff === 0) return `${fmt} (hoje)`;
-  if (diff <= 7)  return `${fmt} (${diff}d)`;
+  if(!data) return '—';
+  const d=new Date(data+'T00:00:00'), hoje=new Date(); hoje.setHours(0,0,0,0);
+  const diff=Math.ceil((d-hoje)/86400000), fmt=d.toLocaleDateString('pt-BR');
+  if(diff<0) return `${fmt} (${Math.abs(diff)}d atraso)`;
+  if(diff===0) return `${fmt} (hoje)`;
+  if(diff<=7) return `${fmt} (${diff}d)`;
   return fmt;
 }
 
-// ════════════════════════════════════════════════
-// BOTÃO DE ATUALIZAÇÃO INTELIGENTE (só dados do vendedor)
-// ════════════════════════════════════════════════
 async function refreshCurrentUserData() {
-  const btn = document.getElementById('btn-refresh-data');
-  if (btn) { btn.disabled = true; btn.innerHTML = '⏳ Atualizando…'; }
-
+  const btn=document.getElementById('btn-refresh-data');
+  if(btn){btn.disabled=true;btn.innerHTML='⏳ Atualizando…';}
   try {
-    if (!useSupabase || !sbClient) {
-      showToast('⚠ Sem conexão com Supabase', '#b45309');
-      return;
-    }
-
-    const access = getUserAccess();
-
-    if (access.canSeeAll) {
-      // ADM / Rodrigo — carrega TUDO com paginação completa
-      await loadFromSupabase();
-    } else {
-      // Vendedor — carrega só seus clientes com paginação
+    if(!useSupabase||!sbClient){showToast('⚠ Sem conexão com Supabase','#b45309');return;}
+    if(!currentUserProfile) currentUserProfile='adm';
+    if(getUserAccess().canSeeAll) { await loadFromSupabase(); }
+    else {
       markSyncing();
-      const vendorClients = getVendorClients(currentUserProfile);
-
-      for (const client of vendorClients) {
-        // Paginated load per client
-        const PAGE = 1000;
-        let page = 0, hasMore = true;
-        data[client] = [];
-        while (hasMore) {
-          const from = page * PAGE;
-          const to   = from + PAGE - 1;
-          const res  = await sbFetch('GET',
-            `?cliente=eq.${encodeURIComponent(client)}&select=*&order=ano.asc,mes.asc&offset=${from}&limit=${PAGE}`
-          );
-          if (!res.ok) break;
-          const rows = await res.json();
-          rows.forEach(r => {
-            const rec = rowToRec(r);
-            computeRecord(rec);
-            data[client].push(rec);
-          });
-          hasMore = rows.length === PAGE;
-          page++;
+      const vendorClients=getVendorClients(currentUserProfile);
+      for(const client of vendorClients){
+        const PAGE=1000; let page=0,hasMore=true; data[client]=[];
+        while(hasMore){
+          const res=await sbFetch('GET',`?cliente=eq.${encodeURIComponent(client)}&select=*&order=ano.asc,mes.asc&offset=${page*PAGE}&limit=${PAGE}`);
+          if(!res.ok) break;
+          const rows=await res.json();
+          rows.forEach(r=>{const rec=rowToRec(r);computeRecord(rec);data[client].push(rec);});
+          hasMore=rows.length===PAGE; page++;
         }
       }
-
-      saveLocal();
-      markSynced();
-      localStorage.setItem('ipartes_last_sync', new Date().toISOString());
+      saveLocal(); markSynced();
+      localStorage.setItem('ipartes_last_sync',new Date().toISOString());
       document.getElementById('cache-banner')?.remove();
-
-      if (currentSidebarNav === 'overview' || !currentSidebarNav) {
-        renderOverview();
-      } else {
-        sidebarNav(currentSidebarNav);
-      }
-      showToast(`✅ Dados atualizados — ${vendorClients.length} cliente(s)`, '#15803d');
+      if(!currentSidebarNav||currentSidebarNav==='overview') renderOverview();
+      else sidebarNav(currentSidebarNav);
     }
-
-  } catch(e) {
-    markSyncError(e.message);
-    showToast('✗ Erro ao atualizar: ' + e.message, '#dc2626');
-  } finally {
-    if (btn) {
-      btn.disabled = false;
-      btn.innerHTML = '✅ Atualizado';
-      btn.style.background = 'rgba(21,128,61,.3)';
-      setTimeout(() => {
-        btn.innerHTML = '🔄 Atualizar';
-        btn.style.background = 'rgba(255,255,255,.12)';
-      }, 3000);
-    }
-  }
+    showToast('✅ Dados atualizados!','#15803d');
+  } catch(e) { markSyncError(e.message); showToast('✗ Erro: '+e.message,'#dc2626'); }
+  finally { if(btn){btn.disabled=false;btn.innerHTML='✅ Atualizado';btn.style.background='rgba(21,128,61,.3)';setTimeout(()=>{btn.innerHTML='🔄 Atualizar';btn.style.background='rgba(255,255,255,.15)';},3000);} }
 }
 
-// ════════════════════════════════════════════════
-// ATUALIZAÇÃO AUTOMÁTICA — 9h e 13h
-// ════════════════════════════════════════════════
-function scheduleAutoRefresh() {
-  function msUntil(hour) {
-    const now  = new Date();
-    const next = new Date();
-    next.setHours(hour, 0, 0, 0);
-    if (next <= now) next.setDate(next.getDate() + 1);
-    return next - now;
-  }
-
-  // Schedule 9h refresh
-  setTimeout(async () => {
-    showToast('🔄 Atualização automática das 9h…', '#1d4ed8');
-    await refreshCurrentUserData();
-    // Reschedule for next day
-    setInterval(async () => {
-      showToast('🔄 Atualização automática das 9h…', '#1d4ed8');
-      await refreshCurrentUserData();
-    }, 24 * 60 * 60 * 1000);
-  }, msUntil(9));
-
-  // Schedule 13h refresh
-  setTimeout(async () => {
-    showToast('🔄 Atualização automática das 13h…', '#1d4ed8');
-    await refreshCurrentUserData();
-    setInterval(async () => {
-      showToast('🔄 Atualização automática das 13h…', '#1d4ed8');
-      await refreshCurrentUserData();
-    }, 24 * 60 * 60 * 1000);
-  }, msUntil(13));
-}
-
-// ════════════════════════════════════════════════
-// BACKUP AUTOMÁTICO DIÁRIO ÀS 19H
-// ════════════════════════════════════════════════
-function scheduleAutoBackup() {
-  function msUntil19h() {
-    const now  = new Date();
-    const next = new Date();
-    next.setHours(19, 0, 0, 0);
-    if (next <= now) next.setDate(next.getDate() + 1);
-    return next - now;
-  }
-
-  setTimeout(() => {
-    const lastBackup = localStorage.getItem('ipartes_last_backup');
-    const hoje = new Date().toISOString().slice(0,10);
-    if (lastBackup && lastBackup.startsWith(hoje)) return; // já fez hoje
-    showToast('💾 Realizando backup automático das 19h…', '#1d4ed8');
-    backupData();
-    // Reschedule for next day
-    setInterval(() => {
-      showToast('💾 Realizando backup automático das 19h…', '#1d4ed8');
-      backupData();
-    }, 24 * 60 * 60 * 1000);
-  }, msUntil19h());
-}
-
-// Override checkAutoBackup — só avisa se não fez hoje
-function checkAutoBackup() {
-  const last = localStorage.getItem('ipartes_last_backup');
-  if (!last) return;
-  const dias = Math.floor((Date.now() - new Date(last).getTime()) / 86400000);
-  if (dias >= 2) showToast('⚠ Último backup há '+dias+' dias. Backup automático às 19h.','#b45309');
-}
-
-
-// ════════════════════════════════════════════════
-// CACHE-FIRST LOADING
-// ════════════════════════════════════════════════
-
-// Called on login — shows cached data immediately with notice
 function showCacheNotice() {
-  // Data is already loaded from localStorage in init()
-  // Just show a subtle notice that data may not be current
-  const lastSync = localStorage.getItem('ipartes_last_sync');
-  const lastSyncText = lastSync
-    ? 'Última atualização: ' + new Date(lastSync).toLocaleString('pt-BR')
-    : 'Dados do cache local';
-
-  // Update sync indicator in footer
-  const syncEl = document.getElementById('syncStatus');
-  if (syncEl) syncEl.textContent = lastSyncText;
-
-  // Show update prompt in header refresh button
-  const btn = document.getElementById('btn-refresh-data');
-  if (btn) {
-    btn.innerHTML = '🔄 Atualizar dados';
-    btn.style.background = 'rgba(255,255,255,.15)';
-    btn.style.border = '1px solid rgba(255,255,255,.4)';
-    btn.title = lastSyncText;
-  }
-
-  // Show banner if cache is old (> 2 hours)
-  if (lastSync) {
-    const horasDesde = (Date.now() - new Date(lastSync).getTime()) / 3600000;
-    if (horasDesde > 2) {
-      showCacheBanner(Math.round(horasDesde));
-    }
-  } else {
-    // No cache at all — must load
-    showCacheBanner(null);
-  }
+  const lastSync=localStorage.getItem('ipartes_last_sync');
+  const btn=document.getElementById('btn-refresh-data');
+  if(btn){btn.innerHTML='🔄 Atualizar dados';btn.title=lastSync?'Última atualização: '+new Date(lastSync).toLocaleString('pt-BR'):'Dados do cache local';}
+  if(lastSync){const h=(Date.now()-new Date(lastSync).getTime())/3600000;if(h>2)showCacheBanner(Math.round(h));}
+  else showCacheBanner(null);
 }
 
 function showCacheBanner(horas) {
-  const existing = document.getElementById('cache-banner');
-  if (existing) existing.remove();
-
-  const banner = document.createElement('div');
-  banner.id = 'cache-banner';
-  banner.style.cssText = `
-    background: linear-gradient(135deg, #1e40af, #1d4ed8);
-    color: #fff;
-    padding: 10px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-family: var(--font);
-    font-size: 12px;
-    gap: 12px;
-    border-bottom: 1px solid rgba(255,255,255,.1);
-  `;
-
-  const msg = horas === null
-    ? '⚡ Nenhum dado em cache. Clique em <strong>Atualizar</strong> para carregar as oportunidades.'
-    : `⏱ Dados do cache (${horas}h atrás). Clique em <strong>Atualizar</strong> para buscar os dados mais recentes.`;
-
-  banner.innerHTML = `
-    <span>${msg}</span>
-    <div style="display:flex;gap:8px;align-items:center">
-      <button onclick="refreshCurrentUserData();document.getElementById('cache-banner')?.remove()"
-        style="background:#fff;color:#1d4ed8;border:none;border-radius:6px;
-               padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;
-               font-family:var(--font)">
-        🔄 Atualizar agora
-      </button>
-      <button onclick="document.getElementById('cache-banner')?.remove()"
-        style="background:transparent;border:1px solid rgba(255,255,255,.3);color:#fff;
-               border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer">
-        Usar cache
-      </button>
-    </div>`;
-
-  // Insert after header
-  const header = document.querySelector('.header');
-  if (header && header.nextSibling) {
-    header.parentNode.insertBefore(banner, header.nextSibling);
-  }
+  document.getElementById('cache-banner')?.remove();
+  const banner=document.createElement('div');
+  banner.id='cache-banner';
+  banner.style.cssText='background:linear-gradient(135deg,#1e40af,#1d4ed8);color:#fff;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;font-family:var(--font);font-size:12px;gap:12px;border-bottom:1px solid rgba(255,255,255,.1);';
+  const msg=horas===null?'⚡ Nenhum dado em cache. Clique em <strong>Atualizar</strong> para carregar.':`⏱ Dados do cache (${horas}h atrás). Clique em <strong>Atualizar</strong> para os dados mais recentes.`;
+  banner.innerHTML=`<span>${msg}</span><div style="display:flex;gap:8px">
+    <button onclick="refreshCurrentUserData();document.getElementById('cache-banner')?.remove()" style="background:#fff;color:#1d4ed8;border:none;border-radius:6px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)">🔄 Atualizar agora</button>
+    <button onclick="document.getElementById('cache-banner')?.remove()" style="background:transparent;border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:6px;padding:5px 10px;font-size:12px;cursor:pointer">Usar cache</button>
+  </div>`;
+  const header=document.querySelector('.header');
+  if(header&&header.nextSibling) header.parentNode.insertBefore(banner,header.nextSibling);
 }
 
+let _realtimeInterval=null;
+function startRealtimeSync() {
+  if(_realtimeInterval) return;
+  _realtimeInterval=setInterval(async()=>{
+    if(!useSupabase||!sbClient) return;
+    try {
+      const res=await sbFetch('GET','?select=id&limit=1&order=created_at.desc');
+      if(!res.ok) return;
+      const d=await res.json(); const hash=JSON.stringify(d);
+      if(window._lastSyncHash&&hash!==window._lastSyncHash){await loadFromSupabase();showToast('🔄 Dados atualizados por outro usuário','#1d4ed8');}
+      window._lastSyncHash=hash;
+    }catch(e){}
+  },60000);
+}
 
-
-function clearClientFilters(slug, client) {
-  ['cf-search','cf-status','cf-portal','cf-particip','cf-venda',
-   'cf-ano','cf-mes','cf-data-de','cf-data-ate','cf-fin-de','cf-fin-ate'].forEach(id => {
-    const el = document.getElementById(id+'-'+slug);
-    if (el) el.value = '';
+function clearClientFilters(slug,client) {
+  ['cf-search','cf-status','cf-portal','cf-particip','cf-venda','cf-ano','cf-mes',
+   'cf-data-de','cf-data-ate','cf-fin-de','cf-fin-ate'].forEach(id=>{
+    const el=document.getElementById(id+'-'+slug); if(el) el.value='';
   });
   renderClientTab(client);
 }
-
 function clearSelection(slug) {
-  document.querySelectorAll('#table-'+slug+' .row-select-cb').forEach(cb => cb.checked = false);
+  document.querySelectorAll('#table-'+slug+' .row-select-cb').forEach(cb=>cb.checked=false);
   updateBulkBar(slug);
 }
+
 
 // ════════════════════════════════════════════════
 // SYNC INDICATOR
@@ -6872,16 +6286,12 @@ async function init() {
   CLIENTS = getClients();
   buildClientTabs();
   renderNav();
-  // Apply access control then navigate
   applySidebarAccess();
   applyInitialNavigation();
   // Verifica regra de perdido no carregamento local
   setTimeout(() => aplicarRegraPerdido(), 2000);
-  // Notificações de prazo
   setTimeout(() => { checkPrazoNotifications(); checkAutoBackup(); }, 3000);
-  // Sincronização em tempo real
   setTimeout(() => startRealtimeSync(), 5000);
-  // Agendamentos automáticos
   scheduleAutoRefresh();
   scheduleAutoBackup();
   // Restore last sync time
@@ -6965,44 +6375,6 @@ try {
 
 
 
-
-<div id="module-rodrigo" style="display:none">
-  <div class="module-header"><div class="module-badge rodrigo">RO</div>
-    <div><div class="module-title">Módulo Rodrigo</div><div class="module-sub">Vale Ferrosos · Vale Metals · Suzano · Outros</div></div>
-  </div><div id="module-rodrigo-content"></div>
-</div>
-<div id="module-rodrigo-vendas" style="display:none">
-  <div class="module-header"><div class="module-badge rodrigo">RO</div>
-    <div><div class="module-title">Vendas — Rodrigo</div><div class="module-sub">Pedidos e entregas</div></div>
-  </div><div id="module-rodrigo-vendas-content"></div>
-</div>
-<div id="module-lenon" style="display:none">
-  <div class="module-header"><div class="module-badge lenon">LE</div>
-    <div><div class="module-title">Módulo Lenon</div><div class="module-sub">Petrobras · Eneva · Transpetro · Engie · TBG</div></div>
-  </div><div id="module-lenon-content"></div>
-</div>
-<div id="module-lenon-vendas" style="display:none">
-  <div class="module-header"><div class="module-badge lenon">LE</div>
-    <div><div class="module-title">Vendas — Lenon</div><div class="module-sub">Pedidos e entregas</div></div>
-  </div><div id="module-lenon-vendas-content"></div>
-</div>
-<div id="module-luiz" style="display:none">
-  <div class="module-header"><div class="module-badge luiz">LU</div>
-    <div><div class="module-title">Módulo Luiz</div><div class="module-sub">Clientes atribuídos</div></div>
-  </div><div id="module-luiz-content"></div>
-</div>
-<div id="module-luiz-vendas" style="display:none">
-  <div class="module-header"><div class="module-badge luiz">LU</div>
-    <div><div class="module-title">Vendas — Luiz</div><div class="module-sub">Pedidos e entregas</div></div>
-  </div><div id="module-luiz-vendas-content"></div>
-</div>
-
-</div><!-- /main-content -->
-</div><!-- /app-layout -->
-
-</div><!-- /main-content -->
-</div><!-- /app-layout -->
-
 <!-- ── FOOTER ── -->
 <footer id="appFooter" style="
   background:#f8fafc;
@@ -7023,15 +6395,7 @@ try {
       <span id="syncTime"></span>
     </div>
   </div>
-  <div style="display:flex;gap:8px;align-items:center">
-  <button onclick="showHistoryModal()" style="background:transparent;border:1px solid #e2e8f0;color:#94a3b8;font-family:'Inter',sans-serif;font-size:11px;padding:4px 10px;border-radius:6px;cursor:pointer">
-    📋 Histórico
-  </button>
-  <button onclick="backupData()" style="background:transparent;border:1px solid #e2e8f0;color:#94a3b8;font-family:'Inter',sans-serif;font-size:11px;padding:4px 10px;border-radius:6px;cursor:pointer">
-    💾 Backup
-  </button>
-</div>
-<button onclick="openDbConfig()" style="
+  <button onclick="openDbConfig()" style="
     background:transparent;
     border:1px solid #e2e8f0;
     color:#94a3b8;
@@ -7165,6 +6529,40 @@ CREATE POLICY "Allow authenticated" ON mro_oportunidades
     </div>
   </div>
 </div>
+
+
+<div id="module-rodrigo" style="display:none">
+  <div class="module-header"><div class="module-badge rodrigo">RO</div>
+    <div><div class="module-title">Módulo Rodrigo</div><div class="module-sub">Vale Ferrosos · Vale Metals · Suzano · Outros</div></div>
+  </div><div id="module-rodrigo-content"></div>
+</div>
+<div id="module-rodrigo-vendas" style="display:none">
+  <div class="module-header"><div class="module-badge rodrigo">RO</div>
+    <div><div class="module-title">Vendas — Rodrigo</div><div class="module-sub">Pedidos e entregas</div></div>
+  </div><div id="module-rodrigo-vendas-content"></div>
+</div>
+<div id="module-lenon" style="display:none">
+  <div class="module-header"><div class="module-badge lenon">LE</div>
+    <div><div class="module-title">Módulo Lenon</div><div class="module-sub">Petrobras · Eneva · Transpetro · Engie · TBG</div></div>
+  </div><div id="module-lenon-content"></div>
+</div>
+<div id="module-lenon-vendas" style="display:none">
+  <div class="module-header"><div class="module-badge lenon">LE</div>
+    <div><div class="module-title">Vendas — Lenon</div><div class="module-sub">Pedidos e entregas</div></div>
+  </div><div id="module-lenon-vendas-content"></div>
+</div>
+<div id="module-luiz" style="display:none">
+  <div class="module-header"><div class="module-badge luiz">LU</div>
+    <div><div class="module-title">Módulo Luiz</div><div class="module-sub">Clientes atribuídos</div></div>
+  </div><div id="module-luiz-content"></div>
+</div>
+<div id="module-luiz-vendas" style="display:none">
+  <div class="module-header"><div class="module-badge luiz">LU</div>
+    <div><div class="module-title">Vendas — Luiz</div><div class="module-sub">Pedidos e entregas</div></div>
+  </div><div id="module-luiz-vendas-content"></div>
+</div>
+</div><!-- /main-content -->
+</div><!-- /app-layout -->
 
 <!-- PDF REPORT (hidden, shown on print) -->
 <div id="pdfReport" style="display:none"></div>
